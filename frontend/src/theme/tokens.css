@@ -41,17 +41,36 @@
   --aq-c-orange-500: #f1682c;
   --aq-c-orange-600: #d9541b;
 
-  /* Air-quality status hues. Identical in both themes: a category's colour is
-     part of its meaning, so it must not shift with the theme. Only the
-     text-on-dark variants below are lightened, for contrast. */
+  /* Air-quality status hues, as sampled from the mockups. These are the
+     *graphic* values: map markers, legend dots, sparklines and chart series.
+     Identical in both themes, because a category's colour is part of its
+     meaning and must not shift with the theme. WCAG 1.4.11 asks 3:1 of
+     graphics, which these meet against the surfaces they sit on. */
   --aq-c-good: #5ca56c;
-  --aq-c-good-light: #6cba7d;
   --aq-c-moderate: #e0a93a;
-  --aq-c-moderate-light: #eab94f;
   --aq-c-elevated: #f1682c;
-  --aq-c-elevated-light: #f57f4a;
   --aq-c-unhealthy: #d6463a;
-  --aq-c-unhealthy-light: #e36658;
+
+  /* The same hues taken to a text weight.
+     The mockup's palette is beautiful and fails WCAG AA for small text — amber
+     #e0a93a on white is 2.1:1 where 4.5:1 is required, and an operator
+     dashboard that cannot be read in a bright control room is a worse failure
+     than a small deviation from a comp. These are the minimum darkenings that
+     clear 4.5:1 on every background they are used against; hue and saturation
+     are preserved, so the family still reads as the same palette. */
+  --aq-c-good-text: #41764d;
+  --aq-c-moderate-text: #8b6416;
+  --aq-c-elevated-text: #b8400c;
+  --aq-c-unhealthy-text: #ba3227;
+  --aq-c-accent-text: #c3440d;
+  --aq-c-subtle-text: #746e67;
+
+  /* Lightened for text on the dark theme's near-black surfaces. */
+  --aq-c-good-light: #6cba7d;
+  --aq-c-moderate-light: #eab94f;
+  --aq-c-elevated-light: #f26f35;
+  --aq-c-unhealthy-light: #e67568;
+  --aq-c-subtle-light: #9a968c;
 
   /* Soft status tints, used as chip backgrounds in both themes. */
   --aq-c-tint-good: #e3f0e5;
@@ -75,36 +94,47 @@
 
   --aq-ink: var(--aq-c-ink);
   --aq-ink-muted: var(--aq-c-neutral-600);
-  --aq-ink-subtle: var(--aq-c-neutral-400);
+  --aq-ink-subtle: var(--aq-c-subtle-text);
   --aq-ink-inverse: var(--aq-c-paper);
 
+  /* `--aq-accent` paints surfaces and borders; `--aq-accent-text` is for the
+     accent used as type, where the contrast floor is higher. */
   --aq-accent: var(--aq-c-orange-500);
+  --aq-accent-text: var(--aq-c-accent-text);
   --aq-accent-hover: var(--aq-c-orange-600);
   --aq-accent-contrast: var(--aq-c-neutral-0);
   --aq-focus-ring: color-mix(in srgb, var(--aq-accent) 45%, transparent);
 
-  /* Status: `-fg` is text/marker colour, `-bg` the chip behind it. */
-  --aq-status-good-fg: var(--aq-c-good);
-  --aq-status-good-bg: var(--aq-c-tint-good);
-  --aq-status-moderate-fg: var(--aq-c-moderate);
-  --aq-status-moderate-bg: var(--aq-c-tint-moderate);
-  --aq-status-elevated-fg: var(--aq-c-elevated);
-  --aq-status-elevated-bg: var(--aq-c-tint-elevated);
-  --aq-status-unhealthy-fg: var(--aq-c-unhealthy);
-  --aq-status-unhealthy-bg: var(--aq-c-tint-unhealthy);
+  /* Status as *text* on a page surface — table figures, watchlist readings. */
+  --aq-status-good-fg: var(--aq-c-good-text);
+  --aq-status-moderate-fg: var(--aq-c-moderate-text);
+  --aq-status-elevated-fg: var(--aq-c-elevated-text);
+  --aq-status-unhealthy-fg: var(--aq-c-unhealthy-text);
+
+  /* Status chips. The tinted background stays light in both themes — the
+     mockup renders them as labels rather than surfaces — so the pair is
+     defined once here and deliberately NOT re-pointed in the dark block. */
+  --aq-chip-good-fg: var(--aq-c-good-text);
+  --aq-chip-good-bg: var(--aq-c-tint-good);
+  --aq-chip-moderate-fg: var(--aq-c-moderate-text);
+  --aq-chip-moderate-bg: var(--aq-c-tint-moderate);
+  --aq-chip-elevated-fg: var(--aq-c-elevated-text);
+  --aq-chip-elevated-bg: var(--aq-c-tint-elevated);
+  --aq-chip-unhealthy-fg: var(--aq-c-unhealthy-text);
+  --aq-chip-unhealthy-bg: var(--aq-c-tint-unhealthy);
 
   /* Connection states reuse the status hues: HQ reads as good, poor as bad,
      offline as absent. One vocabulary, so a colour never means two things. */
-  --aq-link-hq: var(--aq-c-good);
-  --aq-link-poor: var(--aq-c-unhealthy);
-  --aq-link-offline: var(--aq-c-neutral-400);
+  --aq-link-hq: var(--aq-c-good-text);
+  --aq-link-poor: var(--aq-c-unhealthy-text);
+  --aq-link-offline: var(--aq-c-subtle-text);
 
   /* Trend badges: colour encodes better/worse, not the sign of the number. */
-  --aq-trend-good-fg: var(--aq-c-good);
+  --aq-trend-good-fg: var(--aq-c-good-text);
   --aq-trend-good-bg: var(--aq-c-tint-good);
-  --aq-trend-bad-fg: var(--aq-c-unhealthy);
+  --aq-trend-bad-fg: var(--aq-c-unhealthy-text);
   --aq-trend-bad-bg: var(--aq-c-tint-unhealthy);
-  --aq-trend-flat-fg: var(--aq-c-neutral-600);
+  --aq-trend-flat-fg: var(--aq-c-subtle-text);
   --aq-trend-flat-bg: var(--aq-c-neutral-50);
 
   /* Data visualisation. */
@@ -173,27 +203,29 @@
 
   --aq-ink: var(--aq-c-paper);
   --aq-ink-muted: #b4afa5;
-  --aq-ink-subtle: var(--aq-c-neutral-500);
+  --aq-ink-subtle: var(--aq-c-subtle-light);
   --aq-ink-inverse: var(--aq-c-ink);
 
   --aq-accent-contrast: var(--aq-c-neutral-950);
+  --aq-accent-text: var(--aq-c-elevated-light);
 
-  /* Markers and chips keep the shared hues; text-weight uses the lightened
-     variants so it clears contrast on the near-black surface. */
+  /* Status text lightens against the near-black surface. The chip tokens are
+     absent here on purpose: those chips keep their light backgrounds, so their
+     dark text stays exactly as the light theme defines it. */
   --aq-status-good-fg: var(--aq-c-good-light);
   --aq-status-moderate-fg: var(--aq-c-moderate-light);
-  --aq-status-elevated-fg: var(--aq-c-elevated);
+  --aq-status-elevated-fg: var(--aq-c-elevated-light);
   --aq-status-unhealthy-fg: var(--aq-c-unhealthy-light);
 
   --aq-link-hq: var(--aq-c-good-light);
   --aq-link-poor: var(--aq-c-unhealthy-light);
-  --aq-link-offline: var(--aq-c-neutral-500);
+  --aq-link-offline: var(--aq-c-subtle-light);
 
   --aq-trend-good-fg: var(--aq-c-good-light);
   --aq-trend-good-bg: var(--aq-c-tint-good-dark);
   --aq-trend-bad-fg: var(--aq-c-unhealthy-light);
   --aq-trend-bad-bg: var(--aq-c-tint-unhealthy-dark);
-  --aq-trend-flat-fg: var(--aq-c-neutral-500);
+  --aq-trend-flat-fg: var(--aq-c-subtle-light);
   --aq-trend-flat-bg: var(--aq-c-neutral-800);
 
   --aq-viz-pm10: var(--aq-c-neutral-700);

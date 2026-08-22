@@ -38,23 +38,23 @@ const label = computed(() => (props.category ? AQI_LABELS[props.category] : 'No 
 }
 
 .badge--good {
-  color: var(--aq-c-good);
-  background: var(--aq-status-good-bg);
+  color: var(--aq-chip-good-fg);
+  background: var(--aq-chip-good-bg);
 }
 
 .badge--moderate {
-  color: var(--aq-c-moderate);
-  background: var(--aq-status-moderate-bg);
+  color: var(--aq-chip-moderate-fg);
+  background: var(--aq-chip-moderate-bg);
 }
 
 .badge--elevated {
-  color: var(--aq-c-elevated);
-  background: var(--aq-status-elevated-bg);
+  color: var(--aq-chip-elevated-fg);
+  background: var(--aq-chip-elevated-bg);
 }
 
 .badge--unhealthy {
-  color: var(--aq-c-unhealthy);
-  background: var(--aq-status-unhealthy-bg);
+  color: var(--aq-chip-unhealthy-fg);
+  background: var(--aq-chip-unhealthy-bg);
 }
 
 .badge--none {
@@ -62,7 +62,8 @@ const label = computed(() => (props.category ? AQI_LABELS[props.category] : 'No 
   background: var(--aq-surface-sunken);
 }
 
-/* The tinted chips keep their light backgrounds in dark mode — they read as
-   labels rather than surfaces, and the mockup shows them that way — so the
-   text colour stays the dark-on-tint variant regardless of theme. */
+/* The chips keep their light backgrounds in dark mode — they read as labels
+   rather than surfaces, and the mockup shows them that way. Their token pair is
+   therefore defined once in tokens.css and never re-pointed, which is what
+   keeps the text/background contrast valid in both themes. */
 </style>

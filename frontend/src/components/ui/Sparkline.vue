@@ -78,6 +78,9 @@ const geometry = computed(() => {
 </template>
 
 <style scoped>
+/* Colours come from the graphic primitives, not the text tokens: a sparkline
+   is a graphic (WCAG 1.4.11 asks 3:1, not 4.5:1), and keeping the vivid hue is
+   what makes a row scannable at a glance. */
 .spark {
   width: 100%;
   height: 32px;
@@ -86,19 +89,19 @@ const geometry = computed(() => {
 }
 
 .spark--good {
-  color: var(--aq-status-good-fg);
+  color: var(--aq-c-good);
 }
 
 .spark--moderate {
-  color: var(--aq-status-moderate-fg);
+  color: var(--aq-c-moderate);
 }
 
 .spark--elevated {
-  color: var(--aq-status-elevated-fg);
+  color: var(--aq-c-elevated);
 }
 
 .spark--unhealthy {
-  color: var(--aq-status-unhealthy-fg);
+  color: var(--aq-c-unhealthy);
 }
 
 .spark__line {

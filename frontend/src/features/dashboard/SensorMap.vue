@@ -131,7 +131,16 @@ watch(
     </template>
 
     <div class="map">
-      <div ref="container" class="map__canvas" role="application" aria-label="Sensor map" />
+      <!-- `region`, not `application`: `application` hands keystrokes to the widget
+           and traps a screen reader's virtual cursor, which would be a bad trade
+           for a map whose stations are all reachable from the watchlist and the
+           sensor table. -->
+      <div
+        ref="container"
+        class="map__canvas"
+        role="region"
+        aria-label="Sensor map — station markers coloured by air quality index"
+      />
 
       <div class="map__legend">
         <p class="map__legend-title">Air Quality Index</p>
