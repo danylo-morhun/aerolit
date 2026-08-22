@@ -112,9 +112,7 @@ describe('Dashboard', () => {
     await waitFor(() => expect(screen.getByText('Pankow')).toBeInTheDocument());
     await user.type(screen.getByRole('searchbox'), 'zzzz');
 
-    await waitFor(() =>
-      expect(screen.getByRole('status')).toHaveTextContent(/No station matches/),
-    );
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent(/No station matches/));
   });
 
   it('distinguishes "nothing tracked" from "search hid them"', async () => {
@@ -126,7 +124,9 @@ describe('Dashboard', () => {
     await user.type(screen.getByRole('searchbox'), 'zzzz');
 
     await waitFor(() =>
-      expect(screen.getByText('No tracked station matches the current search.')).toBeInTheDocument(),
+      expect(
+        screen.getByText('No tracked station matches the current search.'),
+      ).toBeInTheDocument(),
     );
     expect(screen.queryByText(/Star a station in the sensor list/)).not.toBeInTheDocument();
   });

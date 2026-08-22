@@ -1,4 +1,11 @@
 dist
 coverage
 node_modules
+
+# Given by the assignment — preserved verbatim, never reformatted.
 mock-data
+README.md
+
+# Playwright run artefacts
+test-results
+playwright-report

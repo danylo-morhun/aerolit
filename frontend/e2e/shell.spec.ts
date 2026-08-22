@@ -19,7 +19,9 @@ test('each page has its own URL and the tabs navigate between them', async ({ pa
 
   await page.goBack();
   await expect(page).toHaveURL(/\/dashboard$/);
-  await expect(page.getByRole('heading', { name: 'Berlin · Particulate Monitoring' })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Berlin · Particulate Monitoring' }),
+  ).toBeVisible();
 });
 
 test('a deep link opens the page directly', async ({ page }) => {

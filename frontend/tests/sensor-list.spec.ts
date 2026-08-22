@@ -136,9 +136,10 @@ describe('Sensor List', () => {
     await user.click(screen.getByRole('button', { name: 'Track Pankow BLN-0002' }));
 
     expect(JSON.parse(localStorage.getItem(WATCHLIST_STORAGE_KEY)!)).toEqual(['BLN-0002']);
-    expect(
-      screen.getByRole('button', { name: 'Stop tracking Pankow BLN-0002' }),
-    ).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: 'Stop tracking Pankow BLN-0002' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
   });
 
   it('untracks a station that is already on the watchlist', async () => {

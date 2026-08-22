@@ -18,7 +18,10 @@ test('rolls the real 240-station network up into the KPI row', async ({ page }) 
   await expect(active.getByText('223', { exact: true })).toBeVisible({ timeout: 30_000 });
   await expect(page.getByText('Avg PM2.5 · Moderate')).toBeVisible();
   await expect(
-    page.getByRole('article').filter({ hasText: 'Poor Connection' }).getByText('17', { exact: true }),
+    page
+      .getByRole('article')
+      .filter({ hasText: 'Poor Connection' })
+      .getByText('17', { exact: true }),
   ).toBeVisible();
 });
 
@@ -35,9 +38,7 @@ test('renders the OpenStreetMap layer with one marker per station', async ({ pag
   await expect(page.locator('.leaflet-tile-loaded').first()).toBeVisible();
 
   // Markers are drawn once readings land; 240 stations, one circle each.
-  await expect
-    .poll(() => page.locator('path.marker').count(), { timeout: 30_000 })
-    .toBe(240);
+  await expect.poll(() => page.locator('path.marker').count(), { timeout: 30_000 }).toBe(240);
 
   await expect(page.getByText('Air Quality Index')).toBeVisible();
 });
@@ -79,7 +80,9 @@ test('the header search narrows the map and the watchlist together', async ({ pa
   await page.getByRole('searchbox').fill('pankow');
 
   await expect.poll(() => page.locator('path.marker').count()).toBe(20);
-  await expect(page.getByRole('list', { name: 'Tracked stations' }).getByText('Mitte')).toHaveCount(0);
+  await expect(page.getByRole('list', { name: 'Tracked stations' }).getByText('Mitte')).toHaveCount(
+    0,
+  );
 });
 
 test('a search matching nothing says so instead of showing a blank map', async ({ page }) => {
