@@ -87,7 +87,6 @@
   --aq-page: var(--aq-c-neutral-150);
   --aq-surface: var(--aq-c-neutral-0);
   --aq-surface-sunken: var(--aq-c-neutral-50);
-  --aq-surface-raised: var(--aq-c-neutral-0);
   --aq-surface-input: var(--aq-c-neutral-0);
   --aq-border: var(--aq-c-neutral-100);
   --aq-border-strong: var(--aq-c-neutral-200);
@@ -95,7 +94,6 @@
   --aq-ink: var(--aq-c-ink);
   --aq-ink-muted: var(--aq-c-neutral-600);
   --aq-ink-subtle: var(--aq-c-subtle-text);
-  --aq-ink-inverse: var(--aq-c-paper);
 
   /* `--aq-accent` paints surfaces and borders; `--aq-accent-text` is for the
      accent used as type, where the contrast floor is higher. */
@@ -103,7 +101,6 @@
   --aq-accent-text: var(--aq-c-accent-text);
   --aq-accent-hover: var(--aq-c-orange-600);
   --aq-accent-contrast: var(--aq-c-neutral-0);
-  --aq-focus-ring: color-mix(in srgb, var(--aq-accent) 45%, transparent);
 
   /* Status as *text* on a page surface — table figures, watchlist readings. */
   --aq-status-good-fg: var(--aq-c-good-text);
@@ -145,9 +142,6 @@
   /* Light enough that the bars behind it stay readable — the line is the
      figure, the wash only anchors it to the axis. */
   --aq-viz-area-from: color-mix(in srgb, var(--aq-c-orange-500) 13%, transparent);
-
-  /* Map basemap: CARTO raster tiles, swapped with the theme. */
-  --aq-map-tiles: 'light_all';
 
   --aq-shadow-card: 0 1px 2px rgb(28 27 25 / 4%), 0 1px 3px rgb(28 27 25 / 3%);
   --aq-shadow-pop: 0 4px 16px rgb(28 27 25 / 10%);
@@ -196,7 +190,6 @@
   --aq-page: var(--aq-c-neutral-950);
   --aq-surface: var(--aq-c-neutral-900);
   --aq-surface-sunken: var(--aq-c-neutral-950);
-  --aq-surface-raised: var(--aq-c-neutral-800);
   --aq-surface-input: var(--aq-c-neutral-800);
   --aq-border: var(--aq-c-neutral-850);
   --aq-border-strong: var(--aq-c-neutral-700);
@@ -204,7 +197,6 @@
   --aq-ink: var(--aq-c-paper);
   --aq-ink-muted: #b4afa5;
   --aq-ink-subtle: var(--aq-c-subtle-light);
-  --aq-ink-inverse: var(--aq-c-ink);
 
   --aq-accent-contrast: var(--aq-c-neutral-950);
   --aq-accent-text: var(--aq-c-elevated-light);
@@ -231,8 +223,6 @@
   --aq-viz-pm10: var(--aq-c-neutral-700);
   --aq-viz-grid: var(--aq-c-neutral-900);
   --aq-viz-axis: var(--aq-c-neutral-500);
-
-  --aq-map-tiles: 'dark_all';
 
   --aq-shadow-card: 0 1px 2px rgb(0 0 0 / 40%);
   --aq-shadow-pop: 0 4px 16px rgb(0 0 0 / 50%);
