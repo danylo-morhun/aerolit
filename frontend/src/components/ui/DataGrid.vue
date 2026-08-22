@@ -8,6 +8,12 @@ export interface GridColumn<K extends string> {
   key: K;
   label: string;
   sortable?: boolean;
+  /**
+   * Hides the header text visually but keeps it for assistive tech — for a
+   * column whose meaning is carried by its control (the watch star), where a
+   * blank `<th>` would leave screen-reader users with an unnamed column.
+   */
+  labelHidden?: boolean;
 }
 
 const props = defineProps<{
@@ -62,7 +68,11 @@ function sortIcon(key: Key): string {
       }"
     >
       <template #header>
-        <span v-if="column.sortable === false" class="grid__label">{{ column.label }}</span>
+        <span
+          v-if="column.sortable === false"
+          :class="column.labelHidden ? 'sr-only' : 'grid__label'"
+          >{{ column.label }}</span
+        >
         <button v-else type="button" class="grid__sort" @click="emit('sort', column.key)">
           {{ column.label }}
           <i :class="[sortIcon(column.key), 'grid__sort-icon']" aria-hidden="true" />

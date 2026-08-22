@@ -39,7 +39,7 @@ const emit = defineEmits<{
 
 /** `watch` is not sortable: it reflects a local preference, not station data. */
 const COLUMNS: GridColumn<SortKey | 'watch'>[] = [
-  { key: 'watch', label: '', sortable: false },
+  { key: 'watch', label: 'Tracked', sortable: false, labelHidden: true },
   { key: 'id', label: 'ID' },
   { key: 'district', label: 'District' },
   { key: 'location', label: 'Neighborhood' },
