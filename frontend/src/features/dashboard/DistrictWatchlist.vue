@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 
 import AppCard from '@/components/ui/AppCard.vue';
 import AqiBadge from '@/components/ui/AqiBadge.vue';
@@ -42,6 +42,25 @@ const rows = computed(() =>
     metrics: props.metricsByStation.get(station.id) ?? null,
   })),
 );
+
+const list = ref<HTMLElement | null>(null);
+
+/**
+ * Keeps the selected row visible when the selection came from somewhere else.
+ *
+ * The panel scrolls once enough stations are tracked, so a marker clicked on
+ * the map could otherwise highlight a row that is out of view.
+ */
+watch(
+  () => props.selectedId,
+  async (id) => {
+    if (id === null) return;
+    await nextTick();
+    list.value
+      ?.querySelector(`[data-station="${CSS.escape(id)}"]`)
+      ?.scrollIntoView({ block: 'nearest' });
+  },
+);
 </script>
 
 <template>
@@ -59,10 +78,11 @@ const rows = computed(() =>
       compact
     />
 
-    <ul v-else class="watchlist" aria-label="Tracked stations">
+    <ul v-else ref="list" class="watchlist" aria-label="Tracked stations">
       <li
         v-for="{ station, metrics } in rows"
         :key="station.id"
+        :data-station="station.id"
         :class="['watchlist__item', { 'watchlist__item--selected': station.id === selectedId }]"
       >
         <!-- The row is the button: selecting a station is the row's whole
@@ -136,6 +156,14 @@ const rows = computed(() =>
   padding: 0;
   margin: 0;
   list-style: none;
+  /* Tracking eight stations must not decide the height of the dashboard: past
+     roughly four rows the panel scrolls inside itself, so the map keeps its
+     size and the chart stays where the operator left it. `contain` stops that
+     scroll chaining into the page once the list bottoms out. */
+  max-height: min(56vh, 560px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
 }
 
 /* Between the tablet breakpoint and the desktop split, the panel spans the full
