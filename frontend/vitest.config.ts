@@ -14,7 +14,9 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./tests/setup.ts'],
+    // `e2e/` is Playwright's; Vitest would try to run it and fail on its imports.
     include: ['src/**/*.spec.ts', 'tests/**/*.spec.ts'],
+    exclude: ['e2e/**', 'node_modules/**'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html'],
