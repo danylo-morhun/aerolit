@@ -125,6 +125,27 @@ export const AerolitPreset = definePreset(Aura, {
    * style block, and there is one place to change when the row rhythm changes.
    */
   components: {
+    /**
+     * PrimeVue renders a ToggleButton as a button wrapping a
+     * `.p-togglebutton-content` span, and Aura styles *both*: the selected
+     * button gets a background, and so does the span inside it — with a
+     * different radius and a shadow of its own. Two nested plates read as a
+     * double outline. The content layer is flattened here so the pill the
+     * segmented control draws is the only one visible.
+     */
+    togglebutton: {
+      content: {
+        borderRadius: 'var(--aq-radius-pill)',
+        checkedShadow: 'none',
+      },
+      // The colour half lives under `colorScheme`, which is where Aura declares
+      // it; setting it alongside the shape tokens above silently does nothing.
+      colorScheme: {
+        light: { content: { checkedBackground: 'transparent' } },
+        dark: { content: { checkedBackground: 'transparent' } },
+      },
+    },
+
     datatable: {
       headerCell: {
         background: 'var(--aq-surface)',
