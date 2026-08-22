@@ -104,6 +104,33 @@ describe('Dashboard', () => {
     expect(screen.getByText('Mitte')).toBeInTheDocument();
   });
 
+  it('says so when a search matches no station', async () => {
+    trackAll();
+    const user = userEvent.setup();
+    renderWithApp(DashboardPage);
+
+    await waitFor(() => expect(screen.getByText('Pankow')).toBeInTheDocument());
+    await user.type(screen.getByRole('searchbox'), 'zzzz');
+
+    await waitFor(() =>
+      expect(screen.getByRole('status')).toHaveTextContent(/No station matches/),
+    );
+  });
+
+  it('distinguishes "nothing tracked" from "search hid them"', async () => {
+    trackAll();
+    const user = userEvent.setup();
+    renderWithApp(DashboardPage);
+
+    await waitFor(() => expect(screen.getByText('Pankow')).toBeInTheDocument());
+    await user.type(screen.getByRole('searchbox'), 'zzzz');
+
+    await waitFor(() =>
+      expect(screen.getByText('No tracked station matches the current search.')).toBeInTheDocument(),
+    );
+    expect(screen.queryByText(/Star a station in the sensor list/)).not.toBeInTheDocument();
+  });
+
   it('explains itself when the API is unreachable', async () => {
     server.use(...failingHandlers);
     renderWithApp(DashboardPage);

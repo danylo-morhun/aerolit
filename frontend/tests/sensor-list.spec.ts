@@ -3,13 +3,17 @@ import userEvent from '@testing-library/user-event';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 
 import SensorListPage from '@/pages/SensorListPage.vue';
+import { MAX_WATCHLIST, WATCHLIST_STORAGE_KEY } from '@/stores/watchlist';
 
 import { failingHandlers } from './msw/handlers';
 import { server } from './msw/server';
 import { renderWithApp } from './render';
 
 beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
-afterEach(() => server.resetHandlers());
+afterEach(() => {
+  server.resetHandlers();
+  localStorage.clear();
+});
 afterAll(() => server.close());
 
 const table = () => screen.getByRole('table');
@@ -119,6 +123,46 @@ describe('Sensor List', () => {
         .map((row) => row.querySelector('.aq-mono')?.textContent);
       expect(ids).toEqual(['BLN-0001', 'BLN-0003', 'BLN-0002']);
     });
+  });
+
+  it('lets an operator track a station from the list', async () => {
+    // Closes the loop the watchlist's own empty state promises: it tells the
+    // operator to star a station here, so the control has to exist here.
+    localStorage.setItem(WATCHLIST_STORAGE_KEY, JSON.stringify([]));
+    const user = userEvent.setup();
+    renderWithApp(SensorListPage);
+    await rowsWithReadings();
+
+    await user.click(screen.getByRole('button', { name: 'Track Pankow BLN-0002' }));
+
+    expect(JSON.parse(localStorage.getItem(WATCHLIST_STORAGE_KEY)!)).toEqual(['BLN-0002']);
+    expect(
+      screen.getByRole('button', { name: 'Stop tracking Pankow BLN-0002' }),
+    ).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  it('untracks a station that is already on the watchlist', async () => {
+    localStorage.setItem(WATCHLIST_STORAGE_KEY, JSON.stringify(['BLN-0001']));
+    const user = userEvent.setup();
+    renderWithApp(SensorListPage);
+    await rowsWithReadings();
+
+    await user.click(screen.getByRole('button', { name: 'Stop tracking Mitte BLN-0001' }));
+
+    expect(JSON.parse(localStorage.getItem(WATCHLIST_STORAGE_KEY)!)).toEqual([]);
+  });
+
+  it('blocks adding past the watchlist limit and says why', async () => {
+    const full = Array.from({ length: MAX_WATCHLIST }, (_, i) => `OTHER-${i}`);
+    localStorage.setItem(WATCHLIST_STORAGE_KEY, JSON.stringify(full));
+    renderWithApp(SensorListPage);
+    await rowsWithReadings();
+
+    // Every row is blocked, and each one explains why rather than just
+    // going inert.
+    const blocked = screen.getAllByRole('button', { name: /Watchlist is full/ });
+    expect(blocked).toHaveLength(3);
+    for (const star of blocked) expect(star).toBeDisabled();
   });
 
   it('offers a retry when the API is down', async () => {
