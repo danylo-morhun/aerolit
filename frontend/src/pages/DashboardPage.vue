@@ -45,6 +45,10 @@ const watchlistStations = computed(() => {
   return visibleStations.value.filter((station) => tracked.has(station.id));
 });
 
+const noMatches = computed(
+  () => !isLoading.value && query.value.trim() !== '' && visibleStations.value.length === 0,
+);
+
 const selectedStation = computed(() =>
   selection.stationId === null ? null : (view.value.stationsById.get(selection.stationId) ?? null),
 );
@@ -81,6 +85,14 @@ watch(
   <template v-else>
     <KpiRow :kpis="view.kpis" :reference="view.referenceKpis" :loading="isLoading" />
 
+    <!-- The KPIs stay: they describe the whole network and are not filtered.
+         What follows them is, so an empty result needs saying out loud rather
+         than leaving a blank map. -->
+    <p v-if="noMatches" class="dashboard__no-matches" role="status">
+      No station matches “{{ query.trim() }}”. The map and watchlist below are empty until the
+      search is cleared.
+    </p>
+
     <div class="dashboard__split">
       <SensorMap
         v-model:pollutant="selection.pollutant"
@@ -94,6 +106,7 @@ watch(
         :metrics-by-station="view.metricsByStation"
         :selected-id="selection.stationId"
         :loading="isLoading"
+        :filtered="query.trim() !== ''"
         @select="selection.select($event)"
         @unwatch="watchlist.toggle($event)"
       />
@@ -110,6 +123,15 @@ watch(
 </template>
 
 <style scoped>
+.dashboard__no-matches {
+  padding: var(--aq-space-4) var(--aq-space-5);
+  font-size: var(--aq-text-sm);
+  color: var(--aq-ink-muted);
+  background: var(--aq-surface);
+  border: 1px solid var(--aq-border);
+  border-radius: var(--aq-radius-lg);
+}
+
 .dashboard__split {
   display: grid;
   grid-template-columns: minmax(0, 1.9fr) minmax(340px, 1fr);
