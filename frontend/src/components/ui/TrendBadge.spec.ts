@@ -5,13 +5,15 @@ import TrendBadge from './TrendBadge.vue';
 
 describe('TrendBadge', () => {
   it('shows an improvement arrow for a fall in a lower-is-better KPI', () => {
-    // The mockup pairs "−2.4" with ↗: falling PM2.5 is good news. The arrow
+    // The mockup pairs "−2.4" with an up-right arrow: falling PM2.5 is good
+    // news, and the glyph is an icon rather than a character so it renders at
+    // the size it was set in. The arrow
     // encodes the interpretation, the signed number the magnitude.
     const { container } = render(TrendBadge, {
       props: { delta: -2.4, higherIsBetter: false },
     });
 
-    expect(container.textContent).toContain('↗');
+    expect(container.querySelector('.pi-arrow-up-right')).not.toBeNull();
     expect(container.textContent).toContain('−2.4');
     expect(container.querySelector('.trend--good')).not.toBeNull();
   });
@@ -21,7 +23,7 @@ describe('TrendBadge', () => {
       props: { delta: 16, higherIsBetter: false, fractionDigits: 0 },
     });
 
-    expect(container.textContent).toContain('↙');
+    expect(container.querySelector('.pi-arrow-down-left')).not.toBeNull();
     expect(container.textContent).toContain('+16');
     expect(container.querySelector('.trend--bad')).not.toBeNull();
   });

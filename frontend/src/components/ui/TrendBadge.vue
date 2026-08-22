@@ -33,8 +33,19 @@ const text = computed(() =>
  * improved", which is why the mockup pairs `−2.4` with ↗ (falling PM2.5 is
  * good news) and `+16` with ↙. The signed number carries the magnitude and
  * direction; the arrow and colour carry the interpretation.
+ *
+ * Drawn from PrimeIcons rather than the ↗ / ↙ characters: those glyphs are
+ * outside the latin subset of the bundled typeface, so the browser substituted
+ * whatever font it could find and rendered them a size or two too small to
+ * read at 11 px.
  */
-const arrow = computed(() => (tone.value === 'bad' ? '↙' : tone.value === 'good' ? '↗' : '→'));
+const arrow = computed(() =>
+  tone.value === 'bad'
+    ? 'pi pi-arrow-down-left'
+    : tone.value === 'good'
+      ? 'pi pi-arrow-up-right'
+      : 'pi pi-arrow-right',
+);
 
 const srLabel = computed(() => {
   if (props.delta === null) return 'No week-over-week comparison available';
@@ -46,7 +57,7 @@ const srLabel = computed(() => {
 
 <template>
   <span :class="['trend', `trend--${tone}`]">
-    <span class="trend__arrow" aria-hidden="true">{{ arrow }}</span>
+    <i :class="['trend__arrow', arrow]" aria-hidden="true" />
     <span class="trend__value" aria-hidden="true">{{ text }}</span>
     <span class="sr-only">{{ srLabel }}</span>
   </span>
@@ -66,7 +77,8 @@ const srLabel = computed(() => {
 }
 
 .trend__arrow {
-  font-size: 0.8em;
+  font-size: 10px;
+  font-weight: 700;
   line-height: 1;
 }
 
