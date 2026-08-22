@@ -43,15 +43,21 @@ Dependency direction: `pages → features → (ui, queries, stores) → (api, do
   present in the data, not `Date.now()`. Every window (24h, 168h, 30d) is
   anchored to it.
 - **Dashboard.** Needs the whole network (map markers, KPI roll-ups):
-  `/stations?limit=100` ×3 pages, then one `/readings?range=30d` per station,
-  fetched through a query cache keyed by station id. Everything time-based is
-  derived client-side from that one series per station: current PM2.5/PM10,
+  `/stations?limit=100` ×3 pages, then one `/readings` per station — the full
+  30-day series — fetched through a query cache keyed by station id. Everything
+  time-based is derived client-side from that one series per station: PM2.5/PM10,
   AQI, offline check, stability %, 24h sparkline, KPI aggregates and their
   week-over-week deltas (reference point = now − 168h). See ADR 0005.
-- **Sensor List.** Strictly cursor-driven (`after` / `before`), one page at a
-  time; readings are fetched only for the rows currently on screen. The list
-  is never pre-walked into a client-side copy. Search/sort semantics:
-  ADR 0006.
+- **Sensor List.** Two modes, derived from what the operator asked for
+  (ADR 0006). *Browse* — the default — is strictly cursor-driven (`after` /
+  `before`), one page at a time, with readings fetched only for the rows on
+  screen; pages are never pre-walked into a client-side list. *Search* — a
+  query or a sort by a measured column — is a question twenty rows cannot
+  answer, so it reads the network-wide station *index* the dashboard already
+  holds (identity only, 3 requests) and windows it client-side; the visible
+  rows still fetch their own readings. Ordering **by** a measured column is the
+  single case that needs every series, because the top twenty by PM2.5 cannot
+  be known from twenty rows.
 - **Selection.** Map marker, watchlist row and table all set the same selected
   station (Pinia); the chart reads it. Selecting a station whose series is
   already cached renders the chart without a network round-trip.
