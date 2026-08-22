@@ -19,7 +19,10 @@ test.beforeEach(async ({ page }) => {
 
 test('lists one cursor page at a time', async ({ page }) => {
   expect(await firstId(page)).toBe('BLN-0001');
-  await expect(page.getByText('Browsing the network one page at a time')).toBeVisible();
+  await expect(page.getByText(/Browsing one cursor page at a time/)).toBeVisible();
+  // Position, not a page picker: the collection's size comes from
+  // /stations/count, the page number from pages actually walked.
+  await expect(page.getByText(/1–20 of 240 · page 1 of 12/)).toBeVisible();
 });
 
 test('disables Previous on the first page', async ({ page }) => {
@@ -36,6 +39,7 @@ test('pages forward and back to the same rows', async ({ page }) => {
 
   await page.getByRole('button', { name: /Previous/ }).click();
   await expect.poll(() => firstId(page)).toBe(page1);
+  await expect(page.getByText(/page 1 of 12/)).toBeVisible();
 });
 
 test('disables Next once the last page is reached', async ({ page }) => {
@@ -46,6 +50,7 @@ test('disables Next once the last page is reached', async ({ page }) => {
   }
 
   expect(await firstId(page)).toBe('BLN-0221');
+  await expect(page.getByText(/221–240 of 240 · page 12 of 12/)).toBeVisible();
   await expect(page.getByRole('button', { name: /Next/ })).toBeDisabled();
   await expect(page.getByRole('button', { name: /Previous/ })).toBeEnabled();
 });
@@ -100,7 +105,7 @@ test('search reports matches across the whole network, not the page', async ({ p
 
   // 20 Pankow stations exist network-wide, none of them on the first page.
   await expect(page.getByText('20 matching stations')).toBeVisible({ timeout: 30_000 });
-  await expect(page.getByText('· showing 1–20')).toBeVisible();
+  await expect(page.getByText(/1–20 of 20 · page 1 of 1/)).toBeVisible();
 });
 
 test('sorting by a measured column orders the whole network', async ({ page }) => {

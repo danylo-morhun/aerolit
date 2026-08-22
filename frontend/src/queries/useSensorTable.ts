@@ -15,7 +15,7 @@ import { deriveStationMetrics } from '@/domain/station-metrics';
 import type { ReadingSeries, Station } from '@/domain/types';
 
 import { queryKeys } from './keys';
-import { useNetwork } from './useNetwork';
+import { useNetwork, useStationCount } from './useNetwork';
 
 export const PAGE_SIZE = 20;
 
@@ -53,6 +53,14 @@ export function useSensorTable(query: Ref<string>) {
   const sortDirection = ref<SortDirection>('asc');
   const cursor = ref<Cursor>({});
   const searchOffset = ref(0);
+  /**
+   * How far into the collection the cursor walk has reached.
+   *
+   * The API has no offset access, and this does not invent one — it is a tally
+   * of pages actually stepped through, which is enough to tell the operator
+   * where they are ("page 2 of 12") even though there is no way to jump there.
+   */
+  const browseOffset = ref(0);
 
   const mode = computed<TableMode>(() =>
     query.value.trim() !== '' || !isServerOrder(sortKey.value, sortDirection.value)
@@ -66,6 +74,8 @@ export function useSensorTable(query: Ref<string>) {
   );
 
   // ---------------------------------------------------------------- browse
+
+  const stationCount = useStationCount();
 
   const pageQuery = useQuery({
     queryKey: computed(() =>
@@ -232,6 +242,7 @@ export function useSensorTable(query: Ref<string>) {
     if (mode.value === 'browse') {
       const after = pageQuery.data.value?.nextCursor;
       if (after) cursor.value = { after };
+      browseOffset.value += PAGE_SIZE;
     } else {
       searchOffset.value += PAGE_SIZE;
     }
@@ -242,6 +253,7 @@ export function useSensorTable(query: Ref<string>) {
     if (mode.value === 'browse') {
       const before = pageQuery.data.value?.prevCursor;
       if (before) cursor.value = { before };
+      browseOffset.value = Math.max(0, browseOffset.value - PAGE_SIZE);
     } else {
       searchOffset.value = Math.max(0, searchOffset.value - PAGE_SIZE);
     }
@@ -260,7 +272,10 @@ export function useSensorTable(query: Ref<string>) {
   // page 4 of a different result set shows the operator an arbitrary window.
   watch([query, sortKey, sortDirection], () => {
     searchOffset.value = 0;
-    if (mode.value === 'browse') cursor.value = {};
+    if (mode.value === 'browse') {
+      cursor.value = {};
+      browseOffset.value = 0;
+    }
   });
 
   return {
@@ -277,7 +292,15 @@ export function useSensorTable(query: Ref<string>) {
     next,
     previous,
     searchTotal,
-    rangeStart: computed(() => (mode.value === 'search' ? searchOffset.value + 1 : null)),
+    /** Matches in search mode, the whole network in browse. */
+    total: computed(() =>
+      mode.value === 'search' ? searchTotal.value : (stationCount.data.value ?? null),
+    ),
+    /** 1-based index of the first row on screen, in whichever mode is active. */
+    rangeStart: computed(() =>
+      mode.value === 'search' ? searchOffset.value + 1 : browseOffset.value + 1,
+    ),
+    pageSize: PAGE_SIZE,
     refetch: () => (mode.value === 'browse' ? pageQuery.refetch() : network.refetch()),
   };
 }

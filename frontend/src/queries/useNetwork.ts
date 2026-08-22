@@ -2,7 +2,7 @@ import { useQuery, useQueryClient } from '@tanstack/vue-query';
 import { computed, toValue, type ComputedRef, type MaybeRefOrGetter } from 'vue';
 
 import { mapWithConcurrency } from '@/api/concurrency';
-import { fetchReadings, fetchStationPage, MAX_PAGE_SIZE } from '@/api/stations';
+import { fetchReadings, fetchStationCount, fetchStationPage, MAX_PAGE_SIZE } from '@/api/stations';
 import { rollUpNetwork, snapshotWindow, type SnapshotWindow } from '@/domain/network';
 import type { Reading, ReadingSeries, Station, StationMetrics } from '@/domain/types';
 import type { KpiSnapshot } from '@/domain/kpi';
@@ -14,6 +14,20 @@ import { queryKeys } from './keys';
  * Above the browser's ~6 connections per host the extra requests just queue.
  */
 const READING_CONCURRENCY = 8;
+
+/**
+ * How many stations the network has, in one request.
+ *
+ * `/stations/count` is the only way to know the size of a cursor-paginated
+ * collection without walking it, which is what lets the table say "page 2 of
+ * 12" while still following cursors one page at a time.
+ */
+export function useStationCount() {
+  return useQuery({
+    queryKey: queryKeys.stationCount(),
+    queryFn: ({ signal }) => fetchStationCount({ signal }),
+  });
+}
 
 /**
  * Every station's identity.

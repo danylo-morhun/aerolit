@@ -21,9 +21,11 @@ defineProps<{
   error: boolean;
   canGoNext: boolean;
   canGoPrevious: boolean;
-  /** Present in search mode: total matches and the current window's first row. */
+  /** Matches in search mode, the whole network in browse; null until known. */
   total: number | null;
+  /** 1-based index of the first row on screen. */
   rangeStart: number | null;
+  pageSize: number;
   /** Ids currently on the dashboard watchlist. */
   watchedIds: readonly string[];
   watchlistFull: boolean;
@@ -51,6 +53,29 @@ const COLUMNS: GridColumn<SortKey | 'watch'>[] = [
 
 function pmClass(category: AqiCategory | null | undefined): string {
   return `cell-value cell-value--${category ?? 'none'}`;
+}
+
+/**
+ * Where the operator is in the collection.
+ *
+ * The page *number* is honest — it counts pages actually walked — while a page
+ * *picker* would not be: `/stations` has no offset access, so there is no way
+ * to jump to page seven without walking the six before it, which the brief
+ * rules out. Position without teleportation is the most this API can support.
+ */
+function position(props: {
+  rows: readonly SortableRow[];
+  total: number | null;
+  rangeStart: number | null;
+  pageSize: number;
+}): string {
+  if (props.total === null || props.rangeStart === null || props.rows.length === 0) return '';
+
+  const last = Math.min(props.rangeStart + props.rows.length - 1, props.total);
+  const page = Math.floor((props.rangeStart - 1) / props.pageSize) + 1;
+  const pages = Math.max(1, Math.ceil(props.total / props.pageSize));
+
+  return `${props.rangeStart}–${last} of ${props.total} · page ${page} of ${pages}`;
 }
 </script>
 
@@ -116,11 +141,12 @@ function pmClass(category: AqiCategory | null | undefined): string {
                does not have yet. -->
           <template v-if="loading && mode === 'search'">Searching the network…</template>
           <template v-else-if="enriching">Loading readings…</template>
-          <template v-else-if="mode === 'search' && total !== null">
-            {{ total }} matching {{ total === 1 ? 'station' : 'stations' }}
-            <span v-if="rangeStart !== null && total > 0">
-              · showing {{ rangeStart }}–{{ Math.min(rangeStart + rows.length - 1, total) }}
-            </span>
+          <template v-else-if="mode === 'search'">
+            {{ total ?? 0 }} matching {{ total === 1 ? 'station' : 'stations' }}
+            <template v-if="position($props)"> · {{ position($props) }}</template>
+          </template>
+          <template v-else-if="position($props)">
+            Browsing one cursor page at a time · {{ position($props) }}
           </template>
           <template v-else>Browsing the network one page at a time</template>
         </p>
