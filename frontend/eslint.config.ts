@@ -64,12 +64,20 @@ export default defineConfigWithVueTs(
           ],
         },
       ],
-      'no-restricted-globals': [
+      // Date *arithmetic* is fine and unavoidable here; reading the ambient
+      // clock is not. The dataset is a fixed snapshot, so "now" is a value the
+      // caller supplies — a hidden `Date.now()` would silently make every
+      // derived metric depend on when the page happened to be opened.
+      'no-restricted-properties': [
         'error',
         {
-          name: 'Date',
-          message: 'Domain code must receive "now" explicitly — the dataset is a fixed snapshot.',
+          object: 'Date',
+          property: 'now',
+          message: 'Pass the snapshot instant in explicitly instead of reading the clock.',
         },
+      ],
+      'no-restricted-globals': [
+        'error',
         { name: 'fetch', message: 'src/domain must stay free of I/O.' },
       ],
     },
