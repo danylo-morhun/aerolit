@@ -112,8 +112,9 @@
   --aq-viz-pm25: var(--aq-c-orange-500);
   --aq-viz-grid: var(--aq-c-neutral-100);
   --aq-viz-axis: var(--aq-c-neutral-400);
-  --aq-viz-area-from: color-mix(in srgb, var(--aq-c-orange-500) 22%, transparent);
-  --aq-viz-area-to: color-mix(in srgb, var(--aq-c-orange-500) 0%, transparent);
+  /* Light enough that the bars behind it stay readable — the line is the
+     figure, the wash only anchors it to the axis. */
+  --aq-viz-area-from: color-mix(in srgb, var(--aq-c-orange-500) 13%, transparent);
 
   /* Map basemap: CARTO raster tiles, swapped with the theme. */
   --aq-map-tiles: 'light_all';
