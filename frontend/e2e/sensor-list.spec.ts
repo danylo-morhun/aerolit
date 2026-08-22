@@ -50,6 +50,51 @@ test('disables Next once the last page is reached', async ({ page }) => {
   await expect(page.getByRole('button', { name: /Previous/ })).toBeEnabled();
 });
 
+test('reversing the id order reaches the end of the network, not the end of the page', async ({
+  page,
+}) => {
+  // Ascending id is the only ordering the server itself serves; reversing it is
+  // a whole-collection question, so the table must answer it with BLN-0240 —
+  // not with the loaded page upside down.
+  await page.getByRole('button', { name: /sort by ID/i }).click();
+
+  await expect.poll(() => firstId(page), { timeout: 30_000 }).toBe('BLN-0240');
+  await expect(page.getByText(/240 matching stations/)).toBeVisible();
+});
+
+test('a text search fetches readings for the rows it shows, not for the network', async ({
+  page,
+}) => {
+  const requested = new Set<string>();
+  page.on('request', (request) => {
+    const match = /\/api\/stations\/([^/]+)\/readings/.exec(request.url());
+    if (match?.[1]) requested.add(match[1]);
+  });
+
+  await page.getByRole('searchbox').fill('pankow');
+  await expect(page.getByText('20 matching stations')).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByText(/HQ link|Poor link|Offline/).first()).toBeVisible();
+
+  // The twenty rows on screen, and nothing like the 240 the network holds.
+  expect(requested.size).toBeLessThanOrEqual(20);
+});
+
+test('ordering by a measured column is the one question that needs every series', async ({
+  page,
+}) => {
+  const requested = new Set<string>();
+  page.on('request', (request) => {
+    const match = /\/api\/stations\/([^/]+)\/readings/.exec(request.url());
+    if (match?.[1]) requested.add(match[1]);
+  });
+
+  await page.getByRole('button', { name: /sort by PM2\.5/i }).click();
+  await expect(page.getByText(/240 matching stations/)).toBeVisible({ timeout: 60_000 });
+
+  // You cannot know the twenty lowest readings without looking at all 240.
+  expect(requested.size).toBeGreaterThan(200);
+});
+
 test('search reports matches across the whole network, not the page', async ({ page }) => {
   await page.getByRole('searchbox').fill('pankow');
 
