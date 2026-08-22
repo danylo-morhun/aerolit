@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { formatPercent } from '@/domain/format';
+import { formatStability } from '@/domain/format';
 import type { ConnectionState } from '@/domain/types';
 
 const props = defineProps<{
@@ -17,7 +17,7 @@ const LABELS: Record<ConnectionState, string> = {
 };
 
 const label = computed(() => LABELS[props.state]);
-const percent = computed(() => formatPercent(props.stability));
+const percent = computed(() => formatStability(props.stability));
 
 /**
  * The dot is decorative; the state is already in the text. Screen readers get

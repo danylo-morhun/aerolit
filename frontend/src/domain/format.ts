@@ -32,9 +32,20 @@ export function formatConcentrationPrecise(value: number | null): string {
   return value === null || !Number.isFinite(value) ? EM_DASH : oneDecimal.format(value);
 }
 
-/** A 0–1 share as a whole percentage, e.g. 0.964 → "96%". */
-export function formatPercent(share: number | null): string {
-  return share === null || !Number.isFinite(share) ? EM_DASH : `${integer.format(share * 100)}%`;
+/**
+ * A stability share as a whole percentage, e.g. 0.964 → "96%".
+ *
+ * Rounded *down*, not to nearest. The connection state is decided from the
+ * unrounded share against an 86 % threshold, so a station at 0.8556 is a poor
+ * link — and rounding its badge to "86%" would print a figure the brief says is
+ * a healthy link right next to the word "Poor". Flooring keeps the number and
+ * the label telling the same story: the displayed percentage clears 86 exactly
+ * when the state does. One station in the shipped dataset (BLN-0011) sits in
+ * that gap.
+ */
+export function formatStability(share: number | null): string {
+  if (share === null || !Number.isFinite(share)) return EM_DASH;
+  return `${integer.format(Math.floor(share * 100))}%`;
 }
 
 /** A 0–1 share with one decimal, for the KPI tile, e.g. 0.868 → "86.8". */

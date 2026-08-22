@@ -7,7 +7,7 @@ import {
   formatDateTime,
   formatDelta,
   formatHour,
-  formatPercent,
+  formatStability,
   formatPercentPrecise,
 } from './format';
 
@@ -32,9 +32,19 @@ describe('concentrations', () => {
 
 describe('percentages', () => {
   it('formats a 0–1 share', () => {
-    expect(formatPercent(0.964)).toBe('96%');
+    expect(formatStability(0.964)).toBe('96%');
     expect(formatPercentPrecise(0.868)).toBe('86.8');
-    expect(formatPercent(null)).toBe(EM_DASH);
+    expect(formatStability(null)).toBe(EM_DASH);
+  });
+
+  // The badge prints this figure next to the connection state, which is decided
+  // from the unrounded share: rounding 0.8556 up to "86%" would label a poor
+  // link with the percentage the brief calls healthy.
+  it('rounds stability down so it never contradicts the connection label', () => {
+    expect(formatStability(0.8555555)).toBe('85%');
+    expect(formatStability(0.86)).toBe('86%');
+    expect(formatStability(0.9999)).toBe('99%');
+    expect(formatStability(1)).toBe('100%');
   });
 });
 
