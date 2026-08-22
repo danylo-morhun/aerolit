@@ -1,0 +1,2162 @@
+[
+  {
+    "id": "BLN-0001",
+    "district": "Mitte",
+    "location": "Alexanderplatz",
+    "coordinates": {
+      "lat": 52.5295,
+      "lng": 13.41614
+    }
+  },
+  {
+    "id": "BLN-0002",
+    "district": "Mitte",
+    "location": "Hauptbahnhof",
+    "coordinates": {
+      "lat": 52.51677,
+      "lng": 13.40977
+    }
+  },
+  {
+    "id": "BLN-0003",
+    "district": "Mitte",
+    "location": "Rosenthaler Platz",
+    "coordinates": {
+      "lat": 52.52986,
+      "lng": 13.38771
+    }
+  },
+  {
+    "id": "BLN-0004",
+    "district": "Mitte",
+    "location": "Alexanderplatz Nord",
+    "coordinates": {
+      "lat": 52.52383,
+      "lng": 13.41251
+    }
+  },
+  {
+    "id": "BLN-0005",
+    "district": "Mitte",
+    "location": "Hauptbahnhof Nord",
+    "coordinates": {
+      "lat": 52.52078,
+      "lng": 13.40473
+    }
+  },
+  {
+    "id": "BLN-0006",
+    "district": "Mitte",
+    "location": "Rosenthaler Platz Nord",
+    "coordinates": {
+      "lat": 52.52724,
+      "lng": 13.39312
+    }
+  },
+  {
+    "id": "BLN-0007",
+    "district": "Mitte",
+    "location": "Alexanderplatz Ost",
+    "coordinates": {
+      "lat": 52.5284,
+      "lng": 13.40076
+    }
+  },
+  {
+    "id": "BLN-0008",
+    "district": "Mitte",
+    "location": "Hauptbahnhof Ost",
+    "coordinates": {
+      "lat": 52.52362,
+      "lng": 13.40375
+    }
+  },
+  {
+    "id": "BLN-0009",
+    "district": "Mitte",
+    "location": "Rosenthaler Platz Ost",
+    "coordinates": {
+      "lat": 52.52104,
+      "lng": 13.41602
+    }
+  },
+  {
+    "id": "BLN-0010",
+    "district": "Mitte",
+    "location": "Alexanderplatz Sued",
+    "coordinates": {
+      "lat": 52.52423,
+      "lng": 13.41975
+    }
+  },
+  {
+    "id": "BLN-0011",
+    "district": "Mitte",
+    "location": "Hauptbahnhof Sued",
+    "coordinates": {
+      "lat": 52.52276,
+      "lng": 13.40945
+    }
+  },
+  {
+    "id": "BLN-0012",
+    "district": "Mitte",
+    "location": "Rosenthaler Platz Sued",
+    "coordinates": {
+      "lat": 52.51375,
+      "lng": 13.42237
+    }
+  },
+  {
+    "id": "BLN-0013",
+    "district": "Mitte",
+    "location": "Alexanderplatz West",
+    "coordinates": {
+      "lat": 52.52573,
+      "lng": 13.40065
+    }
+  },
+  {
+    "id": "BLN-0014",
+    "district": "Mitte",
+    "location": "Hauptbahnhof West",
+    "coordinates": {
+      "lat": 52.52573,
+      "lng": 13.38801
+    }
+  },
+  {
+    "id": "BLN-0015",
+    "district": "Mitte",
+    "location": "Rosenthaler Platz West",
+    "coordinates": {
+      "lat": 52.51948,
+      "lng": 13.39881
+    }
+  },
+  {
+    "id": "BLN-0016",
+    "district": "Mitte",
+    "location": "Alexanderplatz",
+    "coordinates": {
+      "lat": 52.51445,
+      "lng": 13.41271
+    }
+  },
+  {
+    "id": "BLN-0017",
+    "district": "Mitte",
+    "location": "Hauptbahnhof",
+    "coordinates": {
+      "lat": 52.52529,
+      "lng": 13.41413
+    }
+  },
+  {
+    "id": "BLN-0018",
+    "district": "Mitte",
+    "location": "Rosenthaler Platz",
+    "coordinates": {
+      "lat": 52.52205,
+      "lng": 13.41812
+    }
+  },
+  {
+    "id": "BLN-0019",
+    "district": "Mitte",
+    "location": "Alexanderplatz Nord",
+    "coordinates": {
+      "lat": 52.5209,
+      "lng": 13.40248
+    }
+  },
+  {
+    "id": "BLN-0020",
+    "district": "Mitte",
+    "location": "Hauptbahnhof Nord",
+    "coordinates": {
+      "lat": 52.53174,
+      "lng": 13.40813
+    }
+  },
+  {
+    "id": "BLN-0021",
+    "district": "Friedrichshain-Kreuzberg",
+    "location": "Kottbusser Tor",
+    "coordinates": {
+      "lat": 52.51728,
+      "lng": 13.44938
+    }
+  },
+  {
+    "id": "BLN-0022",
+    "district": "Friedrichshain-Kreuzberg",
+    "location": "Warschauer Str.",
+    "coordinates": {
+      "lat": 52.50428,
+      "lng": 13.44978
+    }
+  },
+  {
+    "id": "BLN-0023",
+    "district": "Friedrichshain-Kreuzberg",
+    "location": "Boxhagener Platz",
+    "coordinates": {
+      "lat": 52.50168,
+      "lng": 13.4426
+    }
+  },
+  {
+    "id": "BLN-0024",
+    "district": "Friedrichshain-Kreuzberg",
+    "location": "Kottbusser Tor Nord",
+    "coordinates": {
+      "lat": 52.50083,
+      "lng": 13.43353
+    }
+  },
+  {
+    "id": "BLN-0025",
+    "district": "Friedrichshain-Kreuzberg",
+    "location": "Warschauer Str. Nord",
+    "coordinates": {
+      "lat": 52.49717,
+      "lng": 13.42979
+    }
+  },
+  {
+    "id": "BLN-0026",
+    "district": "Friedrichshain-Kreuzberg",
+    "location": "Boxhagener Platz Nord",
+    "coordinates": {
+      "lat": 52.49651,
+      "lng": 13.43936
+    }
+  },
+  {
+    "id": "BLN-0027",
+    "district": "Friedrichshain-Kreuzberg",
+    "location": "Kottbusser Tor Ost",
+    "coordinates": {
+      "lat": 52.49742,
+      "lng": 13.43995
+    }
+  },
+  {
+    "id": "BLN-0028",
+    "district": "Friedrichshain-Kreuzberg",
+    "location": "Warschauer Str. Ost",
+    "coordinates": {
+      "lat": 52.50668,
+      "lng": 13.43565
+    }
+  },
+  {
+    "id": "BLN-0029",
+    "district": "Friedrichshain-Kreuzberg",
+    "location": "Boxhagener Platz Ost",
+    "coordinates": {
+      "lat": 52.50827,
+      "lng": 13.45342
+    }
+  },
+  {
+    "id": "BLN-0030",
+    "district": "Friedrichshain-Kreuzberg",
+    "location": "Kottbusser Tor Sued",
+    "coordinates": {
+      "lat": 52.50244,
+      "lng": 13.45331
+    }
+  },
+  {
+    "id": "BLN-0031",
+    "district": "Friedrichshain-Kreuzberg",
+    "location": "Warschauer Str. Sued",
+    "coordinates": {
+      "lat": 52.49696,
+      "lng": 13.42523
+    }
+  },
+  {
+    "id": "BLN-0032",
+    "district": "Friedrichshain-Kreuzberg",
+    "location": "Boxhagener Platz Sued",
+    "coordinates": {
+      "lat": 52.50193,
+      "lng": 13.44329
+    }
+  },
+  {
+    "id": "BLN-0033",
+    "district": "Friedrichshain-Kreuzberg",
+    "location": "Kottbusser Tor West",
+    "coordinates": {
+      "lat": 52.5132,
+      "lng": 13.42342
+    }
+  },
+  {
+    "id": "BLN-0034",
+    "district": "Friedrichshain-Kreuzberg",
+    "location": "Warschauer Str. West",
+    "coordinates": {
+      "lat": 52.50746,
+      "lng": 13.44373
+    }
+  },
+  {
+    "id": "BLN-0035",
+    "district": "Friedrichshain-Kreuzberg",
+    "location": "Boxhagener Platz West",
+    "coordinates": {
+      "lat": 52.49871,
+      "lng": 13.43973
+    }
+  },
+  {
+    "id": "BLN-0036",
+    "district": "Friedrichshain-Kreuzberg",
+    "location": "Kottbusser Tor",
+    "coordinates": {
+      "lat": 52.51506,
+      "lng": 13.43337
+    }
+  },
+  {
+    "id": "BLN-0037",
+    "district": "Friedrichshain-Kreuzberg",
+    "location": "Warschauer Str.",
+    "coordinates": {
+      "lat": 52.49873,
+      "lng": 13.45404
+    }
+  },
+  {
+    "id": "BLN-0038",
+    "district": "Friedrichshain-Kreuzberg",
+    "location": "Boxhagener Platz",
+    "coordinates": {
+      "lat": 52.51416,
+      "lng": 13.42491
+    }
+  },
+  {
+    "id": "BLN-0039",
+    "district": "Friedrichshain-Kreuzberg",
+    "location": "Kottbusser Tor Nord",
+    "coordinates": {
+      "lat": 52.51314,
+      "lng": 13.44563
+    }
+  },
+  {
+    "id": "BLN-0040",
+    "district": "Friedrichshain-Kreuzberg",
+    "location": "Warschauer Str. Nord",
+    "coordinates": {
+      "lat": 52.50291,
+      "lng": 13.42795
+    }
+  },
+  {
+    "id": "BLN-0041",
+    "district": "Pankow",
+    "location": "Schoenhauser Allee",
+    "coordinates": {
+      "lat": 52.57814,
+      "lng": 13.39593
+    }
+  },
+  {
+    "id": "BLN-0042",
+    "district": "Pankow",
+    "location": "Florastr.",
+    "coordinates": {
+      "lat": 52.56804,
+      "lng": 13.41332
+    }
+  },
+  {
+    "id": "BLN-0043",
+    "district": "Pankow",
+    "location": "Buergerpark",
+    "coordinates": {
+      "lat": 52.5759,
+      "lng": 13.4138
+    }
+  },
+  {
+    "id": "BLN-0044",
+    "district": "Pankow",
+    "location": "Schoenhauser Allee Nord",
+    "coordinates": {
+      "lat": 52.57802,
+      "lng": 13.3891
+    }
+  },
+  {
+    "id": "BLN-0045",
+    "district": "Pankow",
+    "location": "Florastr. Nord",
+    "coordinates": {
+      "lat": 52.56008,
+      "lng": 13.38663
+    }
+  },
+  {
+    "id": "BLN-0046",
+    "district": "Pankow",
+    "location": "Buergerpark Nord",
+    "coordinates": {
+      "lat": 52.56088,
+      "lng": 13.41366
+    }
+  },
+  {
+    "id": "BLN-0047",
+    "district": "Pankow",
+    "location": "Schoenhauser Allee Ost",
+    "coordinates": {
+      "lat": 52.57576,
+      "lng": 13.39579
+    }
+  },
+  {
+    "id": "BLN-0048",
+    "district": "Pankow",
+    "location": "Florastr. Ost",
+    "coordinates": {
+      "lat": 52.57517,
+      "lng": 13.42185
+    }
+  },
+  {
+    "id": "BLN-0049",
+    "district": "Pankow",
+    "location": "Buergerpark Ost",
+    "coordinates": {
+      "lat": 52.57389,
+      "lng": 13.40882
+    }
+  },
+  {
+    "id": "BLN-0050",
+    "district": "Pankow",
+    "location": "Schoenhauser Allee Sued",
+    "coordinates": {
+      "lat": 52.56744,
+      "lng": 13.39341
+    }
+  },
+  {
+    "id": "BLN-0051",
+    "district": "Pankow",
+    "location": "Florastr. Sued",
+    "coordinates": {
+      "lat": 52.56902,
+      "lng": 13.40134
+    }
+  },
+  {
+    "id": "BLN-0052",
+    "district": "Pankow",
+    "location": "Buergerpark Sued",
+    "coordinates": {
+      "lat": 52.56344,
+      "lng": 13.41774
+    }
+  },
+  {
+    "id": "BLN-0053",
+    "district": "Pankow",
+    "location": "Schoenhauser Allee West",
+    "coordinates": {
+      "lat": 52.58081,
+      "lng": 13.40251
+    }
+  },
+  {
+    "id": "BLN-0054",
+    "district": "Pankow",
+    "location": "Florastr. West",
+    "coordinates": {
+      "lat": 52.56201,
+      "lng": 13.3903
+    }
+  },
+  {
+    "id": "BLN-0055",
+    "district": "Pankow",
+    "location": "Buergerpark West",
+    "coordinates": {
+      "lat": 52.56694,
+      "lng": 13.38557
+    }
+  },
+  {
+    "id": "BLN-0056",
+    "district": "Pankow",
+    "location": "Schoenhauser Allee",
+    "coordinates": {
+      "lat": 52.57996,
+      "lng": 13.394
+    }
+  },
+  {
+    "id": "BLN-0057",
+    "district": "Pankow",
+    "location": "Florastr.",
+    "coordinates": {
+      "lat": 52.58003,
+      "lng": 13.39086
+    }
+  },
+  {
+    "id": "BLN-0058",
+    "district": "Pankow",
+    "location": "Buergerpark",
+    "coordinates": {
+      "lat": 52.57687,
+      "lng": 13.40203
+    }
+  },
+  {
+    "id": "BLN-0059",
+    "district": "Pankow",
+    "location": "Schoenhauser Allee Nord",
+    "coordinates": {
+      "lat": 52.55882,
+      "lng": 13.41858
+    }
+  },
+  {
+    "id": "BLN-0060",
+    "district": "Pankow",
+    "location": "Florastr. Nord",
+    "coordinates": {
+      "lat": 52.55862,
+      "lng": 13.4224
+    }
+  },
+  {
+    "id": "BLN-0061",
+    "district": "Charlottenburg-Wilmersdorf",
+    "location": "Ernst-Reuter-Platz",
+    "coordinates": {
+      "lat": 52.50484,
+      "lng": 13.31313
+    }
+  },
+  {
+    "id": "BLN-0062",
+    "district": "Charlottenburg-Wilmersdorf",
+    "location": "Adenauerplatz",
+    "coordinates": {
+      "lat": 52.49929,
+      "lng": 13.31941
+    }
+  },
+  {
+    "id": "BLN-0063",
+    "district": "Charlottenburg-Wilmersdorf",
+    "location": "Fehrbelliner Platz",
+    "coordinates": {
+      "lat": 52.50587,
+      "lng": 13.30838
+    }
+  },
+  {
+    "id": "BLN-0064",
+    "district": "Charlottenburg-Wilmersdorf",
+    "location": "Ernst-Reuter-Platz Nord",
+    "coordinates": {
+      "lat": 52.50241,
+      "lng": 13.31268
+    }
+  },
+  {
+    "id": "BLN-0065",
+    "district": "Charlottenburg-Wilmersdorf",
+    "location": "Adenauerplatz Nord",
+    "coordinates": {
+      "lat": 52.49296,
+      "lng": 13.28395
+    }
+  },
+  {
+    "id": "BLN-0066",
+    "district": "Charlottenburg-Wilmersdorf",
+    "location": "Fehrbelliner Platz Nord",
+    "coordinates": {
+      "lat": 52.5089,
+      "lng": 13.31266
+    }
+  },
+  {
+    "id": "BLN-0067",
+    "district": "Charlottenburg-Wilmersdorf",
+    "location": "Ernst-Reuter-Platz Ost",
+    "coordinates": {
+      "lat": 52.49254,
+      "lng": 13.28906
+    }
+  },
+  {
+    "id": "BLN-0068",
+    "district": "Charlottenburg-Wilmersdorf",
+    "location": "Adenauerplatz Ost",
+    "coordinates": {
+      "lat": 52.51076,
+      "lng": 13.31161
+    }
+  },
+  {
+    "id": "BLN-0069",
+    "district": "Charlottenburg-Wilmersdorf",
+    "location": "Fehrbelliner Platz Ost",
+    "coordinates": {
+      "lat": 52.50812,
+      "lng": 13.30795
+    }
+  },
+  {
+    "id": "BLN-0070",
+    "district": "Charlottenburg-Wilmersdorf",
+    "location": "Ernst-Reuter-Platz Sued",
+    "coordinates": {
+      "lat": 52.49405,
+      "lng": 13.28934
+    }
+  },
+  {
+    "id": "BLN-0071",
+    "district": "Charlottenburg-Wilmersdorf",
+    "location": "Adenauerplatz Sued",
+    "coordinates": {
+      "lat": 52.50273,
+      "lng": 13.31117
+    }
+  },
+  {
+    "id": "BLN-0072",
+    "district": "Charlottenburg-Wilmersdorf",
+    "location": "Fehrbelliner Platz Sued",
+    "coordinates": {
+      "lat": 52.49609,
+      "lng": 13.30615
+    }
+  },
+  {
+    "id": "BLN-0073",
+    "district": "Charlottenburg-Wilmersdorf",
+    "location": "Ernst-Reuter-Platz West",
+    "coordinates": {
+      "lat": 52.50136,
+      "lng": 13.28927
+    }
+  },
+  {
+    "id": "BLN-0074",
+    "district": "Charlottenburg-Wilmersdorf",
+    "location": "Adenauerplatz West",
+    "coordinates": {
+      "lat": 52.50033,
+      "lng": 13.31409
+    }
+  },
+  {
+    "id": "BLN-0075",
+    "district": "Charlottenburg-Wilmersdorf",
+    "location": "Fehrbelliner Platz West",
+    "coordinates": {
+      "lat": 52.49677,
+      "lng": 13.31897
+    }
+  },
+  {
+    "id": "BLN-0076",
+    "district": "Charlottenburg-Wilmersdorf",
+    "location": "Ernst-Reuter-Platz",
+    "coordinates": {
+      "lat": 52.50785,
+      "lng": 13.29
+    }
+  },
+  {
+    "id": "BLN-0077",
+    "district": "Charlottenburg-Wilmersdorf",
+    "location": "Adenauerplatz",
+    "coordinates": {
+      "lat": 52.50953,
+      "lng": 13.30604
+    }
+  },
+  {
+    "id": "BLN-0078",
+    "district": "Charlottenburg-Wilmersdorf",
+    "location": "Fehrbelliner Platz",
+    "coordinates": {
+      "lat": 52.49949,
+      "lng": 13.29429
+    }
+  },
+  {
+    "id": "BLN-0079",
+    "district": "Charlottenburg-Wilmersdorf",
+    "location": "Ernst-Reuter-Platz Nord",
+    "coordinates": {
+      "lat": 52.49612,
+      "lng": 13.28095
+    }
+  },
+  {
+    "id": "BLN-0080",
+    "district": "Charlottenburg-Wilmersdorf",
+    "location": "Adenauerplatz Nord",
+    "coordinates": {
+      "lat": 52.50782,
+      "lng": 13.3059
+    }
+  },
+  {
+    "id": "BLN-0081",
+    "district": "Spandau",
+    "location": "Altstadt Spandau",
+    "coordinates": {
+      "lat": 52.52659,
+      "lng": 13.21694
+    }
+  },
+  {
+    "id": "BLN-0082",
+    "district": "Spandau",
+    "location": "Rathaus Spandau",
+    "coordinates": {
+      "lat": 52.53444,
+      "lng": 13.21673
+    }
+  },
+  {
+    "id": "BLN-0083",
+    "district": "Spandau",
+    "location": "Wilhelmstadt",
+    "coordinates": {
+      "lat": 52.54255,
+      "lng": 13.18084
+    }
+  },
+  {
+    "id": "BLN-0084",
+    "district": "Spandau",
+    "location": "Altstadt Spandau Nord",
+    "coordinates": {
+      "lat": 52.5315,
+      "lng": 13.20992
+    }
+  },
+  {
+    "id": "BLN-0085",
+    "district": "Spandau",
+    "location": "Rathaus Spandau Nord",
+    "coordinates": {
+      "lat": 52.52768,
+      "lng": 13.19864
+    }
+  },
+  {
+    "id": "BLN-0086",
+    "district": "Spandau",
+    "location": "Wilhelmstadt Nord",
+    "coordinates": {
+      "lat": 52.53938,
+      "lng": 13.19641
+    }
+  },
+  {
+    "id": "BLN-0087",
+    "district": "Spandau",
+    "location": "Altstadt Spandau Ost",
+    "coordinates": {
+      "lat": 52.52729,
+      "lng": 13.19407
+    }
+  },
+  {
+    "id": "BLN-0088",
+    "district": "Spandau",
+    "location": "Rathaus Spandau Ost",
+    "coordinates": {
+      "lat": 52.52836,
+      "lng": 13.20539
+    }
+  },
+  {
+    "id": "BLN-0089",
+    "district": "Spandau",
+    "location": "Wilhelmstadt Ost",
+    "coordinates": {
+      "lat": 52.53806,
+      "lng": 13.19316
+    }
+  },
+  {
+    "id": "BLN-0090",
+    "district": "Spandau",
+    "location": "Altstadt Spandau Sued",
+    "coordinates": {
+      "lat": 52.53989,
+      "lng": 13.18401
+    }
+  },
+  {
+    "id": "BLN-0091",
+    "district": "Spandau",
+    "location": "Rathaus Spandau Sued",
+    "coordinates": {
+      "lat": 52.52465,
+      "lng": 13.21899
+    }
+  },
+  {
+    "id": "BLN-0092",
+    "district": "Spandau",
+    "location": "Wilhelmstadt Sued",
+    "coordinates": {
+      "lat": 52.52838,
+      "lng": 13.21289
+    }
+  },
+  {
+    "id": "BLN-0093",
+    "district": "Spandau",
+    "location": "Altstadt Spandau West",
+    "coordinates": {
+      "lat": 52.52355,
+      "lng": 13.19354
+    }
+  },
+  {
+    "id": "BLN-0094",
+    "district": "Spandau",
+    "location": "Rathaus Spandau West",
+    "coordinates": {
+      "lat": 52.52776,
+      "lng": 13.20194
+    }
+  },
+  {
+    "id": "BLN-0095",
+    "district": "Spandau",
+    "location": "Wilhelmstadt West",
+    "coordinates": {
+      "lat": 52.5247,
+      "lng": 13.18306
+    }
+  },
+  {
+    "id": "BLN-0096",
+    "district": "Spandau",
+    "location": "Altstadt Spandau",
+    "coordinates": {
+      "lat": 52.52546,
+      "lng": 13.19744
+    }
+  },
+  {
+    "id": "BLN-0097",
+    "district": "Spandau",
+    "location": "Rathaus Spandau",
+    "coordinates": {
+      "lat": 52.53459,
+      "lng": 13.18176
+    }
+  },
+  {
+    "id": "BLN-0098",
+    "district": "Spandau",
+    "location": "Wilhelmstadt",
+    "coordinates": {
+      "lat": 52.53575,
+      "lng": 13.21865
+    }
+  },
+  {
+    "id": "BLN-0099",
+    "district": "Spandau",
+    "location": "Altstadt Spandau Nord",
+    "coordinates": {
+      "lat": 52.53962,
+      "lng": 13.21916
+    }
+  },
+  {
+    "id": "BLN-0100",
+    "district": "Spandau",
+    "location": "Rathaus Spandau Nord",
+    "coordinates": {
+      "lat": 52.54209,
+      "lng": 13.19182
+    }
+  },
+  {
+    "id": "BLN-0101",
+    "district": "Steglitz-Zehlendorf",
+    "location": "Schlossstr.",
+    "coordinates": {
+      "lat": 52.43021,
+      "lng": 13.25215
+    }
+  },
+  {
+    "id": "BLN-0102",
+    "district": "Steglitz-Zehlendorf",
+    "location": "Rathaus Steglitz",
+    "coordinates": {
+      "lat": 52.43008,
+      "lng": 13.26385
+    }
+  },
+  {
+    "id": "BLN-0103",
+    "district": "Steglitz-Zehlendorf",
+    "location": "Mexikoplatz",
+    "coordinates": {
+      "lat": 52.44122,
+      "lng": 13.24305
+    }
+  },
+  {
+    "id": "BLN-0104",
+    "district": "Steglitz-Zehlendorf",
+    "location": "Schlossstr. Nord",
+    "coordinates": {
+      "lat": 52.42955,
+      "lng": 13.24882
+    }
+  },
+  {
+    "id": "BLN-0105",
+    "district": "Steglitz-Zehlendorf",
+    "location": "Rathaus Steglitz Nord",
+    "coordinates": {
+      "lat": 52.42913,
+      "lng": 13.24471
+    }
+  },
+  {
+    "id": "BLN-0106",
+    "district": "Steglitz-Zehlendorf",
+    "location": "Mexikoplatz Nord",
+    "coordinates": {
+      "lat": 52.42419,
+      "lng": 13.2463
+    }
+  },
+  {
+    "id": "BLN-0107",
+    "district": "Steglitz-Zehlendorf",
+    "location": "Schlossstr. Ost",
+    "coordinates": {
+      "lat": 52.43976,
+      "lng": 13.26369
+    }
+  },
+  {
+    "id": "BLN-0108",
+    "district": "Steglitz-Zehlendorf",
+    "location": "Rathaus Steglitz Ost",
+    "coordinates": {
+      "lat": 52.42321,
+      "lng": 13.25607
+    }
+  },
+  {
+    "id": "BLN-0109",
+    "district": "Steglitz-Zehlendorf",
+    "location": "Mexikoplatz Ost",
+    "coordinates": {
+      "lat": 52.44488,
+      "lng": 13.259
+    }
+  },
+  {
+    "id": "BLN-0110",
+    "district": "Steglitz-Zehlendorf",
+    "location": "Schlossstr. Sued",
+    "coordinates": {
+      "lat": 52.42433,
+      "lng": 13.26544
+    }
+  },
+  {
+    "id": "BLN-0111",
+    "district": "Steglitz-Zehlendorf",
+    "location": "Rathaus Steglitz Sued",
+    "coordinates": {
+      "lat": 52.42553,
+      "lng": 13.27592
+    }
+  },
+  {
+    "id": "BLN-0112",
+    "district": "Steglitz-Zehlendorf",
+    "location": "Mexikoplatz Sued",
+    "coordinates": {
+      "lat": 52.44443,
+      "lng": 13.27399
+    }
+  },
+  {
+    "id": "BLN-0113",
+    "district": "Steglitz-Zehlendorf",
+    "location": "Schlossstr. West",
+    "coordinates": {
+      "lat": 52.4449,
+      "lng": 13.25243
+    }
+  },
+  {
+    "id": "BLN-0114",
+    "district": "Steglitz-Zehlendorf",
+    "location": "Rathaus Steglitz West",
+    "coordinates": {
+      "lat": 52.44241,
+      "lng": 13.24435
+    }
+  },
+  {
+    "id": "BLN-0115",
+    "district": "Steglitz-Zehlendorf",
+    "location": "Mexikoplatz West",
+    "coordinates": {
+      "lat": 52.44605,
+      "lng": 13.23899
+    }
+  },
+  {
+    "id": "BLN-0116",
+    "district": "Steglitz-Zehlendorf",
+    "location": "Schlossstr.",
+    "coordinates": {
+      "lat": 52.44167,
+      "lng": 13.27097
+    }
+  },
+  {
+    "id": "BLN-0117",
+    "district": "Steglitz-Zehlendorf",
+    "location": "Rathaus Steglitz",
+    "coordinates": {
+      "lat": 52.43187,
+      "lng": 13.25733
+    }
+  },
+  {
+    "id": "BLN-0118",
+    "district": "Steglitz-Zehlendorf",
+    "location": "Mexikoplatz",
+    "coordinates": {
+      "lat": 52.44119,
+      "lng": 13.23805
+    }
+  },
+  {
+    "id": "BLN-0119",
+    "district": "Steglitz-Zehlendorf",
+    "location": "Schlossstr. Nord",
+    "coordinates": {
+      "lat": 52.42816,
+      "lng": 13.24717
+    }
+  },
+  {
+    "id": "BLN-0120",
+    "district": "Steglitz-Zehlendorf",
+    "location": "Rathaus Steglitz Nord",
+    "coordinates": {
+      "lat": 52.44346,
+      "lng": 13.27656
+    }
+  },
+  {
+    "id": "BLN-0121",
+    "district": "Tempelhof-Schoeneberg",
+    "location": "Tempelhofer Feld",
+    "coordinates": {
+      "lat": 52.46006,
+      "lng": 13.36771
+    }
+  },
+  {
+    "id": "BLN-0122",
+    "district": "Tempelhof-Schoeneberg",
+    "location": "Innsbrucker Platz",
+    "coordinates": {
+      "lat": 52.47943,
+      "lng": 13.36815
+    }
+  },
+  {
+    "id": "BLN-0123",
+    "district": "Tempelhof-Schoeneberg",
+    "location": "Nollendorfplatz",
+    "coordinates": {
+      "lat": 52.47901,
+      "lng": 13.3828
+    }
+  },
+  {
+    "id": "BLN-0124",
+    "district": "Tempelhof-Schoeneberg",
+    "location": "Tempelhofer Feld Nord",
+    "coordinates": {
+      "lat": 52.48069,
+      "lng": 13.36529
+    }
+  },
+  {
+    "id": "BLN-0125",
+    "district": "Tempelhof-Schoeneberg",
+    "location": "Innsbrucker Platz Nord",
+    "coordinates": {
+      "lat": 52.47611,
+      "lng": 13.39439
+    }
+  },
+  {
+    "id": "BLN-0126",
+    "district": "Tempelhof-Schoeneberg",
+    "location": "Nollendorfplatz Nord",
+    "coordinates": {
+      "lat": 52.46215,
+      "lng": 13.38842
+    }
+  },
+  {
+    "id": "BLN-0127",
+    "district": "Tempelhof-Schoeneberg",
+    "location": "Tempelhofer Feld Ost",
+    "coordinates": {
+      "lat": 52.46937,
+      "lng": 13.39782
+    }
+  },
+  {
+    "id": "BLN-0128",
+    "district": "Tempelhof-Schoeneberg",
+    "location": "Innsbrucker Platz Ost",
+    "coordinates": {
+      "lat": 52.45978,
+      "lng": 13.38502
+    }
+  },
+  {
+    "id": "BLN-0129",
+    "district": "Tempelhof-Schoeneberg",
+    "location": "Nollendorfplatz Ost",
+    "coordinates": {
+      "lat": 52.46317,
+      "lng": 13.40122
+    }
+  },
+  {
+    "id": "BLN-0130",
+    "district": "Tempelhof-Schoeneberg",
+    "location": "Tempelhofer Feld Sued",
+    "coordinates": {
+      "lat": 52.47349,
+      "lng": 13.36896
+    }
+  },
+  {
+    "id": "BLN-0131",
+    "district": "Tempelhof-Schoeneberg",
+    "location": "Innsbrucker Platz Sued",
+    "coordinates": {
+      "lat": 52.4663,
+      "lng": 13.37127
+    }
+  },
+  {
+    "id": "BLN-0132",
+    "district": "Tempelhof-Schoeneberg",
+    "location": "Nollendorfplatz Sued",
+    "coordinates": {
+      "lat": 52.48012,
+      "lng": 13.37302
+    }
+  },
+  {
+    "id": "BLN-0133",
+    "district": "Tempelhof-Schoeneberg",
+    "location": "Tempelhofer Feld West",
+    "coordinates": {
+      "lat": 52.46828,
+      "lng": 13.36998
+    }
+  },
+  {
+    "id": "BLN-0134",
+    "district": "Tempelhof-Schoeneberg",
+    "location": "Innsbrucker Platz West",
+    "coordinates": {
+      "lat": 52.46543,
+      "lng": 13.38728
+    }
+  },
+  {
+    "id": "BLN-0135",
+    "district": "Tempelhof-Schoeneberg",
+    "location": "Nollendorfplatz West",
+    "coordinates": {
+      "lat": 52.4621,
+      "lng": 13.3898
+    }
+  },
+  {
+    "id": "BLN-0136",
+    "district": "Tempelhof-Schoeneberg",
+    "location": "Tempelhofer Feld",
+    "coordinates": {
+      "lat": 52.48063,
+      "lng": 13.38331
+    }
+  },
+  {
+    "id": "BLN-0137",
+    "district": "Tempelhof-Schoeneberg",
+    "location": "Innsbrucker Platz",
+    "coordinates": {
+      "lat": 52.47409,
+      "lng": 13.36608
+    }
+  },
+  {
+    "id": "BLN-0138",
+    "district": "Tempelhof-Schoeneberg",
+    "location": "Nollendorfplatz",
+    "coordinates": {
+      "lat": 52.46687,
+      "lng": 13.3977
+    }
+  },
+  {
+    "id": "BLN-0139",
+    "district": "Tempelhof-Schoeneberg",
+    "location": "Tempelhofer Feld Nord",
+    "coordinates": {
+      "lat": 52.47969,
+      "lng": 13.39154
+    }
+  },
+  {
+    "id": "BLN-0140",
+    "district": "Tempelhof-Schoeneberg",
+    "location": "Innsbrucker Platz Nord",
+    "coordinates": {
+      "lat": 52.47289,
+      "lng": 13.40285
+    }
+  },
+  {
+    "id": "BLN-0141",
+    "district": "Neukoelln",
+    "location": "Hermannplatz",
+    "coordinates": {
+      "lat": 52.48618,
+      "lng": 13.41698
+    }
+  },
+  {
+    "id": "BLN-0142",
+    "district": "Neukoelln",
+    "location": "Sonnenallee",
+    "coordinates": {
+      "lat": 52.48818,
+      "lng": 13.44558
+    }
+  },
+  {
+    "id": "BLN-0143",
+    "district": "Neukoelln",
+    "location": "Rathaus Neukoelln",
+    "coordinates": {
+      "lat": 52.4833,
+      "lng": 13.45336
+    }
+  },
+  {
+    "id": "BLN-0144",
+    "district": "Neukoelln",
+    "location": "Hermannplatz Nord",
+    "coordinates": {
+      "lat": 52.48599,
+      "lng": 13.44011
+    }
+  },
+  {
+    "id": "BLN-0145",
+    "district": "Neukoelln",
+    "location": "Sonnenallee Nord",
+    "coordinates": {
+      "lat": 52.4752,
+      "lng": 13.43684
+    }
+  },
+  {
+    "id": "BLN-0146",
+    "district": "Neukoelln",
+    "location": "Rathaus Neukoelln Nord",
+    "coordinates": {
+      "lat": 52.48926,
+      "lng": 13.4201
+    }
+  },
+  {
+    "id": "BLN-0147",
+    "district": "Neukoelln",
+    "location": "Hermannplatz Ost",
+    "coordinates": {
+      "lat": 52.49072,
+      "lng": 13.41663
+    }
+  },
+  {
+    "id": "BLN-0148",
+    "district": "Neukoelln",
+    "location": "Sonnenallee Ost",
+    "coordinates": {
+      "lat": 52.48715,
+      "lng": 13.42042
+    }
+  },
+  {
+    "id": "BLN-0149",
+    "district": "Neukoelln",
+    "location": "Rathaus Neukoelln Ost",
+    "coordinates": {
+      "lat": 52.48392,
+      "lng": 13.41876
+    }
+  },
+  {
+    "id": "BLN-0150",
+    "district": "Neukoelln",
+    "location": "Hermannplatz Sued",
+    "coordinates": {
+      "lat": 52.47459,
+      "lng": 13.41674
+    }
+  },
+  {
+    "id": "BLN-0151",
+    "district": "Neukoelln",
+    "location": "Sonnenallee Sued",
+    "coordinates": {
+      "lat": 52.46932,
+      "lng": 13.41574
+    }
+  },
+  {
+    "id": "BLN-0152",
+    "district": "Neukoelln",
+    "location": "Rathaus Neukoelln Sued",
+    "coordinates": {
+      "lat": 52.4838,
+      "lng": 13.43112
+    }
+  },
+  {
+    "id": "BLN-0153",
+    "district": "Neukoelln",
+    "location": "Hermannplatz West",
+    "coordinates": {
+      "lat": 52.47278,
+      "lng": 13.45455
+    }
+  },
+  {
+    "id": "BLN-0154",
+    "district": "Neukoelln",
+    "location": "Sonnenallee West",
+    "coordinates": {
+      "lat": 52.48015,
+      "lng": 13.41698
+    }
+  },
+  {
+    "id": "BLN-0155",
+    "district": "Neukoelln",
+    "location": "Rathaus Neukoelln West",
+    "coordinates": {
+      "lat": 52.48205,
+      "lng": 13.42387
+    }
+  },
+  {
+    "id": "BLN-0156",
+    "district": "Neukoelln",
+    "location": "Hermannplatz",
+    "coordinates": {
+      "lat": 52.4703,
+      "lng": 13.43777
+    }
+  },
+  {
+    "id": "BLN-0157",
+    "district": "Neukoelln",
+    "location": "Sonnenallee",
+    "coordinates": {
+      "lat": 52.49222,
+      "lng": 13.4264
+    }
+  },
+  {
+    "id": "BLN-0158",
+    "district": "Neukoelln",
+    "location": "Rathaus Neukoelln",
+    "coordinates": {
+      "lat": 52.47266,
+      "lng": 13.45429
+    }
+  },
+  {
+    "id": "BLN-0159",
+    "district": "Neukoelln",
+    "location": "Hermannplatz Nord",
+    "coordinates": {
+      "lat": 52.46954,
+      "lng": 13.43224
+    }
+  },
+  {
+    "id": "BLN-0160",
+    "district": "Neukoelln",
+    "location": "Sonnenallee Nord",
+    "coordinates": {
+      "lat": 52.47317,
+      "lng": 13.42664
+    }
+  },
+  {
+    "id": "BLN-0161",
+    "district": "Treptow-Koepenick",
+    "location": "Treptower Park",
+    "coordinates": {
+      "lat": 52.45402,
+      "lng": 13.58264
+    }
+  },
+  {
+    "id": "BLN-0162",
+    "district": "Treptow-Koepenick",
+    "location": "Altstadt Koepenick",
+    "coordinates": {
+      "lat": 52.45433,
+      "lng": 13.55925
+    }
+  },
+  {
+    "id": "BLN-0163",
+    "district": "Treptow-Koepenick",
+    "location": "Adlershof",
+    "coordinates": {
+      "lat": 52.43943,
+      "lng": 13.55927
+    }
+  },
+  {
+    "id": "BLN-0164",
+    "district": "Treptow-Koepenick",
+    "location": "Treptower Park Nord",
+    "coordinates": {
+      "lat": 52.44545,
+      "lng": 13.59476
+    }
+  },
+  {
+    "id": "BLN-0165",
+    "district": "Treptow-Koepenick",
+    "location": "Altstadt Koepenick Nord",
+    "coordinates": {
+      "lat": 52.45273,
+      "lng": 13.576
+    }
+  },
+  {
+    "id": "BLN-0166",
+    "district": "Treptow-Koepenick",
+    "location": "Adlershof Nord",
+    "coordinates": {
+      "lat": 52.44389,
+      "lng": 13.59419
+    }
+  },
+  {
+    "id": "BLN-0167",
+    "district": "Treptow-Koepenick",
+    "location": "Treptower Park Ost",
+    "coordinates": {
+      "lat": 52.44127,
+      "lng": 13.5615
+    }
+  },
+  {
+    "id": "BLN-0168",
+    "district": "Treptow-Koepenick",
+    "location": "Altstadt Koepenick Ost",
+    "coordinates": {
+      "lat": 52.44531,
+      "lng": 13.56577
+    }
+  },
+  {
+    "id": "BLN-0169",
+    "district": "Treptow-Koepenick",
+    "location": "Adlershof Ost",
+    "coordinates": {
+      "lat": 52.4498,
+      "lng": 13.56576
+    }
+  },
+  {
+    "id": "BLN-0170",
+    "district": "Treptow-Koepenick",
+    "location": "Treptower Park Sued",
+    "coordinates": {
+      "lat": 52.45358,
+      "lng": 13.58682
+    }
+  },
+  {
+    "id": "BLN-0171",
+    "district": "Treptow-Koepenick",
+    "location": "Altstadt Koepenick Sued",
+    "coordinates": {
+      "lat": 52.43629,
+      "lng": 13.56517
+    }
+  },
+  {
+    "id": "BLN-0172",
+    "district": "Treptow-Koepenick",
+    "location": "Adlershof Sued",
+    "coordinates": {
+      "lat": 52.45013,
+      "lng": 13.56623
+    }
+  },
+  {
+    "id": "BLN-0173",
+    "district": "Treptow-Koepenick",
+    "location": "Treptower Park West",
+    "coordinates": {
+      "lat": 52.45661,
+      "lng": 13.56466
+    }
+  },
+  {
+    "id": "BLN-0174",
+    "district": "Treptow-Koepenick",
+    "location": "Altstadt Koepenick West",
+    "coordinates": {
+      "lat": 52.44401,
+      "lng": 13.56972
+    }
+  },
+  {
+    "id": "BLN-0175",
+    "district": "Treptow-Koepenick",
+    "location": "Adlershof West",
+    "coordinates": {
+      "lat": 52.43603,
+      "lng": 13.57447
+    }
+  },
+  {
+    "id": "BLN-0176",
+    "district": "Treptow-Koepenick",
+    "location": "Treptower Park",
+    "coordinates": {
+      "lat": 52.43745,
+      "lng": 13.57109
+    }
+  },
+  {
+    "id": "BLN-0177",
+    "district": "Treptow-Koepenick",
+    "location": "Altstadt Koepenick",
+    "coordinates": {
+      "lat": 52.454,
+      "lng": 13.55897
+    }
+  },
+  {
+    "id": "BLN-0178",
+    "district": "Treptow-Koepenick",
+    "location": "Adlershof",
+    "coordinates": {
+      "lat": 52.43579,
+      "lng": 13.56147
+    }
+  },
+  {
+    "id": "BLN-0179",
+    "district": "Treptow-Koepenick",
+    "location": "Treptower Park Nord",
+    "coordinates": {
+      "lat": 52.44469,
+      "lng": 13.58083
+    }
+  },
+  {
+    "id": "BLN-0180",
+    "district": "Treptow-Koepenick",
+    "location": "Altstadt Koepenick Nord",
+    "coordinates": {
+      "lat": 52.45349,
+      "lng": 13.57622
+    }
+  },
+  {
+    "id": "BLN-0181",
+    "district": "Marzahn-Hellersdorf",
+    "location": "Marzahner Promenade",
+    "coordinates": {
+      "lat": 52.5537,
+      "lng": 13.58844
+    }
+  },
+  {
+    "id": "BLN-0182",
+    "district": "Marzahn-Hellersdorf",
+    "location": "Helle Mitte",
+    "coordinates": {
+      "lat": 52.5455,
+      "lng": 13.5746
+    }
+  },
+  {
+    "id": "BLN-0183",
+    "district": "Marzahn-Hellersdorf",
+    "location": "Springpfuhl",
+    "coordinates": {
+      "lat": 52.54528,
+      "lng": 13.57664
+    }
+  },
+  {
+    "id": "BLN-0184",
+    "district": "Marzahn-Hellersdorf",
+    "location": "Marzahner Promenade Nord",
+    "coordinates": {
+      "lat": 52.54324,
+      "lng": 13.5728
+    }
+  },
+  {
+    "id": "BLN-0185",
+    "district": "Marzahn-Hellersdorf",
+    "location": "Helle Mitte Nord",
+    "coordinates": {
+      "lat": 52.5546,
+      "lng": 13.60632
+    }
+  },
+  {
+    "id": "BLN-0186",
+    "district": "Marzahn-Hellersdorf",
+    "location": "Springpfuhl Nord",
+    "coordinates": {
+      "lat": 52.54011,
+      "lng": 13.58675
+    }
+  },
+  {
+    "id": "BLN-0187",
+    "district": "Marzahn-Hellersdorf",
+    "location": "Marzahner Promenade Ost",
+    "coordinates": {
+      "lat": 52.5466,
+      "lng": 13.5857
+    }
+  },
+  {
+    "id": "BLN-0188",
+    "district": "Marzahn-Hellersdorf",
+    "location": "Helle Mitte Ost",
+    "coordinates": {
+      "lat": 52.54169,
+      "lng": 13.58974
+    }
+  },
+  {
+    "id": "BLN-0189",
+    "district": "Marzahn-Hellersdorf",
+    "location": "Springpfuhl Ost",
+    "coordinates": {
+      "lat": 52.55379,
+      "lng": 13.57118
+    }
+  },
+  {
+    "id": "BLN-0190",
+    "district": "Marzahn-Hellersdorf",
+    "location": "Marzahner Promenade Sued",
+    "coordinates": {
+      "lat": 52.53417,
+      "lng": 13.57468
+    }
+  },
+  {
+    "id": "BLN-0191",
+    "district": "Marzahn-Hellersdorf",
+    "location": "Helle Mitte Sued",
+    "coordinates": {
+      "lat": 52.54243,
+      "lng": 13.60242
+    }
+  },
+  {
+    "id": "BLN-0192",
+    "district": "Marzahn-Hellersdorf",
+    "location": "Springpfuhl Sued",
+    "coordinates": {
+      "lat": 52.54646,
+      "lng": 13.59695
+    }
+  },
+  {
+    "id": "BLN-0193",
+    "district": "Marzahn-Hellersdorf",
+    "location": "Marzahner Promenade West",
+    "coordinates": {
+      "lat": 52.53984,
+      "lng": 13.60484
+    }
+  },
+  {
+    "id": "BLN-0194",
+    "district": "Marzahn-Hellersdorf",
+    "location": "Helle Mitte West",
+    "coordinates": {
+      "lat": 52.55018,
+      "lng": 13.60479
+    }
+  },
+  {
+    "id": "BLN-0195",
+    "district": "Marzahn-Hellersdorf",
+    "location": "Springpfuhl West",
+    "coordinates": {
+      "lat": 52.54424,
+      "lng": 13.59897
+    }
+  },
+  {
+    "id": "BLN-0196",
+    "district": "Marzahn-Hellersdorf",
+    "location": "Marzahner Promenade",
+    "coordinates": {
+      "lat": 52.54553,
+      "lng": 13.58768
+    }
+  },
+  {
+    "id": "BLN-0197",
+    "district": "Marzahn-Hellersdorf",
+    "location": "Helle Mitte",
+    "coordinates": {
+      "lat": 52.53516,
+      "lng": 13.58376
+    }
+  },
+  {
+    "id": "BLN-0198",
+    "district": "Marzahn-Hellersdorf",
+    "location": "Springpfuhl",
+    "coordinates": {
+      "lat": 52.55326,
+      "lng": 13.58719
+    }
+  },
+  {
+    "id": "BLN-0199",
+    "district": "Marzahn-Hellersdorf",
+    "location": "Marzahner Promenade Nord",
+    "coordinates": {
+      "lat": 52.55091,
+      "lng": 13.59137
+    }
+  },
+  {
+    "id": "BLN-0200",
+    "district": "Marzahn-Hellersdorf",
+    "location": "Helle Mitte Nord",
+    "coordinates": {
+      "lat": 52.54838,
+      "lng": 13.58634
+    }
+  },
+  {
+    "id": "BLN-0201",
+    "district": "Lichtenberg",
+    "location": "Frankfurter Allee",
+    "coordinates": {
+      "lat": 52.52019,
+      "lng": 13.51326
+    }
+  },
+  {
+    "id": "BLN-0202",
+    "district": "Lichtenberg",
+    "location": "Rathaus Lichtenberg",
+    "coordinates": {
+      "lat": 52.53648,
+      "lng": 13.51798
+    }
+  },
+  {
+    "id": "BLN-0203",
+    "district": "Lichtenberg",
+    "location": "Landsberger Allee",
+    "coordinates": {
+      "lat": 52.53568,
+      "lng": 13.50183
+    }
+  },
+  {
+    "id": "BLN-0204",
+    "district": "Lichtenberg",
+    "location": "Frankfurter Allee Nord",
+    "coordinates": {
+      "lat": 52.53214,
+      "lng": 13.48225
+    }
+  },
+  {
+    "id": "BLN-0205",
+    "district": "Lichtenberg",
+    "location": "Rathaus Lichtenberg Nord",
+    "coordinates": {
+      "lat": 52.53535,
+      "lng": 13.50339
+    }
+  },
+  {
+    "id": "BLN-0206",
+    "district": "Lichtenberg",
+    "location": "Landsberger Allee Nord",
+    "coordinates": {
+      "lat": 52.53828,
+      "lng": 13.48513
+    }
+  },
+  {
+    "id": "BLN-0207",
+    "district": "Lichtenberg",
+    "location": "Frankfurter Allee Ost",
+    "coordinates": {
+      "lat": 52.5396,
+      "lng": 13.51078
+    }
+  },
+  {
+    "id": "BLN-0208",
+    "district": "Lichtenberg",
+    "location": "Rathaus Lichtenberg Ost",
+    "coordinates": {
+      "lat": 52.53724,
+      "lng": 13.49599
+    }
+  },
+  {
+    "id": "BLN-0209",
+    "district": "Lichtenberg",
+    "location": "Landsberger Allee Ost",
+    "coordinates": {
+      "lat": 52.53115,
+      "lng": 13.49293
+    }
+  },
+  {
+    "id": "BLN-0210",
+    "district": "Lichtenberg",
+    "location": "Frankfurter Allee Sued",
+    "coordinates": {
+      "lat": 52.52078,
+      "lng": 13.50006
+    }
+  },
+  {
+    "id": "BLN-0211",
+    "district": "Lichtenberg",
+    "location": "Rathaus Lichtenberg Sued",
+    "coordinates": {
+      "lat": 52.53545,
+      "lng": 13.50544
+    }
+  },
+  {
+    "id": "BLN-0212",
+    "district": "Lichtenberg",
+    "location": "Landsberger Allee Sued",
+    "coordinates": {
+      "lat": 52.52515,
+      "lng": 13.50229
+    }
+  },
+  {
+    "id": "BLN-0213",
+    "district": "Lichtenberg",
+    "location": "Frankfurter Allee West",
+    "coordinates": {
+      "lat": 52.52523,
+      "lng": 13.48807
+    }
+  },
+  {
+    "id": "BLN-0214",
+    "district": "Lichtenberg",
+    "location": "Rathaus Lichtenberg West",
+    "coordinates": {
+      "lat": 52.53561,
+      "lng": 13.49406
+    }
+  },
+  {
+    "id": "BLN-0215",
+    "district": "Lichtenberg",
+    "location": "Landsberger Allee West",
+    "coordinates": {
+      "lat": 52.52989,
+      "lng": 13.50116
+    }
+  },
+  {
+    "id": "BLN-0216",
+    "district": "Lichtenberg",
+    "location": "Frankfurter Allee",
+    "coordinates": {
+      "lat": 52.52843,
+      "lng": 13.48838
+    }
+  },
+  {
+    "id": "BLN-0217",
+    "district": "Lichtenberg",
+    "location": "Rathaus Lichtenberg",
+    "coordinates": {
+      "lat": 52.53,
+      "lng": 13.4845
+    }
+  },
+  {
+    "id": "BLN-0218",
+    "district": "Lichtenberg",
+    "location": "Landsberger Allee",
+    "coordinates": {
+      "lat": 52.53415,
+      "lng": 13.4935
+    }
+  },
+  {
+    "id": "BLN-0219",
+    "district": "Lichtenberg",
+    "location": "Frankfurter Allee Nord",
+    "coordinates": {
+      "lat": 52.52671,
+      "lng": 13.48173
+    }
+  },
+  {
+    "id": "BLN-0220",
+    "district": "Lichtenberg",
+    "location": "Rathaus Lichtenberg Nord",
+    "coordinates": {
+      "lat": 52.5311,
+      "lng": 13.49065
+    }
+  },
+  {
+    "id": "BLN-0221",
+    "district": "Reinickendorf",
+    "location": "Rathaus Reinickendorf",
+    "coordinates": {
+      "lat": 52.5843,
+      "lng": 13.34236
+    }
+  },
+  {
+    "id": "BLN-0222",
+    "district": "Reinickendorf",
+    "location": "Tegel",
+    "coordinates": {
+      "lat": 52.59411,
+      "lng": 13.31526
+    }
+  },
+  {
+    "id": "BLN-0223",
+    "district": "Reinickendorf",
+    "location": "Kurt-Schumacher-Platz",
+    "coordinates": {
+      "lat": 52.57802,
+      "lng": 13.31588
+    }
+  },
+  {
+    "id": "BLN-0224",
+    "district": "Reinickendorf",
+    "location": "Rathaus Reinickendorf Nord",
+    "coordinates": {
+      "lat": 52.57393,
+      "lng": 13.34189
+    }
+  },
+  {
+    "id": "BLN-0225",
+    "district": "Reinickendorf",
+    "location": "Tegel Nord",
+    "coordinates": {
+      "lat": 52.59383,
+      "lng": 13.31494
+    }
+  },
+  {
+    "id": "BLN-0226",
+    "district": "Reinickendorf",
+    "location": "Kurt-Schumacher-Platz Nord",
+    "coordinates": {
+      "lat": 52.57532,
+      "lng": 13.31127
+    }
+  },
+  {
+    "id": "BLN-0227",
+    "district": "Reinickendorf",
+    "location": "Rathaus Reinickendorf Ost",
+    "coordinates": {
+      "lat": 52.58406,
+      "lng": 13.33527
+    }
+  },
+  {
+    "id": "BLN-0228",
+    "district": "Reinickendorf",
+    "location": "Tegel Ost",
+    "coordinates": {
+      "lat": 52.57956,
+      "lng": 13.34534
+    }
+  },
+  {
+    "id": "BLN-0229",
+    "district": "Reinickendorf",
+    "location": "Kurt-Schumacher-Platz Ost",
+    "coordinates": {
+      "lat": 52.58216,
+      "lng": 13.31367
+    }
+  },
+  {
+    "id": "BLN-0230",
+    "district": "Reinickendorf",
+    "location": "Rathaus Reinickendorf Sued",
+    "coordinates": {
+      "lat": 52.58158,
+      "lng": 13.31684
+    }
+  },
+  {
+    "id": "BLN-0231",
+    "district": "Reinickendorf",
+    "location": "Tegel Sued",
+    "coordinates": {
+      "lat": 52.57122,
+      "lng": 13.34556
+    }
+  },
+  {
+    "id": "BLN-0232",
+    "district": "Reinickendorf",
+    "location": "Kurt-Schumacher-Platz Sued",
+    "coordinates": {
+      "lat": 52.58395,
+      "lng": 13.31074
+    }
+  },
+  {
+    "id": "BLN-0233",
+    "district": "Reinickendorf",
+    "location": "Rathaus Reinickendorf West",
+    "coordinates": {
+      "lat": 52.5925,
+      "lng": 13.32699
+    }
+  },
+  {
+    "id": "BLN-0234",
+    "district": "Reinickendorf",
+    "location": "Tegel West",
+    "coordinates": {
+      "lat": 52.58932,
+      "lng": 13.32004
+    }
+  },
+  {
+    "id": "BLN-0235",
+    "district": "Reinickendorf",
+    "location": "Kurt-Schumacher-Platz West",
+    "coordinates": {
+      "lat": 52.57664,
+      "lng": 13.33642
+    }
+  },
+  {
+    "id": "BLN-0236",
+    "district": "Reinickendorf",
+    "location": "Rathaus Reinickendorf",
+    "coordinates": {
+      "lat": 52.57927,
+      "lng": 13.31836
+    }
+  },
+  {
+    "id": "BLN-0237",
+    "district": "Reinickendorf",
+    "location": "Tegel",
+    "coordinates": {
+      "lat": 52.58446,
+      "lng": 13.34698
+    }
+  },
+  {
+    "id": "BLN-0238",
+    "district": "Reinickendorf",
+    "location": "Kurt-Schumacher-Platz",
+    "coordinates": {
+      "lat": 52.58297,
+      "lng": 13.31613
+    }
+  },
+  {
+    "id": "BLN-0239",
+    "district": "Reinickendorf",
+    "location": "Rathaus Reinickendorf Nord",
+    "coordinates": {
+      "lat": 52.57703,
+      "lng": 13.32264
+    }
+  },
+  {
+    "id": "BLN-0240",
+    "district": "Reinickendorf",
+    "location": "Tegel Nord",
+    "coordinates": {
+      "lat": 52.58075,
+      "lng": 13.32267
+    }
+  }
+]
