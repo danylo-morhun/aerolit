@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import Button from 'primevue/button';
-import Column from 'primevue/column';
-import DataTable from 'primevue/datatable';
-
+import AppButton from '@/components/ui/AppButton.vue';
 import AqiBadge from '@/components/ui/AqiBadge.vue';
 import ConnectionBadge from '@/components/ui/ConnectionBadge.vue';
+import DataGrid, { type GridColumn } from '@/components/ui/DataGrid.vue';
 import StateBlock from '@/components/ui/StateBlock.vue';
+import WatchStar from '@/components/ui/WatchStar.vue';
 import { formatConcentration } from '@/domain/format';
 import type { SortableRow, SortDirection, SortKey } from '@/domain/sort';
 import type { AqiCategory } from '@/domain/types';
@@ -17,12 +16,17 @@ defineProps<{
   sortDirection: SortDirection;
   mode: TableMode;
   loading: boolean;
+  /** Rows are visible; their measured columns are still arriving. */
+  enriching?: boolean;
   error: boolean;
   canGoNext: boolean;
   canGoPrevious: boolean;
   /** Present in search mode: total matches and the current window's first row. */
   total: number | null;
   rangeStart: number | null;
+  /** Ids currently on the dashboard watchlist. */
+  watchedIds: readonly string[];
+  watchlistFull: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -30,28 +34,20 @@ const emit = defineEmits<{
   next: [];
   previous: [];
   retry: [];
+  toggleWatch: [stationId: string];
 }>();
 
-const COLUMNS: { key: SortKey; label: string; numeric?: boolean }[] = [
+/** `watch` is not sortable: it reflects a local preference, not station data. */
+const COLUMNS: GridColumn<SortKey | 'watch'>[] = [
+  { key: 'watch', label: '', sortable: false },
   { key: 'id', label: 'ID' },
   { key: 'district', label: 'District' },
   { key: 'location', label: 'Neighborhood' },
-  { key: 'pm25', label: 'PM2.5', numeric: true },
-  { key: 'pm10', label: 'PM10', numeric: true },
+  { key: 'pm25', label: 'PM2.5' },
+  { key: 'pm10', label: 'PM10' },
   { key: 'aqi', label: 'AQI' },
   { key: 'connection', label: 'Connection' },
 ];
-
-/** Ascending is the "healthiest first" direction, so it reads as up. */
-function sortIcon(key: SortKey, activeKey: SortKey, direction: SortDirection): string {
-  if (key !== activeKey) return 'pi pi-sort-alt';
-  return direction === 'asc' ? 'pi pi-sort-up-fill' : 'pi pi-sort-down-fill';
-}
-
-function ariaSort(key: SortKey, activeKey: SortKey, direction: SortDirection) {
-  if (key !== activeKey) return 'none';
-  return direction === 'asc' ? 'ascending' : 'descending';
-}
 
 function pmClass(category: AqiCategory | null | undefined): string {
   return `cell-value cell-value--${category ?? 'none'}`;
@@ -69,99 +65,75 @@ function pmClass(category: AqiCategory | null | undefined): string {
     />
 
     <template v-else>
-      <DataTable
-        :value="[...rows]"
-        data-key="station.id"
-        :loading="loading"
-        scrollable
-        class="table__grid"
-      >
-        <Column v-for="column in COLUMNS" :key="column.key" :field="column.key">
-          <template #header>
-            <!--
-              The sort control is a real button rather than DataTable's built-in
-              sorting: ordering is decided in `useSensorTable`, because outside
-              `browse` mode it has to apply to the whole result set and not just
-              the twenty rows this component was handed.
-            -->
-            <button
-              type="button"
-              class="table__sort"
-              :class="{ 'table__sort--numeric': column.numeric }"
-              :aria-sort="ariaSort(column.key, sortKey, sortDirection)"
-              @click="emit('sort', column.key)"
-            >
-              {{ column.label }}
-              <i
-                :class="[sortIcon(column.key, sortKey, sortDirection), 'table__sort-icon']"
-                aria-hidden="true"
-              />
-            </button>
+      <div class="table__scroll">
+        <DataGrid
+          :rows="rows"
+          :columns="COLUMNS"
+          row-key="station.id"
+          :loading="loading"
+          :sort-key="sortKey"
+          :sort-direction="sortDirection"
+          empty-title="No stations match that search"
+          @sort="(key) => key !== 'watch' && emit('sort', key)"
+        >
+          <template #cell-watch="{ row }">
+            <WatchStar
+              :watched="watchedIds.includes(row.station.id)"
+              :disabled="watchlistFull && !watchedIds.includes(row.station.id)"
+              :station-label="`${row.station.district} ${row.station.id}`"
+              @toggle="emit('toggleWatch', row.station.id)"
+            />
           </template>
-
-          <template #body="{ data }: { data: SortableRow }">
-            <template v-if="column.key === 'id'">
-              <span class="aq-mono">{{ data.station.id }}</span>
-            </template>
-            <template v-else-if="column.key === 'district'">{{ data.station.district }}</template>
-            <template v-else-if="column.key === 'location'">{{ data.station.location }}</template>
-            <template v-else-if="column.key === 'pm25'">
-              <span :class="pmClass(data.metrics?.aqi)">
-                {{ formatConcentration(data.metrics?.pm25 ?? null) }}
-              </span>
-            </template>
-            <template v-else-if="column.key === 'pm10'">
-              {{ formatConcentration(data.metrics?.pm10 ?? null) }}
-            </template>
-            <template v-else-if="column.key === 'aqi'">
-              <AqiBadge :category="data.metrics?.aqi ?? null" size="sm" />
-            </template>
-            <template v-else>
-              <ConnectionBadge
-                :state="data.metrics?.connection ?? 'offline'"
-                :stability="data.metrics?.stability ?? 0"
-              />
-            </template>
+          <template #cell-id="{ row }">
+            <span class="aq-mono">{{ row.station.id }}</span>
           </template>
-        </Column>
-
-        <template #empty>
-          <StateBlock
-            :state="loading ? 'loading' : 'empty'"
-            :title="loading ? 'Loading stations…' : 'No stations match that search'"
-            compact
-          />
-        </template>
-      </DataTable>
+          <template #cell-district="{ row }">{{ row.station.district }}</template>
+          <template #cell-location="{ row }">{{ row.station.location }}</template>
+          <template #cell-pm25="{ row }">
+            <span :class="pmClass(row.metrics?.aqi)">
+              {{ formatConcentration(row.metrics?.pm25 ?? null) }}
+            </span>
+          </template>
+          <template #cell-pm10="{ row }">
+            {{ formatConcentration(row.metrics?.pm10 ?? null) }}
+          </template>
+          <template #cell-aqi="{ row }">
+            <AqiBadge :category="row.metrics?.aqi ?? null" size="sm" />
+          </template>
+          <template #cell-connection="{ row }">
+            <ConnectionBadge
+              :state="row.metrics?.connection ?? 'offline'"
+              :stability="row.metrics?.stability ?? 0"
+            />
+          </template>
+        </DataGrid>
+      </div>
 
       <footer class="table__footer">
         <p class="table__status" aria-live="polite">
-          <template v-if="mode === 'search' && total !== null">
+          <template v-if="enriching">Loading readings…</template>
+          <template v-else-if="mode === 'search' && total !== null">
             {{ total }} matching {{ total === 1 ? 'station' : 'stations' }}
             <span v-if="rangeStart !== null && total > 0">
               · showing {{ rangeStart }}–{{ Math.min(rangeStart + rows.length - 1, total) }}
             </span>
           </template>
-          <template v-else> Browsing the network one page at a time </template>
+          <template v-else>Browsing the network one page at a time</template>
         </p>
 
         <div class="table__pager">
-          <Button
+          <AppButton
             label="Previous"
             icon="pi pi-angle-left"
-            size="small"
-            severity="secondary"
-            outlined
+            size="sm"
             :disabled="!canGoPrevious || loading"
             @click="emit('previous')"
           />
-          <Button
+          <AppButton
             label="Next"
             icon="pi pi-angle-right"
             icon-pos="right"
-            size="small"
-            severity="secondary"
-            outlined
+            size="sm"
             :disabled="!canGoNext || loading"
             @click="emit('next')"
           />
@@ -182,32 +154,11 @@ function pmClass(category: AqiCategory | null | undefined): string {
   box-shadow: var(--aq-shadow-card);
 }
 
-.table__grid {
+/* The table is the one piece of content wide enough to need its own scroll
+   container on a tablet — the page itself must never scroll sideways. */
+.table__scroll {
   min-width: 0;
-}
-
-.table__sort {
-  display: inline-flex;
-  gap: 6px;
-  align-items: center;
-  padding: 0;
-  font-size: var(--aq-text-2xs);
-  font-weight: 600;
-  color: var(--aq-ink-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  cursor: pointer;
-  background: none;
-  border: 0;
-}
-
-.table__sort:hover {
-  color: var(--aq-ink);
-}
-
-.table__sort-icon {
-  font-size: 9px;
-  opacity: 0.7;
+  overflow-x: auto;
 }
 
 .table__footer {
@@ -252,29 +203,5 @@ function pmClass(category: AqiCategory | null | undefined): string {
 
 .cell-value--none {
   color: var(--aq-ink-subtle);
-}
-</style>
-
-<style>
-/* DataTable renders its own markup; these rules retint it with project tokens
-   rather than accepting the preset's default table chrome. */
-.table__grid .p-datatable-thead > tr > th {
-  padding: var(--aq-space-4) var(--aq-space-4);
-  background: var(--aq-surface);
-  border-bottom: 1px solid var(--aq-border);
-}
-
-.table__grid .p-datatable-tbody > tr > td {
-  padding: var(--aq-space-4);
-  font-size: var(--aq-text-base);
-  border-bottom: 1px solid var(--aq-border);
-}
-
-.table__grid .p-datatable-tbody > tr:last-child > td {
-  border-bottom: 0;
-}
-
-.table__grid .p-datatable-tbody > tr:hover > td {
-  background: var(--aq-surface-sunken);
 }
 </style>

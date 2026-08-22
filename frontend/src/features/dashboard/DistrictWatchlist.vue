@@ -6,6 +6,7 @@ import AqiBadge from '@/components/ui/AqiBadge.vue';
 import ConnectionBadge from '@/components/ui/ConnectionBadge.vue';
 import MetricChip from '@/components/ui/MetricChip.vue';
 import Sparkline from '@/components/ui/Sparkline.vue';
+import WatchStar from '@/components/ui/WatchStar.vue';
 import StateBlock from '@/components/ui/StateBlock.vue';
 import { formatConcentration } from '@/domain/format';
 import type { Station, StationMetrics } from '@/domain/types';
@@ -15,12 +16,25 @@ const props = defineProps<{
   metricsByStation: ReadonlyMap<string, StationMetrics>;
   selectedId: string | null;
   loading?: boolean;
+  /** True when a header search is narrowing the panel. */
+  filtered?: boolean;
 }>();
 
 const emit = defineEmits<{
   select: [stationId: string];
   unwatch: [stationId: string];
 }>();
+
+/**
+ * Two different empty states: nothing tracked at all, versus tracked stations
+ * that the current search hides. Telling an operator to go and star something
+ * when they have simply filtered them out would be misleading.
+ */
+const emptyDescription = computed(() =>
+  props.filtered
+    ? 'No tracked station matches the current search.'
+    : 'Star a station in the sensor list to follow it here.',
+);
 
 const rows = computed(() =>
   props.stations.map((station) => ({
@@ -41,7 +55,7 @@ const rows = computed(() =>
       v-else-if="rows.length === 0"
       state="empty"
       title="No tracked stations"
-      description="Star a station in the sensor list to follow it here."
+      :description="emptyDescription"
       compact
     />
 
@@ -93,14 +107,12 @@ const rows = computed(() =>
 
         <!-- Sits outside the row button: nesting one button inside another is
              invalid, and the star is a separate action from selecting. -->
-        <button
-          type="button"
+        <WatchStar
           class="watchlist__star"
-          :aria-label="`Stop tracking ${station.district} ${station.id}`"
-          @click="emit('unwatch', station.id)"
-        >
-          <i class="pi pi-star-fill" aria-hidden="true" />
-        </button>
+          watched
+          :station-label="`${station.district} ${station.id}`"
+          @toggle="emit('unwatch', station.id)"
+        />
       </li>
     </ul>
   </AppCard>
@@ -110,7 +122,7 @@ const rows = computed(() =>
 .watchlist__all {
   font-size: var(--aq-text-sm);
   font-weight: 600;
-  color: var(--aq-accent);
+  color: var(--aq-accent-text);
   text-decoration: none;
 }
 
@@ -242,19 +254,5 @@ const rows = computed(() =>
   position: absolute;
   top: var(--aq-space-3);
   right: var(--aq-space-3);
-  display: grid;
-  place-items: center;
-  width: 28px;
-  height: 28px;
-  font-size: 13px;
-  color: var(--aq-accent);
-  cursor: pointer;
-  background: none;
-  border: 0;
-  border-radius: var(--aq-radius-sm);
-}
-
-.watchlist__star:hover {
-  background: var(--aq-surface-sunken);
 }
 </style>
