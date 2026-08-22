@@ -135,7 +135,7 @@ watch(
 
       <div class="map__legend">
         <p class="map__legend-title">Air Quality Index</p>
-        <ul class="map__legend-list">
+        <ul class="map__legend-list" aria-label="Air Quality Index bands">
           <li v-for="band in legend" :key="band.category" class="map__legend-item">
             <span
               class="map__legend-dot"

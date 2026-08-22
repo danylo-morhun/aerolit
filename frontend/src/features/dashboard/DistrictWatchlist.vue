@@ -45,7 +45,7 @@ const rows = computed(() =>
       compact
     />
 
-    <ul v-else class="watchlist">
+    <ul v-else class="watchlist" aria-label="Tracked stations">
       <li
         v-for="{ station, metrics } in rows"
         :key="station.id"
