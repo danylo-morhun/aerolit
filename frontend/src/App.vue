@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted } from 'vue';
 
+import AppShell from '@/components/layout/AppShell.vue';
 import { useThemeStore } from '@/stores/theme';
 
 const theme = useThemeStore();
@@ -15,5 +16,7 @@ onBeforeUnmount(() => stopFollowingSystem?.());
 
 <template>
   <a class="aq-skip-link" href="#main">Skip to content</a>
-  <RouterView />
+  <AppShell>
+    <RouterView />
+  </AppShell>
 </template>
