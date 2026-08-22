@@ -21,7 +21,12 @@ const trend = computed(() =>
   props.delta === null ? null : toTrend(props.delta, props.higherIsBetter),
 );
 const tone = computed(() => trend.value?.tone ?? 'flat');
-const text = computed(() => formatDelta(props.delta, props.fractionDigits));
+// The *clamped* delta, not the raw prop: a movement inside the dead band is
+// reported as flat, and printing its raw "+0.0" would claim a direction the
+// badge has just decided not to assert.
+const text = computed(() =>
+  formatDelta(trend.value === null ? null : trend.value.delta, props.fractionDigits),
+);
 
 /**
  * The arrow tracks the *tone*, not the sign — an up-right arrow means "this
