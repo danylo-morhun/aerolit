@@ -145,10 +145,21 @@ export function useSensorTable(query: Ref<string>) {
     return sorted.slice(searchOffset.value, searchOffset.value + PAGE_SIZE);
   });
 
+  /**
+   * Blocking load: there are no rows to show yet.
+   *
+   * Deliberately excludes the per-row readings. Station identity arrives first
+   * and those rows are useful immediately; covering them with a spinner while
+   * the measured columns stream in would hide content the operator can already
+   * read, and would flicker the pagination controls disabled.
+   */
   const isLoading = computed(() =>
-    mode.value === 'browse'
-      ? pageQuery.isPending.value || rowReadings.value.some((q) => q.isPending)
-      : network.isLoading.value,
+    mode.value === 'browse' ? pageQuery.isPending.value : network.isLoading.value,
+  );
+
+  /** Non-blocking: rows are on screen, their measured columns still filling in. */
+  const isEnriching = computed(
+    () => mode.value === 'browse' && rowReadings.value.some((query) => query.isPending),
   );
 
   const isError = computed(() =>
@@ -210,6 +221,7 @@ export function useSensorTable(query: Ref<string>) {
     sortDirection,
     toggleSort,
     isLoading,
+    isEnriching,
     isError,
     canGoNext,
     canGoPrevious,
