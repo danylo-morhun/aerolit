@@ -95,9 +95,29 @@ identity index, and resolved it as **two modes** (`useSensorTable.ts`):
   sort: it looks like an answer and isn't.
 
 The mode is derived from what was asked, not chosen from a menu, and the footer
-says which one is active. I asked Wised which reading of the constraint was
-intended; the code is structured so that switching to the strict interpretation
-means deleting the `search` branch, not rewriting the table.
+says which one is active.
+
+Two details decide whether that boundary is principled or just convenient:
+
+- **The server's order is `id` ascending — direction included.** Descending by
+  id looks like a free reversal of the page, and isn't: page one reversed is
+  stations 1–20 backwards, never 240–221. It switches mode like any other
+  ordering the server doesn't serve.
+- **Search mode fetches the identity index, not the network's readings.** 240
+  identities is 3 requests and ~40 kB; the twenty rows on screen then fetch
+  their own series, shared with the dashboard's cache. Only a sort **by a
+  measured column** needs everything — you cannot know which twenty stations
+  have the highest PM2.5 without looking at all 240 — and that is the one case
+  that pays for it. Measured in the running app: text search 3 requests, sort by
+  district 23, sort by PM2.5 243.
+
+Rather than guess against the brief's "don't build one big client-side list", I
+**asked Wised** which reading was intended (the question is quoted verbatim in
+[ADR 0006](docs/adr/0006-table-pagination-search-sort.md), sent 22 Aug). No
+answer had arrived by the time this was written, so the submission ships the
+reading I argued for — and is structured so the strict one is a deletion: drop
+the `search` branch, and `isServerOrder` returns true for every key. Nothing
+else in the table changes.
 
 ### Accessibility caught a real defect in the design
 
@@ -169,19 +189,21 @@ eyeballed.
 | **Times display in Europe/Berlin** | The network is Berlin's and an 18:00 peak should land at 18:00. Pinning the zone also makes rendering identical on every machine, CI included. |
 | **The watchlist seeds with four stations and is user-editable** | The brief says "a short watchlist… not the full network" without saying which. The star control makes it theirs; the choice persists in `localStorage`. |
 | **Dashboard search narrows; list search filters** | On the dashboard the map and watchlist are one view of "the network right now", so the query narrows both. Exhaustive lookup belongs on the Sensor List. |
-| **Fonts load from Google Fonts** | With a system-font fallback stack. The mockup is clearly not set in a system font. |
+| **Fonts are bundled, not loaded from Google's CDN** | The mockup is clearly not set in a system font, but embedding Google Fonts sends the visitor's IP to the US without consent — held to breach the GDPR by a German court in 2022, which is not a footnote for a Berlin network run from the EU. Only the latin subset and the seven weights this UI uses are shipped: 112 kB. A system-font stack still backs them. |
+| **The map card says "Particulate readings", where the mockup says "Real-time particulate readings"** | The dataset is a fixed snapshot the brief says not to poll. Calling it real-time would be the one piece of copy on the page that isn't true. |
 | **Tablet layout** | No mockup was given. KPIs go 4→2 columns at 900 px; the map/watchlist split stacks at 1100 px, where the watchlist becomes two columns to use the width. Verified at 768 px and 1024 px in both orientations. |
 
 ---
 
 ## 3 · Where I traded completeness for time
 
-- **The table's snapshot instant is page-scoped.** On the dashboard "now" is
-  exact — every station is loaded. On the Sensor List it is the latest hour
-  among the twenty visible rows, which lands on the true value unless an entire
-  page is offline (17 of 240 are, so this is vanishingly unlikely, but it is not
-  impossible). The clean fix is a network-wide `/snapshot` endpoint; inventing
-  one felt out of scope.
+- **The table's snapshot instant is derived from the rows on screen.** On the
+  dashboard "now" is exact — every station is loaded. On the Sensor List it is
+  the latest hour among the twenty visible rows, which lands on the true value
+  unless an entire page is offline (17 of 240 are, so this is vanishingly
+  unlikely, but it is not impossible). That is the price of not pulling 240
+  series to render 20 rows. The clean fix is a network-wide `/snapshot`
+  endpoint; inventing one felt out of scope.
 - **No keyboard access to individual map markers.** 240 tab stops would be worse
   than none; keyboard and screen-reader users reach every station through the
   watchlist and the table, which are ordinary buttons and rows. A production
@@ -225,6 +247,20 @@ changes I would point at first:
   tracked" when a search had simply hidden the rows.
 - Numeric column headers misaligned with their cells, and the twelve contrast
   failures above.
+
+A second pass, done by reading the shipped screens against the brief again
+rather than the code, found four more:
+
+- **A badge that contradicted itself.** One station in the dataset (BLN-0011)
+  reports 0.8556 stability: below the brief's 86 % threshold, so a *poor* link —
+  but rounded to nearest it printed "Poor link 86%", a figure the same brief
+  calls healthy. Stability now rounds **down**, so the number clears 86 exactly
+  when the state does (`formatStability`).
+- **A sort that lied about its scope**, and **a search that fetched far more
+  than it needed** — both described under "the table" above.
+- **A count reported before it was known.** Entering a search rendered "0
+  matching stations" for as long as the index took to arrive. It now says it is
+  still searching, because zero is an answer and the table did not have one yet.
 
 ## 4 · What I'd do next, with more time
 
