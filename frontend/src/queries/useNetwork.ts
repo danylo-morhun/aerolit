@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from '@tanstack/vue-query';
-import { computed, type ComputedRef } from 'vue';
+import { computed, toValue, type ComputedRef, type MaybeRefOrGetter } from 'vue';
 
 import { mapWithConcurrency } from '@/api/concurrency';
 import { fetchReadings, fetchStationPage, MAX_PAGE_SIZE } from '@/api/stations';
@@ -26,9 +26,10 @@ const READING_CONCURRENCY = 8;
  * whole network. Only identity is fetched here (id, district, location,
  * coordinates), which is small.
  */
-export function useAllStations() {
+export function useAllStations(enabled: MaybeRefOrGetter<boolean> = true) {
   return useQuery({
     queryKey: queryKeys.allStations(),
+    enabled: computed(() => toValue(enabled)),
     queryFn: async ({ signal }): Promise<Station[]> => {
       const stations: Station[] = [];
       let cursor: string | undefined;
@@ -51,12 +52,15 @@ export function useAllStations() {
  * chart, the watchlist and the table all read a station's history straight
  * from cache instead of re-requesting it. One fetch, four consumers.
  */
-export function useNetworkReadings(stationIds: ComputedRef<readonly string[]>) {
+export function useNetworkReadings(
+  stationIds: ComputedRef<readonly string[]>,
+  enabled: MaybeRefOrGetter<boolean> = true,
+) {
   const queryClient = useQueryClient();
 
   return useQuery({
     queryKey: queryKeys.networkReadings(),
-    enabled: computed(() => stationIds.value.length > 0),
+    enabled: computed(() => toValue(enabled) && stationIds.value.length > 0),
     queryFn: async ({ signal }): Promise<Map<string, ReadingSeries>> => {
       const ids = stationIds.value;
 
@@ -94,10 +98,15 @@ export interface NetworkView {
  * create a second source of truth to keep in sync. The two roll-up passes over
  * 240 × 720 readings run once per data change, not per render.
  */
-export function useNetwork() {
-  const stationsQuery = useAllStations();
+/**
+ * @param enabled gates the whole fetch. The sensor table only needs the full
+ * network once the operator searches or sorts by a measured column, so it
+ * passes a ref rather than paying for 240 series on page load.
+ */
+export function useNetwork(enabled: MaybeRefOrGetter<boolean> = true) {
+  const stationsQuery = useAllStations(enabled);
   const stationIds = computed(() => (stationsQuery.data.value ?? []).map((s) => s.id));
-  const readingsQuery = useNetworkReadings(stationIds);
+  const readingsQuery = useNetworkReadings(stationIds, enabled);
 
   const view = computed<NetworkView>(() => {
     const stations = stationsQuery.data.value ?? [];
