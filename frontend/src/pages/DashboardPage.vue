@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, defineAsyncComponent, ref, watch } from 'vue';
 
 import PageHeader from '@/components/layout/PageHeader.vue';
 import StateBlock from '@/components/ui/StateBlock.vue';
-import ConcentrationChart from '@/features/dashboard/ConcentrationChart.vue';
 import DistrictWatchlist from '@/features/dashboard/DistrictWatchlist.vue';
 import KpiRow from '@/features/dashboard/KpiRow.vue';
 import SensorMap from '@/features/dashboard/SensorMap.vue';
@@ -13,6 +12,17 @@ import { useSelectionStore } from '@/stores/selection';
 import { useWatchlistStore } from '@/stores/watchlist';
 
 defineOptions({ name: 'DashboardPage' });
+
+/**
+ * The chart pulls in ECharts, which is the single largest dependency in the
+ * app. Loading it asynchronously keeps it out of the dashboard's initial chunk
+ * so the KPIs and the map — the part an operator reads first, and the part
+ * above the fold — paint without waiting for a charting library. The card
+ * renders its own loading state until the module arrives.
+ */
+const ConcentrationChart = defineAsyncComponent(
+  () => import('@/features/dashboard/ConcentrationChart.vue'),
+);
 
 const query = ref('');
 const selection = useSelectionStore();
