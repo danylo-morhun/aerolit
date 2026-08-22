@@ -26,3 +26,9 @@ pnpm-debug.log*
 # override any global ignore rules for these paths.
 !CLAUDE.md
 !docs/
+
+# playwright output
+test-results/
+playwright-report/
+blob-report/
+.playwright/
