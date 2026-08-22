@@ -1,0 +1,212 @@
+/**
+ * Design tokens — the single source of colour, type and spacing for the app.
+ *
+ * Two tiers:
+ *   1. Primitives (`--aq-c-*`, `--aq-space-*`, …) — raw values, theme-agnostic.
+ *   2. Semantic (`--aq-surface`, `--aq-ink`, `--aq-status-*`, …) — roles that
+ *      the UI actually references. Only these are re-pointed for dark mode.
+ *
+ * Everything downstream reads the semantic tier: the PrimeVue preset
+ * (src/theme/preset.ts) maps its component tokens onto these vars, the ECharts
+ * options read them at render time, and the Leaflet layer picks its basemap
+ * from the same signal. Changing a colour here changes it everywhere, which is
+ * the property the brief asks for.
+ *
+ * Palette values were sampled from the reference mockups.
+ */
+
+:root {
+  /* ---------------------------------------------------------------- *
+   * 1 · Primitives                                                    *
+   * ---------------------------------------------------------------- */
+
+  /* Warm neutral ramp — the mockup's paper/ink family. */
+  --aq-c-neutral-0: #ffffff;
+  --aq-c-neutral-50: #f4f2ee;
+  --aq-c-neutral-100: #eae7e2;
+  --aq-c-neutral-150: #e7e4e0;
+  --aq-c-neutral-200: #ded8cf;
+  --aq-c-neutral-400: #a7a29c;
+  --aq-c-neutral-500: #7c776d;
+  --aq-c-neutral-600: #6e6b66;
+  --aq-c-neutral-700: #464138;
+  --aq-c-neutral-800: #322f27;
+  --aq-c-neutral-850: #2b2721;
+  --aq-c-neutral-900: #211f19;
+  --aq-c-neutral-950: #16150f;
+  --aq-c-ink: #1c1b19;
+  --aq-c-paper: #f2ede6;
+
+  /* Brand / accent. */
+  --aq-c-orange-500: #f1682c;
+  --aq-c-orange-600: #d9541b;
+
+  /* Air-quality status hues. Identical in both themes: a category's colour is
+     part of its meaning, so it must not shift with the theme. Only the
+     text-on-dark variants below are lightened, for contrast. */
+  --aq-c-good: #5ca56c;
+  --aq-c-good-light: #6cba7d;
+  --aq-c-moderate: #e0a93a;
+  --aq-c-moderate-light: #eab94f;
+  --aq-c-elevated: #f1682c;
+  --aq-c-elevated-light: #f57f4a;
+  --aq-c-unhealthy: #d6463a;
+  --aq-c-unhealthy-light: #e36658;
+
+  /* Soft status tints, used as chip backgrounds in both themes. */
+  --aq-c-tint-good: #e3f0e5;
+  --aq-c-tint-moderate: #f7ecd3;
+  --aq-c-tint-elevated: #fbe3d6;
+  --aq-c-tint-unhealthy: #f6dcd8;
+  --aq-c-tint-good-dark: #233428;
+  --aq-c-tint-unhealthy-dark: #3b2422;
+
+  /* ---------------------------------------------------------------- *
+   * 2 · Semantic — light theme                                        *
+   * ---------------------------------------------------------------- */
+
+  --aq-page: var(--aq-c-neutral-150);
+  --aq-surface: var(--aq-c-neutral-0);
+  --aq-surface-sunken: var(--aq-c-neutral-50);
+  --aq-surface-raised: var(--aq-c-neutral-0);
+  --aq-surface-input: var(--aq-c-neutral-0);
+  --aq-border: var(--aq-c-neutral-100);
+  --aq-border-strong: var(--aq-c-neutral-200);
+
+  --aq-ink: var(--aq-c-ink);
+  --aq-ink-muted: var(--aq-c-neutral-600);
+  --aq-ink-subtle: var(--aq-c-neutral-400);
+  --aq-ink-inverse: var(--aq-c-paper);
+
+  --aq-accent: var(--aq-c-orange-500);
+  --aq-accent-hover: var(--aq-c-orange-600);
+  --aq-accent-contrast: var(--aq-c-neutral-0);
+  --aq-focus-ring: color-mix(in srgb, var(--aq-accent) 45%, transparent);
+
+  /* Status: `-fg` is text/marker colour, `-bg` the chip behind it. */
+  --aq-status-good-fg: var(--aq-c-good);
+  --aq-status-good-bg: var(--aq-c-tint-good);
+  --aq-status-moderate-fg: var(--aq-c-moderate);
+  --aq-status-moderate-bg: var(--aq-c-tint-moderate);
+  --aq-status-elevated-fg: var(--aq-c-elevated);
+  --aq-status-elevated-bg: var(--aq-c-tint-elevated);
+  --aq-status-unhealthy-fg: var(--aq-c-unhealthy);
+  --aq-status-unhealthy-bg: var(--aq-c-tint-unhealthy);
+
+  /* Connection states reuse the status hues: HQ reads as good, poor as bad,
+     offline as absent. One vocabulary, so a colour never means two things. */
+  --aq-link-hq: var(--aq-c-good);
+  --aq-link-poor: var(--aq-c-unhealthy);
+  --aq-link-offline: var(--aq-c-neutral-400);
+
+  /* Trend badges: colour encodes better/worse, not the sign of the number. */
+  --aq-trend-good-fg: var(--aq-c-good);
+  --aq-trend-good-bg: var(--aq-c-tint-good);
+  --aq-trend-bad-fg: var(--aq-c-unhealthy);
+  --aq-trend-bad-bg: var(--aq-c-tint-unhealthy);
+  --aq-trend-flat-fg: var(--aq-c-neutral-600);
+  --aq-trend-flat-bg: var(--aq-c-neutral-50);
+
+  /* Data visualisation. */
+  --aq-viz-pm10: var(--aq-c-neutral-200);
+  --aq-viz-pm25: var(--aq-c-orange-500);
+  --aq-viz-grid: var(--aq-c-neutral-100);
+  --aq-viz-axis: var(--aq-c-neutral-400);
+  --aq-viz-area-from: color-mix(in srgb, var(--aq-c-orange-500) 22%, transparent);
+  --aq-viz-area-to: color-mix(in srgb, var(--aq-c-orange-500) 0%, transparent);
+
+  /* Map basemap: CARTO raster tiles, swapped with the theme. */
+  --aq-map-tiles: 'light_all';
+
+  --aq-shadow-card: 0 1px 2px rgb(28 27 25 / 4%), 0 1px 3px rgb(28 27 25 / 3%);
+  --aq-shadow-pop: 0 4px 16px rgb(28 27 25 / 10%);
+
+  /* ---------------------------------------------------------------- *
+   * Typography, spacing, radii — theme-independent                    *
+   * ---------------------------------------------------------------- */
+
+  --aq-font-sans:
+    'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --aq-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --aq-text-2xs: 0.6875rem; /* 11px — badge text */
+  --aq-text-xs: 0.75rem; /* 12px — mono ids, legends */
+  --aq-text-sm: 0.8125rem; /* 13px — labels, captions */
+  --aq-text-base: 0.875rem; /* 14px — body, table cells */
+  --aq-text-md: 1rem; /* 16px — card titles */
+  --aq-text-lg: 1.375rem; /* 22px — watchlist figures */
+  --aq-text-xl: 1.75rem; /* 28px — page title */
+  --aq-text-2xl: 2.125rem; /* 34px — KPI values */
+
+  --aq-space-1: 0.25rem;
+  --aq-space-2: 0.5rem;
+  --aq-space-3: 0.75rem;
+  --aq-space-4: 1rem;
+  --aq-space-5: 1.25rem;
+  --aq-space-6: 1.5rem;
+  --aq-space-8: 2rem;
+
+  --aq-radius-sm: 8px;
+  --aq-radius-md: 12px;
+  --aq-radius-lg: 16px;
+  --aq-radius-xl: 20px;
+  --aq-radius-pill: 999px;
+
+  --aq-transition: 150ms ease;
+}
+
+/* ------------------------------------------------------------------ *
+ * Semantic — dark theme                                               *
+ * Only role→value mappings are re-pointed; the primitive ramp and the *
+ * whole type/space scale are shared.                                  *
+ * ------------------------------------------------------------------ */
+
+.dark {
+  --aq-page: var(--aq-c-neutral-950);
+  --aq-surface: var(--aq-c-neutral-900);
+  --aq-surface-sunken: var(--aq-c-neutral-950);
+  --aq-surface-raised: var(--aq-c-neutral-800);
+  --aq-surface-input: var(--aq-c-neutral-800);
+  --aq-border: var(--aq-c-neutral-850);
+  --aq-border-strong: var(--aq-c-neutral-700);
+
+  --aq-ink: var(--aq-c-paper);
+  --aq-ink-muted: #b4afa5;
+  --aq-ink-subtle: var(--aq-c-neutral-500);
+  --aq-ink-inverse: var(--aq-c-ink);
+
+  --aq-accent-contrast: var(--aq-c-neutral-950);
+
+  /* Markers and chips keep the shared hues; text-weight uses the lightened
+     variants so it clears contrast on the near-black surface. */
+  --aq-status-good-fg: var(--aq-c-good-light);
+  --aq-status-moderate-fg: var(--aq-c-moderate-light);
+  --aq-status-elevated-fg: var(--aq-c-elevated);
+  --aq-status-unhealthy-fg: var(--aq-c-unhealthy-light);
+
+  --aq-link-hq: var(--aq-c-good-light);
+  --aq-link-poor: var(--aq-c-unhealthy-light);
+  --aq-link-offline: var(--aq-c-neutral-500);
+
+  --aq-trend-good-fg: var(--aq-c-good-light);
+  --aq-trend-good-bg: var(--aq-c-tint-good-dark);
+  --aq-trend-bad-fg: var(--aq-c-unhealthy-light);
+  --aq-trend-bad-bg: var(--aq-c-tint-unhealthy-dark);
+  --aq-trend-flat-fg: var(--aq-c-neutral-500);
+  --aq-trend-flat-bg: var(--aq-c-neutral-800);
+
+  --aq-viz-pm10: var(--aq-c-neutral-700);
+  --aq-viz-grid: var(--aq-c-neutral-900);
+  --aq-viz-axis: var(--aq-c-neutral-500);
+
+  --aq-map-tiles: 'dark_all';
+
+  --aq-shadow-card: 0 1px 2px rgb(0 0 0 / 40%);
+  --aq-shadow-pop: 0 4px 16px rgb(0 0 0 / 50%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --aq-transition: 0ms;
+  }
+}
