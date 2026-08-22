@@ -1,0 +1,233 @@
+# NOTES
+
+The reasoning behind the submission: what I decided, what I assumed where the
+brief was silent, what I left out, and where I disagreed with my tools.
+
+Decisions that needed room to breathe are written up as ADRs in
+[`docs/adr/`](docs/adr/) — each records what I rejected as well as what I chose.
+This file is the summary and the honest list of edges.
+
+---
+
+## 1 · The decisions I'd most want to defend
+
+### The domain layer is pure, and that is enforced
+
+Every derived number in the app — AQI category, stability %, connection state,
+the four KPIs, the week-over-week deltas, the chart buckets — is computed by a
+pure function in `src/domain/`. No Vue, no `fetch`, no `Date.now()`. It isn't a
+convention: `eslint.config.ts` restricts imports and the ambient clock inside
+that folder.
+
+The clock rule is the one that matters. The dataset is a **fixed snapshot**, so
+"now" is a property of the data (the most recent hour any station reported,
+`2026-07-11T12:00Z`), not of when the page happens to be opened. A single hidden
+`Date.now()` would make every metric drift as the exercise ages. Callers pass
+the instant in; `deriveStationMetrics({ at })` is the same function whether it is
+producing the live figure or the one from a week ago.
+
+That last property is what makes the trend badges honest rather than decorative
+— more on that below.
+
+### Verifying the definitions, not just the functions
+
+The unit tests use synthetic fixtures, which prove a function does what its name
+says. They cannot prove the name describes the right thing.
+
+So I computed the four KPIs independently — a throwaway Python pass over
+`mock-data/` — and pinned those numbers in
+[`frontend/tests/dataset.spec.ts`](frontend/tests/dataset.spec.ts): 223 active
+sensors, 12.4413 µg/m³ mean PM2.5, 17 poor links, 0.9461 network stability, and
+the week-over-week deltas −6 / +0.34 / −14 / +0.02 pp. Two implementations
+written from the same spec agreeing to four decimals is much stronger evidence
+than either alone. If someone later redefines the stability window or the
+offline rule, that test fails instead of the dashboard quietly showing a
+plausible wrong number.
+
+### Real week-over-week badges, and the clamp that makes them true
+
+The brief allows a static placeholder here. I built the real thing, because the
+data is already in cache: the reference figure re-runs the same roll-up anchored
+at `now − 168 h`.
+
+Doing that surfaces a subtle trap. Stability is "readings present ÷ hours
+expected" over a trailing 30 days. Anchored a week earlier, that window reaches
+**168 hours before the dataset begins**. Scoring every station against 720 hours
+when only 552 were ever observable drags the reference down to ≈0.725 and
+invents a network-wide *+22 point recovery* that never happened.
+
+So the expected count is clamped to the start of available history
+(`stabilityAt`, `src/domain/stability.ts`). The two figures are then both
+"share present ÷ hours that could have been observed", which is comparable. The
+honest caveat: they are measured over windows of different lengths (720 h vs
+552 h). The alternative — equal-length 7-day windows on both sides — would be
+cleaner statistically but would stop matching the KPI actually displayed, which
+the brief defines as a 30-day figure. I chose to match the displayed metric and
+write the caveat down rather than silently change what the number means.
+
+### Which stations feed which KPI
+
+Two judgement calls the brief leaves open, both in `computeKpis`:
+
+- **Avg PM2.5 counts reporting stations only.** An offline station's last
+  reading can be hours old; folding it into a "current" average mixes stale air
+  into a live number. Silence is already reported by the Active Sensors tile.
+- **Network Stability counts every station, offline included.** It measures how
+  dependable the network is at delivering data, and a sensor that stopped
+  reporting is the strongest evidence of undependability. Excluding it would
+  make the fleet's score *improve* as more of it failed.
+
+### The table: cursor pagination versus search and sort
+
+`GET /stations` is cursor-paginated with no server-side search or sort. The
+brief asks for a sortable, searchable table and forbids walking every page up
+front. For any sort key the server doesn't order by, those constraints conflict.
+
+I read the prohibition as targeting bulk data hoarding, not the ~240-entry
+identity index, and resolved it as **two modes** (`useSensorTable.ts`):
+
+- **browse** (default) — one cursor page at a time, `after` / `before`, controls
+  disabled exactly when the API omits the corresponding cursor. Readings are
+  fetched per visible row.
+- **search** — entered only when the operator types a query or sorts by a
+  measured column, because those questions cannot be answered from twenty rows.
+  A page-local sort by PM2.5 shows a per-page maximum, which is worse than no
+  sort: it looks like an answer and isn't.
+
+The mode is derived from what was asked, not chosen from a menu, and the footer
+says which one is active. I asked Wised which reading of the constraint was
+intended; the code is structured so that switching to the strict interpretation
+means deleting the `search` branch, not rewriting the table.
+
+### What became a shared component, and what didn't
+
+`src/components/ui/` holds the elements that appear in more than one place with
+identical meaning: `AqiBadge`, `ConnectionBadge`, `TrendBadge`, `MetricChip`,
+`StatTile`, `Sparkline`, `SegmentedToggle`, `SearchInput`, `AppCard`,
+`StateBlock`. The AQI badge renders in the watchlist and the table; changing its
+shape is one edit.
+
+What stayed local: the watchlist row, the KPI row's composition, the table's
+column definitions. They look reusable but each exists once, and hoisting a
+single-use layout into a "shared" component buys nothing while making the thing
+harder to read.
+
+`SearchInput` is shared; the *query state* is not. Each page owns its own,
+because the two mean different things — narrowing the map and watchlist versus
+filtering a table of every station. Hoisting the query into a store would have
+coupled two behaviours that merely look alike.
+
+### Theming from one place, including the parts that aren't DOM
+
+`src/theme/tokens.css` is a two-tier token set (primitives → semantic roles).
+The PrimeVue preset maps its component tokens onto `var(--aq-*)` rather than
+duplicating literal colours under `colorScheme.light` / `.dark`, so one
+definition covers both themes. ECharts and Leaflet can't read CSS variables from
+canvas, so they read the computed values through `cssVar()` — same source, no
+second palette. Dark mode swaps the CARTO basemap too; a bright map in a dark
+dashboard is what gives away a half-finished theme.
+
+The palette was sampled pixel-by-pixel from the provided mockups rather than
+eyeballed.
+
+---
+
+## 2 · Assumptions where the brief was silent
+
+| Assumption | Why |
+| --- | --- |
+| **"Now" = the latest hour across *all* stations** (2026-07-11T12:00Z) | 17 of 240 stations are offline; anchoring on any single station could shift the app's clock backwards and mark the offline ones healthy. |
+| **AQI bands are `[from, to)`** | The brief writes "0–12" and "12–35", which overlap at 12. A reading of exactly 12 is Moderate. |
+| **PM10 uses the PM2.5 bands, doubled** | The brief defines one scale and ties it to PM2.5, but the map has a PM10 mode that still needs marker colours. Reusing the PM2.5 bounds would paint nearly the whole network red. A real deployment would take these from the regulator. |
+| **Offline stations keep their last known concentrations** | That is what the reference mockup shows (`Offline 86%` next to real PM values). `connection` communicates the silence. |
+| **Missing hours are omitted from the sparkline, not zero-filled** | A zero draws the line to the floor and reads as clean air, when what happened is that nothing was reported. Same reasoning for chart gaps: `connectNulls: false`. |
+| **Times display in Europe/Berlin** | The network is Berlin's and an 18:00 peak should land at 18:00. Pinning the zone also makes rendering identical on every machine, CI included. |
+| **The watchlist seeds with four stations and is user-editable** | The brief says "a short watchlist… not the full network" without saying which. The star control makes it theirs; the choice persists in `localStorage`. |
+| **Dashboard search narrows; list search filters** | On the dashboard the map and watchlist are one view of "the network right now", so the query narrows both. Exhaustive lookup belongs on the Sensor List. |
+| **Fonts load from Google Fonts** | With a system-font fallback stack. The mockup is clearly not set in a system font. |
+| **Tablet layout** | No mockup was given. KPIs go 4→2 columns at 900 px; the map/watchlist split stacks at 1100 px, where the watchlist becomes two columns to use the width. Verified at 768 px and 1024 px in both orientations. |
+
+---
+
+## 3 · Where I traded completeness for time
+
+- **The table's snapshot instant is page-scoped.** On the dashboard "now" is
+  exact — every station is loaded. On the Sensor List it is the latest hour
+  among the twenty visible rows, which lands on the true value unless an entire
+  page is offline (17 of 240 are, so this is vanishingly unlikely, but it is not
+  impossible). The clean fix is a network-wide `/snapshot` endpoint; inventing
+  one felt out of scope.
+- **No keyboard access to individual map markers.** 240 tab stops would be worse
+  than none; keyboard and screen-reader users reach every station through the
+  watchlist and the table, which are ordinary buttons and rows. A production
+  version would add a "jump to station" combobox over the map.
+- **`GET /stations/:id/readings/count` is implemented but unused.** The
+  dashboard already holds each full series, so the tally is free from data in
+  hand (ADR 0005). It stays in the client as the right tool the moment a caller
+  needs stability *without* the series.
+- **The 30-day chart shows daily means, not 720 hourly bars.** Sub-pixel bars
+  imply a precision the eye cannot read. 7D uses 6-hour buckets. Both are
+  labelled by range in the card subtitle.
+- **No E2E layer.** Playwright over the two pages is the obvious next test, but
+  the integration tests already drive the real router, store and query client
+  against MSW, which covers the wiring an E2E run would.
+
+## 4 · What I'd do next, with more time
+
+1. **Server-side aggregation.** This architecture is honest at 240 stations and
+   is the wrong shape at the 10 000 the brief mentions: 10 000 series is not a
+   client's job. The right answer is `/kpis?at=` and `/stations?bbox=` endpoints,
+   with the client rendering rather than reducing. The domain functions would
+   move to the server largely unchanged — they are already pure.
+2. **Virtualised table** with infinite scroll over the cursor stream, once page
+   size stops being 20.
+3. **Deep links** for the selected station, range and pollutant, so an operator
+   can send a colleague exactly what they are looking at.
+4. **Visual regression tests** on both themes — the one class of bug the current
+   suite cannot see.
+5. **A real PM10 scale** from the regulator, replacing the doubling assumption.
+
+---
+
+## 5 · Tooling, and where I disagreed with it
+
+I used Claude Code throughout, the way the job description describes: to move
+quickly through work I already understood, with every decision and every line
+reviewed. The architecture, the trade-offs above and the ADRs are mine; the
+model was fastest at scaffolding, boilerplate and test bodies once the shape was
+decided. `CLAUDE.md` in the repo root is the instruction file I wrote to keep it
+inside the layering rules — the domain-purity constraint, "no fetch in
+components", "cursor pagination only" — rather than re-litigating them per file.
+
+The places I went against the obvious or suggested path:
+
+- **PrimeVue 4, not 5.** `npm install primevue` gives you 5.0.1, which is where
+  PrimeTek moved to a commercial licence — the package description says "premium
+  UI library" and it peer-depends on `@primeui/license-manager`, an offline
+  licence verifier. I pinned **4.5.5 (MIT)** with `@primeuix/themes` 1.2.5 so the
+  submission has no licence question attached to it.
+- **TypeScript 6, not 7.** 7.0.2 is `latest`, but `typescript-eslint@8` declares
+  `typescript >=4.8.4 <6.1.0`; upgrading would have silently broken linting. I
+  took the newest version the ecosystem actually supports. Relatedly, TS 6
+  deprecates `baseUrl` — I removed it and let `paths` resolve relative to the
+  config, rather than silencing the warning with `ignoreDeprecations`.
+- **vue-router 4, not 5.** v5 folds in build-time route codegen (unplugin,
+  `@babel/generator`, chokidar) and peer-depends on Vite and Pinia. For two
+  static routes that is dependency surface with no payoff.
+- **Hand-rolled SVG sparkline, not a chart instance per row.** The suggested
+  path was reusing ECharts. A canvas context, resize observer and init cost per
+  row, to draw a line with no axes and no interactivity, is the wrong tool
+  (ADR 0008 — ~20 lines, and the normalisation is unit-tested).
+- **Leaflet directly, not a Vue binding library.** At one tile layer and 240
+  circle markers, the binding library's API surface is larger than the map code
+  it replaces (ADR 0004).
+- **Sorting is mine, not `DataTable`'s.** The built-in sort would order the
+  twenty rows the component was handed; ordering has to apply to the whole
+  result set in search mode, so it lives in `useSensorTable`.
+
+The other correction worth recording is one the tests caught rather than me: on
+Node 25 the `localStorage` global in the test environment is a bare object with
+no methods, so the persistence tests failed while the app was fine (every
+storage call is wrapped in `try`/`catch`). The fix is a conforming in-memory
+Storage installed in `tests/setup.ts` only when what's already there doesn't
+work — not a change to application code that was behaving correctly.
