@@ -1,6 +1,9 @@
 import L from 'leaflet';
 import { onBeforeUnmount, onMounted, ref, watch, type Ref } from 'vue';
 
+/** How long the "hold ⌘ to zoom" hint stays up after a plain wheel gesture. */
+const WHEEL_HINT_MS = 1600;
+
 /** Berlin, framed so the whole sensor network fits at the default zoom. */
 export const BERLIN_CENTER: L.LatLngExpression = [52.5155, 13.3777];
 export const DEFAULT_ZOOM = 10;
@@ -25,7 +28,10 @@ const ATTRIBUTION =
  */
 export function useLeafletMap(container: Ref<HTMLElement | null>, isDark: Ref<boolean>) {
   const map = ref<L.Map | null>(null);
+  /** True while the map is explaining that zooming needs a modifier. */
+  const wheelHint = ref(false);
   let tileLayer: L.TileLayer | null = null;
+  let hintTimer: ReturnType<typeof setTimeout> | undefined;
 
   function tileUrl(dark: boolean): string {
     return TILE_TEMPLATE.replace('{style}', dark ? 'dark_all' : 'light_all');
@@ -41,9 +47,9 @@ export function useLeafletMap(container: Ref<HTMLElement | null>, isDark: Ref<bo
       zoom: DEFAULT_ZOOM,
       zoomControl: false,
       attributionControl: true,
-      // Scroll-zoom would hijack the page scroll on the way past the map;
-      // the explicit +/- control and pinch-zoom cover both input types.
-      scrollWheelZoom: false,
+      // Left on, but gated below: an unmodified wheel has to keep scrolling the
+      // page, or the map traps the reader halfway down the dashboard.
+      scrollWheelZoom: true,
       doubleClickZoom: true,
     });
 
@@ -57,6 +63,17 @@ export function useLeafletMap(container: Ref<HTMLElement | null>, isDark: Ref<bo
 
     map.value = instance;
 
+    /**
+     * Wheel gating, in the capture phase so it runs before Leaflet's handler.
+     *
+     * With a modifier held the event reaches Leaflet and zooms the map — and
+     * that is not only a keyboard convention: a trackpad pinch *is* a wheel
+     * event with `ctrlKey` set, so the natural gesture zooms the map instead of
+     * the whole page. Without a modifier the event is stopped before Leaflet
+     * sees it, the page scrolls as it should, and the map says why.
+     */
+    instance.getContainer().addEventListener('wheel', onWheel, { capture: true });
+
     // Leaflet measures its container once, at construction. Here the container
     // is a grid child that settles *after* mount — and it also changes height
     // when the layout switches to the stacked tablet arrangement. Without this
@@ -64,6 +81,17 @@ export function useLeafletMap(container: Ref<HTMLElement | null>, isDark: Ref<bo
     resizeObserver = new ResizeObserver(() => instance.invalidateSize({ animate: false }));
     resizeObserver.observe(container.value);
   });
+
+  function onWheel(event: WheelEvent): void {
+    if (event.ctrlKey || event.metaKey) return;
+
+    event.stopImmediatePropagation();
+    wheelHint.value = true;
+    clearTimeout(hintTimer);
+    hintTimer = setTimeout(() => {
+      wheelHint.value = false;
+    }, WHEEL_HINT_MS);
+  }
 
   /** Frames the given points, with a floor on zoom so one station isn't a street map. */
   function fitTo(points: readonly L.LatLngExpression[]): void {
@@ -77,6 +105,8 @@ export function useLeafletMap(container: Ref<HTMLElement | null>, isDark: Ref<bo
   });
 
   onBeforeUnmount(() => {
+    clearTimeout(hintTimer);
+    map.value?.getContainer().removeEventListener('wheel', onWheel, { capture: true });
     resizeObserver?.disconnect();
     resizeObserver = null;
     map.value?.remove();
@@ -84,5 +114,5 @@ export function useLeafletMap(container: Ref<HTMLElement | null>, isDark: Ref<bo
     tileLayer = null;
   });
 
-  return { map, fitTo };
+  return { map, fitTo, wheelHint };
 }

@@ -25,7 +25,7 @@ const pollutant = defineModel<Pollutant>('pollutant', { required: true });
 
 const theme = useThemeStore();
 const container = ref<HTMLElement | null>(null);
-const { map, fitTo } = useLeafletMap(
+const { map, fitTo, wheelHint } = useLeafletMap(
   container,
   computed(() => theme.isDark),
 );
@@ -142,6 +142,11 @@ watch(
         aria-label="Sensor map — station markers coloured by air quality index"
       />
 
+      <!-- Only ever a response to a mouse gesture, and it restates what the +/-
+           control already offers, so it is hidden from assistive tech rather
+           than announced as a live region. -->
+      <p v-if="wheelHint" class="map__hint" aria-hidden="true">Hold ⌘ or Ctrl and scroll to zoom</p>
+
       <div class="map__legend">
         <p class="map__legend-title">Air Quality Index</p>
         <ul class="map__legend-list" aria-label="Air Quality Index bands">
@@ -170,6 +175,23 @@ watch(
   height: 100%;
   min-height: 420px;
   background: var(--aq-surface-sunken);
+}
+
+.map__hint {
+  position: absolute;
+  top: var(--aq-space-4);
+  left: 50%;
+  z-index: 500;
+  padding: var(--aq-space-2) var(--aq-space-4);
+  font-size: var(--aq-text-xs);
+  font-weight: 500;
+  color: var(--aq-ink);
+  white-space: nowrap;
+  background: color-mix(in srgb, var(--aq-surface) 94%, transparent);
+  border: 1px solid var(--aq-border);
+  border-radius: var(--aq-radius-pill);
+  box-shadow: var(--aq-shadow-pop);
+  transform: translateX(-50%);
 }
 
 .map__legend {
