@@ -99,13 +99,38 @@ says which one is active. I asked Wised which reading of the constraint was
 intended; the code is structured so that switching to the strict interpretation
 means deleting the `search` branch, not rewriting the table.
 
+### Accessibility caught a real defect in the design
+
+The palette sampled from the mockups fails WCAG AA for small text — twelve
+distinct violations, worst being Moderate amber at 2.1:1 on white where 4.5:1
+is required. I found this by running `@axe-core/playwright` over both pages,
+not by eye.
+
+The fix splits the palette by role, along the line WCAG itself draws: graphics
+(map markers, sparklines, chart series) need 3:1 and keep the mockup hues
+exactly, because the vivid colour is what makes the map scannable; text needs
+4.5:1 and uses a darkened variant of the same hue — the minimum darkening that
+clears the threshold, hue and saturation preserved. Status text is therefore a
+shade deeper than the comp. That is a deviation I would raise with the
+designer rather than ship silently, and it is enforced rather than asserted:
+axe runs in CI over both pages in **both themes**, so a future colour change
+that breaks contrast fails the build. Full reasoning in
+[ADR 0009](docs/adr/0009-accessible-palette.md).
+
 ### What became a shared component, and what didn't
 
 `src/components/ui/` holds the elements that appear in more than one place with
-identical meaning: `AqiBadge`, `ConnectionBadge`, `TrendBadge`, `MetricChip`,
-`StatTile`, `Sparkline`, `SegmentedToggle`, `SearchInput`, `AppCard`,
-`StateBlock`. The AQI badge renders in the watchlist and the table; changing its
-shape is one edit.
+identical meaning: `AppButton`, `AppCard`, `AqiBadge`, `ConnectionBadge`,
+`TrendBadge`, `MetricChip`, `StatTile`, `Sparkline`, `SegmentedToggle`,
+`SearchInput`, `WatchStar`, `DataGrid`, `StateBlock`. The AQI badge renders in
+the watchlist and the table; changing its shape is one edit.
+
+The boundary is enforced, not just described: ESLint forbids importing
+`primevue/*` anywhere outside `src/components/ui/`, so a feature cannot quietly
+reach past the wrapper layer. Table chrome lives in the theme preset's
+`components.datatable` tokens rather than as `.p-datatable-*` rules inside the
+component that happens to render a table — that is precisely the difference
+the brief draws between "one set of tokens" and "per-view overrides".
 
 What stayed local: the watchlist row, the KPI row's composition, the table's
 column definitions. They look reusable but each exists once, and hoisting a
@@ -168,9 +193,38 @@ eyeballed.
 - **The 30-day chart shows daily means, not 720 hourly bars.** Sub-pixel bars
   imply a precision the eye cannot read. 7D uses 6-hour buckets. Both are
   labelled by range in the card subtitle.
-- **No E2E layer.** Playwright over the two pages is the obvious next test, but
-  the integration tests already drive the real router, store and query client
-  against MSW, which covers the wiring an E2E run would.
+- **The tablet e2e project runs Chromium, not WebKit.** What it verifies —
+  responsive layout, no hover-only interaction, tap targets — is
+  engine-independent, and requiring a second browser engine would mean anyone
+  running the suite downloads WebKit too. A real iPad-targeted product would
+  add the WebKit project.
+
+### An audit pass, and what it found
+
+Late on, I went back through the brief line by line and ran the app rather
+than trusting it. That found eight things worth fixing, and they are the
+changes I would point at first:
+
+- **A dead end in the watchlist.** Its empty state told the operator to star a
+  station in the sensor list — and the sensor list had no star. Unstarring all
+  four defaults left no way back. Now `WatchStar` is a shared control used in
+  both places, with the watchlist cap surfaced as a disabled state that says
+  why.
+- **A feature reaching past the wrapper layer** (`SensorTable` importing
+  PrimeVue's `Button` and `DataTable` directly), now `AppButton` / `DataGrid`
+  plus the lint rule described above.
+- **`aria-sort` on the sort button instead of the `<th>`**, where assistive
+  tech actually reads it.
+- **`role="application"` on the map**, which traps a screen reader's virtual
+  cursor; `region` is the correct role for a landmark you can look at.
+- **A blocking spinner over rows that were already readable** — station
+  identity arrives before the readings, so the table now shows the rows and
+  reports "Loading readings…" instead of hiding them.
+- **Two empty states that were lying**: a dashboard search matching nothing
+  rendered a blank map with no explanation, and the watchlist blamed "nothing
+  tracked" when a search had simply hidden the rows.
+- Numeric column headers misaligned with their cells, and the twelve contrast
+  failures above.
 
 ## 4 · What I'd do next, with more time
 
@@ -184,7 +238,7 @@ eyeballed.
 3. **Deep links** for the selected station, range and pollutant, so an operator
    can send a colleague exactly what they are looking at.
 4. **Visual regression tests** on both themes — the one class of bug the current
-   suite cannot see.
+   suite still cannot see, now that behaviour and accessibility are covered.
 5. **A real PM10 scale** from the regulator, replacing the doubling assumption.
 
 ---

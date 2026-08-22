@@ -29,7 +29,7 @@ Two pages behind a shared app shell, one data source (the mock API on
 | Domain | `src/domain/` | Pure functions only — AQI classification, stability, connection state, KPI roll-ups, week-over-week trends, series downsampling. No Vue imports, no I/O. Fully unit-tested. |
 | Queries | `src/queries/` | TanStack Query composables — caching, deduplication, request lifecycle. Bridge between API and views. |
 | Stores | `src/stores/` | Pinia, UI state only: theme, station selection, watchlist. Server data never lives here. |
-| Shared UI | `src/components/ui/` | Project-level components on top of PrimeVue primitives (StatTile, TrendBadge, AqiBadge, ConnectionBadge, Sparkline, …). A design change propagates from one edit point. |
+| Shared UI | `src/components/ui/` | Project-level components on top of PrimeVue primitives (AppButton, DataGrid, StatTile, TrendBadge, AqiBadge, ConnectionBadge, Sparkline, WatchStar, …). A design change propagates from one edit point. **This is the only layer allowed to import `primevue/*`** — enforced by ESLint. |
 | Features | `src/features/` | Page-specific compositions (dashboard/, sensors/). May use shared UI + queries + domain; never call `fetch` directly. |
 | Pages | `src/pages/` | Route targets. Layout only. |
 | Theme | `src/theme/` | One PrimeVue preset + design tokens; dark mode via a `.dark` selector on `<html>`. |
@@ -75,7 +75,19 @@ persisted and wins.
 
 ## Testing strategy
 
-Depth where the logic is: `domain/` at 100 % (boundary values, missing hours,
-offline edge cases, downsampling), component tests for every state of the
-shared badges/tiles, MSW-backed integration tests for the two pages' happy
-path and error path. Views are thin by construction, so they need few tests.
+Four layers, each answering a different question:
+
+- **Unit** — `domain/` at its boundaries (band edges, missing hours, offline
+  edge cases, downsampling, nulls-last sorting), plus component tests for every
+  state of the shared badges and tiles.
+- **Dataset** (`tests/dataset.spec.ts`) — the domain layer against the real
+  shipped data, pinned to independently computed figures. This is what catches
+  a wrong *definition*, which a fixture-based unit test cannot.
+- **Integration** (`tests/*.spec.ts`) — the two pages with the real router,
+  store and query client, network stubbed by MSW.
+- **End-to-end** (`e2e/`, Playwright) — the app against the real mock API at
+  1512 px and 768 px, including an axe accessibility pass over both pages in
+  both themes.
+
+Coverage thresholds gate `domain/` and `api/`; views are thin by construction
+and are covered through the integration and e2e layers instead.

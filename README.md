@@ -91,21 +91,29 @@ not convention — see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 | `npm run dev` / `dev:full` | Vite dev server, alone or with the mock API |
 | `npm run build` | Type-check, then production build |
 | `npm run test` / `test:coverage` | Vitest; coverage gates the domain and API layers |
+| `npm run test:e2e` | Playwright, desktop + iPad (first run: `npx playwright install chromium`) |
+| `npm run test:all` | The whole gate: lint → types → unit → e2e |
 | `npm run lint` / `format` | ESLint (zero warnings allowed) · Prettier |
 | `npm run typecheck` | `vue-tsc` across app, tests and config projects |
 
 ## Tests
 
-151 tests, all green.
+**156 Vitest + 48 Playwright**, all green.
 
 ```bash
-cd frontend && npm run test
+cd frontend
+npm run test                        # unit, component and integration
+npx playwright install chromium     # once
+npm run test:e2e                    # browser, desktop + iPad
 ```
 
-The depth is where the logic is. `src/domain/` is covered exhaustively at the
-boundaries — AQI band edges, missing hours, the offline rule, nulls-last
-sorting. On top of that, [`tests/dataset.spec.ts`](frontend/tests/dataset.spec.ts)
-runs the domain layer against the **real shipped dataset** and pins the results
-against figures computed independently, so a change to a *definition* fails a
-test instead of quietly producing a plausible wrong dashboard. The two pages are
-covered end to end against MSW with the real router, store and query client.
+Four layers, each answering a different question:
+
+| Layer | What it proves |
+| --- | --- |
+| **Unit** (`src/**/*.spec.ts`) | The domain functions are right at their boundaries — AQI band edges, missing hours, the offline rule, nulls-last sorting. |
+| **Dataset** ([`tests/dataset.spec.ts`](frontend/tests/dataset.spec.ts)) | The *definitions* are right. The domain layer runs against the real shipped data and is pinned to figures computed independently, so redefining the stability window fails a test instead of quietly producing a plausible wrong dashboard. |
+| **Integration** (`tests/*.spec.ts`, MSW) | The pages wire up — real router, store and query client, stubbed network. |
+| **End-to-end** (`e2e/`, Playwright) | The whole thing works against the **real mock API**: the cursor round-trip, the map and chart rendering, the theme surviving a reload. Runs at 1512 px and at 768 px, and includes an `axe-core` accessibility pass over both pages in **both themes**. |
+
+CI runs all of it: [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
