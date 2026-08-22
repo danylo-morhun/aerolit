@@ -28,9 +28,11 @@ export default defineConfigWithVueTs(
   {
     name: 'app/rules',
     rules: {
-      // Component names: multi-word everywhere except the routed pages, which
-      // are named for their route.
-      'vue/multi-word-component-names': ['error', { ignores: [] }],
+      // Multi-word names everywhere, so a project component can never collide
+      // with a current or future HTML element. `Sparkline` is the one
+      // exception: it is a single-word primitive by name, like Card or Badge,
+      // and inventing a prefix for it would only add noise at the call site.
+      'vue/multi-word-component-names': ['error', { ignores: ['Sparkline'] }],
       'vue/component-api-style': ['error', ['script-setup']],
       'vue/define-macros-order': [
         'error',
