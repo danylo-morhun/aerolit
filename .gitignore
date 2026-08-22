@@ -21,3 +21,8 @@ pnpm-debug.log*
 
 # personal working notes, not part of the submission
 .playbook/
+
+# Documentation and the AI-assistant guide ARE part of this submission, so they
+# override any global ignore rules for these paths.
+!CLAUDE.md
+!docs/
