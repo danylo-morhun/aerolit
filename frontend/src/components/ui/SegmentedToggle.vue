@@ -17,8 +17,13 @@ export interface SegmentOption<V extends string> {
 
 defineProps<{
   options: readonly SegmentOption<T>[];
-  /** Names the group for assistive tech, e.g. "Pollutant" or "Chart range". */
-  ariaLabel: string;
+  /**
+   * Names the group for assistive tech, e.g. "Pollutant" or "Chart range".
+   * Deliberately not called `ariaLabel`: that collides with the native
+   * `aria-label` attribute in templates, where Vue cannot tell whether the
+   * kebab-case form is meant as a prop or a passthrough attribute.
+   */
+  groupLabel: string;
   size?: 'sm' | 'md';
 }>();
 
@@ -33,7 +38,7 @@ const model = defineModel<T>({ required: true });
     option-value="value"
     option-disabled="disabled"
     :allow-empty="false"
-    :aria-label="ariaLabel"
+    :aria-label="groupLabel"
     :class="['segmented', `segmented--${size ?? 'md'}`]"
     :pt="{ root: { role: 'radiogroup' } }"
   />
