@@ -74,6 +74,11 @@ const option = computed(() => {
 
   return {
     animationDuration: 240,
+    // ECharts' own accessibility layer: it renders the series into a
+    // description on the canvas element, which is the only way a screen reader
+    // can reach data drawn to a bitmap. The card subtitle names the station and
+    // range; this names the numbers.
+    aria: { enabled: true, label: { enabled: true } },
     grid: { top: 16, right: 8, bottom: 28, left: 44 },
     tooltip: {
       trigger: 'axis',
