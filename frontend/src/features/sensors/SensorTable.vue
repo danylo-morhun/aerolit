@@ -111,7 +111,11 @@ function pmClass(category: AqiCategory | null | undefined): string {
 
       <footer class="table__footer">
         <p class="table__status" aria-live="polite">
-          <template v-if="enriching">Loading readings…</template>
+          <!-- While the network is still arriving, `total` is legitimately 0 —
+               printing "0 matching stations" would report an answer the table
+               does not have yet. -->
+          <template v-if="loading && mode === 'search'">Searching the network…</template>
+          <template v-else-if="enriching">Loading readings…</template>
           <template v-else-if="mode === 'search' && total !== null">
             {{ total }} matching {{ total === 1 ? 'station' : 'stations' }}
             <span v-if="rangeStart !== null && total > 0">
