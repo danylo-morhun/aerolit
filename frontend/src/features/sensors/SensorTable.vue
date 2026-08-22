@@ -85,7 +85,7 @@ function pmClass(category: AqiCategory | null | undefined): string {
             />
           </template>
           <template #cell-id="{ row }">
-            <span class="aq-mono">{{ row.station.id }}</span>
+            <span class="aq-mono cell-id">{{ row.station.id }}</span>
           </template>
           <template #cell-district="{ row }">{{ row.station.district }}</template>
           <template #cell-location="{ row }">{{ row.station.location }}</template>
@@ -183,6 +183,12 @@ function pmClass(category: AqiCategory | null | undefined): string {
 .table__pager {
   display: flex;
   gap: var(--aq-space-2);
+}
+
+/* A station id is one token: letting it wrap turns "BLN-0001" into two lines
+   on a tablet, which reads as a rendering fault rather than a narrow column. */
+.cell-id {
+  white-space: nowrap;
 }
 
 .cell-value {
