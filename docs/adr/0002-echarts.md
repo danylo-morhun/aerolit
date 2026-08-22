@@ -25,7 +25,7 @@ Apache ECharts via `vue-echarts`, importing only the needed modules from
 ## Range display
 
 24H renders raw hourly points (24 bars, matching the mockup). 7D and 30D are
-bucketed in `domain/downsample.ts` (6 h / 24 h means) — 720 raw bars are
+bucketed in `domain/downsample.ts` (6 h / 24 h means, cut on the Berlin clock) — 720 raw bars are
 unreadable and visually dishonest about density.
 
 ## Considered and rejected

@@ -215,6 +215,16 @@ eyeballed.
 - **The 30-day chart shows daily means, not 720 hourly bars.** Sub-pixel bars
   imply a precision the eye cannot read. 7D uses 6-hour buckets. Both are
   labelled by range in the card subtitle.
+
+  The bars are cut on the **Berlin clock**, not measured back from the snapshot
+  instant. Trailing 24-hour windows were what I built first, and they are wrong
+  in a way that only shows up if you read the axis: a bar labelled "12 Jun"
+  covered 15:00 on the 12th to 14:00 on the 13th, when a daily mean means a
+  calendar day — that is what the EU limit values are defined over. The cost is
+  a partial bar at each end, which the tooltip states outright ("11 Jul
+  00:00–15:00"), and two days a year that are 23 or 25 hours long, which
+  `bucketBoundaries` handles by stepping through local midnights rather than
+  adding 24 hours. Both DST days are unit-tested.
 - **The tablet e2e project runs Chromium, not WebKit.** What it verifies —
   responsive layout, no hover-only interaction, tap targets — is
   engine-independent, and requiring a second browser engine would mean anyone
