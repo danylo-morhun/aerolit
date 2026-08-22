@@ -28,5 +28,12 @@ export default defineConfig({
   build: {
     target: 'es2022',
     sourcemap: true,
+    // ECharts is ~530 kB even tree-shaken to the four modules this app draws
+    // with, and it is deliberately isolated: `DashboardPage` loads the chart
+    // asynchronously, so that weight lands in its own chunk after the KPIs and
+    // the map have painted. Raising the threshold above it keeps the build
+    // output quiet about a size that is understood, rather than training
+    // everyone to ignore the warning.
+    chunkSizeWarningLimit: 600,
   },
 });
