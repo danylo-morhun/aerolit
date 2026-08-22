@@ -34,6 +34,12 @@ export default defineConfigWithVueTs(
       // and inventing a prefix for it would only add noise at the call site.
       'vue/multi-word-component-names': ['error', { ignores: ['Sparkline'] }],
       'vue/component-api-style': ['error', ['script-setup']],
+
+      // Off deliberately: with `exactOptionalPropertyTypes`, an optional prop
+      // being *absent* and being *present as undefined* are different types.
+      // Defaulting every optional prop to `undefined` to satisfy this rule
+      // would make the two indistinguishable and fails the type-check.
+      'vue/require-default-prop': 'off',
       'vue/define-macros-order': [
         'error',
         { order: ['defineOptions', 'defineProps', 'defineEmits', 'defineSlots'] },
@@ -45,6 +51,32 @@ export default defineConfigWithVueTs(
 
       'no-console': ['warn', { allow: ['warn', 'error'] }],
       eqeqeq: ['error', 'always', { null: 'ignore' }],
+    },
+  },
+
+  {
+    /**
+     * The brief requires every shared UI element to be a project-level
+     * component sitting on top of the PrimeVue primitive, so that a design
+     * change propagates from one edit point. `src/components/ui/` is that
+     * layer; nothing outside it may reach for PrimeVue directly.
+     */
+    name: 'app/primevue-only-in-ui-layer',
+    files: ['src/**/*.{ts,vue}'],
+    ignores: ['src/components/ui/**', 'src/theme/**', 'src/main.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['primevue/*'],
+              message:
+                'Wrap the PrimeVue primitive in src/components/ui/ and use that, so restyling stays a single edit.',
+            },
+          ],
+        },
+      ],
     },
   },
 

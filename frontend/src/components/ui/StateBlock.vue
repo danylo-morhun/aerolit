@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Button from 'primevue/button';
+import AppButton from './AppButton.vue';
 
 /**
  * The loading / error / empty placeholder every data panel falls back to.
@@ -42,13 +42,11 @@ const DEFAULT_TITLES = {
     />
     <p class="state__title">{{ title || DEFAULT_TITLES[state] }}</p>
     <p v-if="description" class="state__description">{{ description }}</p>
-    <Button
+    <AppButton
       v-if="onRetry && state === 'error'"
       class="state__retry"
       label="Try again"
-      size="small"
-      severity="secondary"
-      outlined
+      size="sm"
       @click="onRetry"
     />
   </div>

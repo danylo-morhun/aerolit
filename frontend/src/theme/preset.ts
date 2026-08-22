@@ -114,6 +114,36 @@ export const AerolitPreset = definePreset(Aura, {
       },
     },
   },
+
+  /**
+   * Component-level tokens.
+   *
+   * These live in the preset rather than as `.p-datatable-*` rules inside the
+   * component that happens to render a table. That is the difference the brief
+   * draws between "theming comes from one set of tokens" and "per-view
+   * overrides": a second table added tomorrow inherits this without copying a
+   * style block, and there is one place to change when the row rhythm changes.
+   */
+  components: {
+    datatable: {
+      headerCell: {
+        background: 'var(--aq-surface)',
+        color: 'var(--aq-ink-muted)',
+        borderColor: 'var(--aq-border)',
+        padding: '1rem',
+      },
+      bodyCell: {
+        borderColor: 'var(--aq-border)',
+        padding: '1rem',
+      },
+      row: {
+        background: 'var(--aq-surface)',
+        color: 'var(--aq-ink)',
+        hoverBackground: 'var(--aq-surface-sunken)',
+        hoverColor: 'var(--aq-ink)',
+      },
+    },
+  },
 });
 
 /**
