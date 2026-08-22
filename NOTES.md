@@ -321,6 +321,16 @@ The places I went against the obvious or suggested path:
 - **Leaflet directly, not a Vue binding library.** At one tile layer and 240
   circle markers, the binding library's API surface is larger than the map code
   it replaces (ADR 0004).
+- **Fonts in the bundle, not a Google Fonts `<link>`.** The two-line CDN snippet
+  is what every scaffold emits and what I had in `index.html` for most of this
+  build. Embedding it sends every visitor's IP to Google without consent, which
+  a Munich court held to breach the GDPR in 2022 — a live concern for an EU
+  operator's dashboard, and not something I would want a reviewer to be the one
+  to notice. The usual counter-argument, that a CDN font is already cached from
+  another site, stopped being true when browsers partitioned the HTTP cache per
+  origin. So `@fontsource`, latin subset, the seven weights this UI actually
+  sets: 112 kB in the bundle, no third-party request, and the app renders
+  identically with the network unplugged.
 - **Sorting is mine, not `DataTable`'s.** The built-in sort would order the
   twenty rows the component was handed; ordering has to apply to the whole
   result set in search mode, so it lives in `useSensorTable`.
