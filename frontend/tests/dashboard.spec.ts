@@ -91,6 +91,31 @@ describe('Dashboard', () => {
     expect(JSON.parse(localStorage.getItem(WATCHLIST_STORAGE_KEY)!)).not.toContain('BLN-0002');
   });
 
+  /**
+   * Selecting a station the operator does not track — a marker on the map is
+   * the usual way — has to show up in the panel, or the map's answer appears
+   * nowhere near the map. Untracking the selected row is the same state reached
+   * from the other direction, and is what this drives through the UI.
+   */
+  it('keeps the selected station in the panel once it is untracked', async () => {
+    trackAll();
+    const user = userEvent.setup();
+    renderWithApp(DashboardPage);
+
+    await waitFor(() => expect(screen.getByText('Pankow')).toBeInTheDocument());
+    await user.click(screen.getByText('Pankow').closest('button')!);
+    await user.click(screen.getByRole('button', { name: /Stop tracking Pankow/ }));
+
+    const watchlist = screen.getByRole('list', { name: 'Tracked stations' });
+    expect(within(watchlist).getByText('Pankow')).toBeInTheDocument();
+    expect(within(watchlist).getByText('Selected')).toBeInTheDocument();
+    expect(JSON.parse(localStorage.getItem(WATCHLIST_STORAGE_KEY)!)).not.toContain('BLN-0002');
+
+    // And the hollow star pins it back, so the map is a route onto the list.
+    await user.click(screen.getByRole('button', { name: 'Track Pankow BLN-0002' }));
+    expect(JSON.parse(localStorage.getItem(WATCHLIST_STORAGE_KEY)!)).toContain('BLN-0002');
+  });
+
   it('narrows the watchlist through the header search', async () => {
     trackAll();
     const user = userEvent.setup();

@@ -12,9 +12,13 @@ import { formatConcentration } from '@/domain/format';
 import type { Station, StationMetrics } from '@/domain/types';
 
 const props = defineProps<{
+  /** Tracked stations, plus the selected one when it is not tracked. */
   stations: readonly Station[];
   metricsByStation: ReadonlyMap<string, StationMetrics>;
   selectedId: string | null;
+  /** Which of the rows are actually on the watchlist. */
+  trackedIds: readonly string[];
+  watchlistFull: boolean;
   loading?: boolean;
   /** True when a header search is narrowing the panel. */
   filtered?: boolean;
@@ -22,7 +26,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   select: [stationId: string];
-  unwatch: [stationId: string];
+  toggle: [stationId: string];
 }>();
 
 /**
@@ -40,8 +44,12 @@ const rows = computed(() =>
   props.stations.map((station) => ({
     station,
     metrics: props.metricsByStation.get(station.id) ?? null,
+    watched: props.trackedIds.includes(station.id),
   })),
 );
+
+/** True when the only row is the selected station, which is not tracked. */
+const nothingTracked = computed(() => rows.value.every((row) => !row.watched));
 
 const list = ref<HTMLElement | null>(null);
 
@@ -49,7 +57,8 @@ const list = ref<HTMLElement | null>(null);
  * Keeps the selected row visible when the selection came from somewhere else.
  *
  * The panel scrolls once enough stations are tracked, so a marker clicked on
- * the map could otherwise highlight a row that is out of view.
+ * the map could otherwise highlight a row that is out of view — the same
+ * "where did it go?" the provisional row exists to answer.
  */
 watch(
   () => props.selectedId,
@@ -80,10 +89,16 @@ watch(
 
     <ul v-else ref="list" class="watchlist" aria-label="Tracked stations">
       <li
-        v-for="{ station, metrics } in rows"
+        v-for="{ station, metrics, watched } in rows"
         :key="station.id"
         :data-station="station.id"
-        :class="['watchlist__item', { 'watchlist__item--selected': station.id === selectedId }]"
+        :class="[
+          'watchlist__item',
+          {
+            'watchlist__item--selected': station.id === selectedId,
+            'watchlist__item--provisional': !watched,
+          },
+        ]"
       >
         <!-- The row is the button: selecting a station is the row's whole
              purpose, and wrapping it makes the entire card a tap target on
@@ -94,7 +109,12 @@ watch(
           :aria-current="station.id === selectedId ? 'true' : undefined"
           @click="emit('select', station.id)"
         >
-          <span class="watchlist__district">{{ station.district }}</span>
+          <span class="watchlist__district">
+            {{ station.district }}
+            <!-- Says why a row is here without a star on it, so the panel never
+                 looks as though it silently started tracking something. -->
+            <span v-if="!watched" class="watchlist__flag">Selected</span>
+          </span>
           <span class="watchlist__id aq-mono">{{ station.id }} · {{ station.location }}</span>
 
           <span class="watchlist__reading">
@@ -129,12 +149,17 @@ watch(
              invalid, and the star is a separate action from selecting. -->
         <WatchStar
           class="watchlist__star"
-          watched
+          :watched="watched"
+          :disabled="!watched && watchlistFull"
           :station-label="`${station.district} ${station.id}`"
-          @toggle="emit('unwatch', station.id)"
+          @toggle="emit('toggle', station.id)"
         />
       </li>
     </ul>
+
+    <p v-if="!loading && rows.length > 0 && nothingTracked" class="watchlist__hint">
+      Nothing tracked yet — star a station to keep it in this panel.
+    </p>
   </AppCard>
 </template>
 
@@ -166,6 +191,12 @@ watch(
   scrollbar-gutter: stable;
 }
 
+.watchlist__hint {
+  padding-top: var(--aq-space-3);
+  font-size: var(--aq-text-sm);
+  color: var(--aq-ink-muted);
+}
+
 /* Between the tablet breakpoint and the desktop split, the panel spans the full
    width and a single column of rows would be mostly empty space. */
 @media (700px <= width <= 1100px) {
@@ -187,6 +218,17 @@ watch(
   background: var(--aq-surface);
 }
 
+/* A row that is only here because it is selected reads as pinned-in-passing:
+   dashed, so the difference from a tracked row survives a greyscale print. */
+.watchlist__item--provisional {
+  border-style: dashed;
+  border-color: var(--aq-border-strong);
+}
+
+.watchlist__item--provisional.watchlist__item--selected {
+  border-color: var(--aq-accent);
+}
+
 .watchlist__button {
   display: grid;
   grid-template-areas:
@@ -206,10 +248,25 @@ watch(
 }
 
 .watchlist__district {
+  display: flex;
+  flex-wrap: wrap;
   grid-area: district;
+  gap: var(--aq-space-2);
+  align-items: baseline;
   padding-right: var(--aq-space-6);
   font-size: var(--aq-text-base);
   font-weight: 700;
+}
+
+.watchlist__flag {
+  padding: 2px 8px;
+  font-size: var(--aq-text-2xs);
+  font-weight: 600;
+  color: var(--aq-accent-text);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: var(--aq-status-elevated-bg);
+  border-radius: var(--aq-radius-pill);
 }
 
 .watchlist__id {

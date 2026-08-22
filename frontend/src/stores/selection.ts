@@ -24,10 +24,18 @@ export const useSelectionStore = defineStore('selection', () => {
     stationId.value = id;
   }
 
-  /** Falls back to the first available station when nothing is chosen yet. */
-  function ensureSelection(candidates: readonly string[]): void {
-    if (stationId.value !== null && candidates.includes(stationId.value)) return;
-    stationId.value = candidates[0] ?? null;
+  /**
+   * Keeps the selection pointing at something the operator can actually see.
+   *
+   * `available` is what is on screen — a search can narrow the network until
+   * the selected station is no longer part of it, and a chart showing a station
+   * that has been filtered away is a lie. Anything else leaves the choice
+   * alone: untracking the station you are looking at, for instance, must not
+   * silently move the chart to a different one.
+   */
+  function ensureSelection(available: readonly string[], fallback: string | null): void {
+    if (stationId.value !== null && available.includes(stationId.value)) return;
+    stationId.value = fallback;
   }
 
   return { stationId, pollutant, range, select, ensureSelection };

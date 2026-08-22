@@ -40,7 +40,7 @@ const visibleStations = computed(() =>
   view.value.stations.filter((station) => matchesStation(station, query.value)),
 );
 
-const watchlistStations = computed(() => {
+const trackedStations = computed(() => {
   const tracked = new Set(watchlist.ids);
   return visibleStations.value.filter((station) => tracked.has(station.id));
 });
@@ -53,19 +53,40 @@ const selectedStation = computed(() =>
   selection.stationId === null ? null : (view.value.stationsById.get(selection.stationId) ?? null),
 );
 
+/**
+ * What the Districts panel lists: the tracked stations, and — first — whatever
+ * is currently loaded into the chart when that station is not one of them.
+ *
+ * Selecting a marker used to update the chart far below the fold and leave the
+ * panel showing four unrelated stations, so the map's answer appeared nowhere
+ * near the map. The provisional row puts it where the eye already is, with a
+ * hollow star: one tap turns "what I am looking at" into "what I track".
+ */
+const panelStations = computed(() => {
+  const selected = selectedStation.value;
+  const isVisible = selected !== null && visibleStations.value.some((s) => s.id === selected.id);
+  if (selected === null || !isVisible || watchlist.has(selected.id)) return trackedStations.value;
+  return [selected, ...trackedStations.value];
+});
+
 const selectedSeries = computed(() =>
   selection.stationId === null
     ? null
     : (view.value.seriesByStation.get(selection.stationId) ?? null),
 );
 
-// Seed the chart with something meaningful once data lands: the first tracked
-// station, falling back to the first station in the network.
+// Seed the chart with something meaningful once data lands — the first tracked
+// station, else the first in the network — and re-point it only when the
+// current one drops out of view, never merely because it stopped being tracked.
 watch(
-  [watchlistStations, () => view.value.stations],
-  ([tracked, all]) => {
-    const candidates = (tracked.length > 0 ? tracked : all).map((station) => station.id);
-    if (candidates.length > 0) selection.ensureSelection(candidates);
+  [trackedStations, visibleStations],
+  ([tracked, visible]) => {
+    if (visible.length === 0) return;
+    const fallback = (tracked.length > 0 ? tracked : visible)[0]?.id ?? null;
+    selection.ensureSelection(
+      visible.map((station) => station.id),
+      fallback,
+    );
   },
   { immediate: true },
 );
@@ -102,13 +123,15 @@ watch(
         @select="selection.select($event)"
       />
       <DistrictWatchlist
-        :stations="watchlistStations"
+        :stations="panelStations"
         :metrics-by-station="view.metricsByStation"
         :selected-id="selection.stationId"
+        :tracked-ids="watchlist.ids"
+        :watchlist-full="watchlist.isFull"
         :loading="isLoading"
         :filtered="query.trim() !== ''"
         @select="selection.select($event)"
-        @unwatch="watchlist.toggle($event)"
+        @toggle="watchlist.toggle($event)"
       />
     </div>
 
