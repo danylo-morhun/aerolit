@@ -1,0 +1,62 @@
+{
+  "name": "aerolit-air-quality-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Operator dashboard for a network of particulate sensors across Berlin",
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "dev:full": "concurrently -n api,web -c cyan,green \"npm:mock-api\" \"npm:dev\"",
+    "mock-api": "node mock-data/server.mjs",
+    "build": "vue-tsc -b --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "vue-tsc -b --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write src",
+    "format:check": "prettier --check src"
+  },
+  "dependencies": {
+    "@primeuix/themes": "1.2.5",
+    "@tanstack/vue-query": "5.101.4",
+    "echarts": "6.1.0",
+    "leaflet": "1.9.4",
+    "pinia": "4.0.3",
+    "primeicons": "7.0.0",
+    "primevue": "4.5.5",
+    "vue": "3.5.41",
+    "vue-echarts": "8.1.0",
+    "vue-router": "4.6.4"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@testing-library/jest-dom": "7.0.1",
+    "@testing-library/user-event": "14.6.6",
+    "@testing-library/vue": "8.1.0",
+    "@types/leaflet": "1.9.22",
+    "@types/node": "26.2.0",
+    "@vitejs/plugin-vue": "6.0.8",
+    "@vitest/coverage-v8": "4.1.11",
+    "@vue/eslint-config-prettier": "10.2.0",
+    "@vue/eslint-config-typescript": "14.9.0",
+    "@vue/test-utils": "2.4.11",
+    "concurrently": "10.0.5",
+    "eslint": "10.9.0",
+    "eslint-plugin-vue": "10.10.0",
+    "globals": "17.11.0",
+    "jiti": "2.7.0",
+    "jsdom": "30.0.1",
+    "msw": "2.15.0",
+    "prettier": "3.9.6",
+    "typescript": "6.0.3",
+    "vite": "8.2.2",
+    "vitest": "4.1.11",
+    "vue-tsc": "3.3.11"
+  }
+}
