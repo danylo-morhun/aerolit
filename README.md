@@ -1,93 +1,111 @@
-# Wised — Frontend Take-Home Assignment
+# Aerolit — Berlin Particulate Monitoring
 
-Welcome, and thanks for taking the time to work through this.
+Operator dashboard for a network of 240 low-cost air-quality sensors across
+Berlin, built for the Wised frontend home assignment.
 
-We run a network of low-cost **air-quality sensor stations** across **Berlin** —
-roughly 10,000 of them. Each station measures particulate matter (**PM2.5** and
-**PM10**, in µg/m³) and continuously streams readings. Your assignment is to
-build the operator-facing dashboard that turns that stream into something an
-operator can read at a glance.
+**Vue 3 · TypeScript · Vite · PrimeVue · Leaflet · ECharts**
 
-## The Assignment
+> **The reasoning behind this is in [`NOTES.md`](NOTES.md)** — trade-offs,
+> assumptions, what I left out and where I disagreed with my tools. Individual
+> decisions are written up as ADRs in [`docs/adr/`](docs/adr/).
+>
+> The original assignment brief is preserved at
+> [`docs/assignment-brief.md`](docs/assignment-brief.md) and
+> [`frontend/README.md`](frontend/README.md).
 
-### Air Quality Monitoring Dashboard
+---
 
-A web app built with **Vite** and either **Vue 3 + PrimeVue** or
-**React + PrimeReact** — your choice, both are equally welcome — that visualises
-Berlin's air quality across two pages behind a shared app shell, in a light and a
-dark theme, from a wide desktop monitor down to an iPad:
+## Running it
 
-- **Dashboard** — station lookup, a KPI row, an OpenStreetMap-based sensor map,
-  a watchlist of tracked districts, and a full-width PM2.5 / PM10 time-series
-  chart.
-- **Sensor List** — the full station network as a sortable, searchable,
-  cursor-paginated table.
+Requires Node ≥ 20.19 (`.nvmrc` pins 24).
 
-The full brief is in [`frontend/README.md`](frontend/README.md), alongside the
-reference mockups: [`dashboard.png`](frontend/dashboard.png) and
-[`sensors-list.png`](frontend/sensors-list.png), each with a `_dark` counterpart.
-They show the desktop layout; the tablet layout is yours to work out.
-
-## Repository Layout
-
-```
-.
-└── frontend/                     # Frontend assignment
-    ├── README.md                 #   → frontend brief
-    ├── dashboard.png             #   → reference mockup · dashboard (light)
-    ├── dashboard_dark.png        #   → reference mockup · dashboard (dark)
-    ├── sensors-list.png          #   → reference mockup · sensor list (light)
-    └── sensors-list_dark.png     #   → reference mockup · sensor list (dark)
+```bash
+cd frontend
+npm install
+npm run dev:full     # mock API on :8787 + Vite on :5173
 ```
 
-## What We're Looking For
+Then open <http://localhost:5173>.
 
-- **Component design** — shared UI elements built as dedicated, reusable
-  components on top of PrimeVue / PrimeReact, so a design change propagates from
-  one edit point. The two pages share badges, tiles and controls; theming comes
-  from one set of tokens, not per-view overrides.
-- **UI & data visualisation** - a clean, readable layout and charts/map that
-  communicate the data clearly, holding up across 16:9 / 16:10 desktop screens
-  and on an iPad.
-- **Code quality** — clean, tested, and consistently structured.
-- **Reasoning** — the thinking behind the above: why this structure, this
-  boundary, this trade-off, and what you considered and rejected.
+To run the two processes separately:
 
-## On AI — Read This Part
+```bash
+npm run mock-api     # http://localhost:8787
+npm run dev          # http://localhost:5173
+```
 
-Use whatever tooling you like, AI included. A working dashboard is cheap to
-produce now and we have no interest in pretending otherwise, so the finished
-screens are not what earns you the next conversation. **The reasoning behind
-them is.**
+The app talks to a same-origin `/api` prefix that Vite proxies to the mock
+server, so there is no CORS setup and no environment file to fill in.
 
-What we're asking is that the submission be yours in the sense that matters:
-don't act as a relay between us and a model. Code you haven't read, don't
-understand and can't defend is the one failure mode that ends the process, no
-matter how polished it looks on screen.
+## Screenshots
 
-We will read the code with you and ask about specific lines. Expect to answer:
+| | Light | Dark |
+| --- | --- | --- |
+| **Dashboard** | ![Dashboard, light theme](docs/screenshots/dashboard-light.png) | ![Dashboard, dark theme](docs/screenshots/dashboard-dark.png) |
+| **Sensor List** | ![Sensor list, light theme](docs/screenshots/sensor-list-light.png) | ![Sensor list, dark theme](docs/screenshots/sensor-list-dark.png) |
 
-- why a piece of state lives where it does, and what you tried first;
-- how you decided what became a shared component and what stayed local;
-- where you traded completeness or correctness for time, and why that was the
-  right call here;
-- for anything a model wrote and you kept — on what grounds you kept it.
+Both pages hold up from 2560 px down to a 768 px iPad in either orientation.
+No interaction depends on hover.
 
-"That's what the AI gave me" is not an answer. "I chose it because X, and here's
-what I ruled out" is a good one — including when X turns out to be arguable.
-A smaller submission you can reason about end to end beats a complete one you
-can't.
+## What's implemented
 
-So please **do** send a `NOTES.md`: the trade-offs you made, the assumptions you
-took where the brief was silent, what you'd do with more time, and where you
-disagreed with your tools. It's the most useful thing in the whole submission —
-treat it as part of the assignment rather than an optional extra.
+**Dashboard** (`/dashboard`) — four KPI tiles with **real week-over-week trend
+badges** (not placeholders), an OpenStreetMap sensor map with AQI-coloured
+markers and a PM2.5/PM10 toggle, a persisted district watchlist with 24-hour
+sparklines, and a full-width PM10-bars / PM2.5-line chart over 24H, 7D or 30D.
+Selecting a station anywhere — map marker, watchlist row — loads it into the
+chart.
 
-## Questions
+**Sensor List** (`/sensors`) — the network as a sortable table, cursor-paginated
+in both directions with controls that disable exactly when the API omits the
+corresponding cursor. Typing a search, or sorting by a measured column, switches
+the table to a mode that can answer that question across the whole network; the
+footer says which mode is active. See [ADR 0006](docs/adr/0006-table-pagination-search-sort.md).
 
-If anything is unclear or you're unsure how to interpret part of the brief,
-**just ask** — reach out any time. We'd much rather answer a question than have
-you guess. Where the spec leaves room, use your judgement and note the
-assumptions you made.
+**Throughout** — light and dark themes from one token set, covering map tiles
+and chart palette, surviving a reload and defaulting to the OS preference.
 
-Good luck — we're looking forward to seeing what you build.
+## How it's put together
+
+```
+frontend/src/
+  api/          typed client — the only place that knows URLs and wire formats
+  domain/       pure functions: AQI, stability, connection, KPIs, trends,
+                bucketing, sorting. No Vue, no I/O, no ambient clock.
+  queries/      TanStack Query composables — caching and request lifecycle
+  stores/       Pinia — theme, selection, watchlist (UI state only)
+  components/   ui/ = shared elements on top of PrimeVue · layout/ = app shell
+  features/     dashboard/ and sensors/ compositions
+  pages/        route targets
+  theme/        design tokens + the PrimeVue preset that consumes them
+```
+
+Dependency direction is `pages → features → (ui, queries, stores) → (api,
+domain)`, and `domain/` depends on nothing. That boundary is enforced by ESLint,
+not convention — see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+
+## Scripts
+
+| Command | |
+| --- | --- |
+| `npm run dev` / `dev:full` | Vite dev server, alone or with the mock API |
+| `npm run build` | Type-check, then production build |
+| `npm run test` / `test:coverage` | Vitest; coverage gates the domain and API layers |
+| `npm run lint` / `format` | ESLint (zero warnings allowed) · Prettier |
+| `npm run typecheck` | `vue-tsc` across app, tests and config projects |
+
+## Tests
+
+151 tests, all green.
+
+```bash
+cd frontend && npm run test
+```
+
+The depth is where the logic is. `src/domain/` is covered exhaustively at the
+boundaries — AQI band edges, missing hours, the offline rule, nulls-last
+sorting. On top of that, [`tests/dataset.spec.ts`](frontend/tests/dataset.spec.ts)
+runs the domain layer against the **real shipped dataset** and pins the results
+against figures computed independently, so a change to a *definition* fails a
+test instead of quietly producing a plausible wrong dashboard. The two pages are
+covered end to end against MSW with the real router, store and query client.
