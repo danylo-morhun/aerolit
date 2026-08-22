@@ -78,6 +78,7 @@
   --aq-c-tint-elevated: #fbe3d6;
   --aq-c-tint-unhealthy: #f6dcd8;
   --aq-c-tint-good-dark: #233428;
+  --aq-c-tint-elevated-dark: #3d2a1e;
   --aq-c-tint-unhealthy-dark: #3b2422;
 
   /* ---------------------------------------------------------------- *
@@ -107,6 +108,14 @@
   --aq-status-moderate-fg: var(--aq-c-moderate-text);
   --aq-status-elevated-fg: var(--aq-c-elevated-text);
   --aq-status-unhealthy-fg: var(--aq-c-unhealthy-text);
+
+  /* The KPI tile's icon plate. Sampled from the mockups, where each tile's
+     glyph sits on a tint of its own status hue and the neutral one on paper. */
+  --aq-status-good-bg: var(--aq-c-tint-good);
+  --aq-status-elevated-bg: var(--aq-c-tint-elevated);
+  --aq-status-unhealthy-bg: var(--aq-c-tint-unhealthy);
+  --aq-status-neutral-bg: var(--aq-c-neutral-100);
+  --aq-status-neutral-fg: var(--aq-c-ink);
 
   /* Status chips. The tinted background stays light in both themes — the
      mockup renders them as labels rather than surfaces — so the pair is
@@ -208,6 +217,14 @@
   --aq-status-moderate-fg: var(--aq-c-moderate-light);
   --aq-status-elevated-fg: var(--aq-c-elevated-light);
   --aq-status-unhealthy-fg: var(--aq-c-unhealthy-light);
+
+  /* The plates darken with the theme — except the neutral one, which the dark
+     mockup keeps light on purpose, so the fourth tile stays the odd one out. */
+  --aq-status-good-bg: var(--aq-c-tint-good-dark);
+  --aq-status-elevated-bg: var(--aq-c-tint-elevated-dark);
+  --aq-status-unhealthy-bg: var(--aq-c-tint-unhealthy-dark);
+  --aq-status-neutral-bg: var(--aq-c-paper);
+  --aq-status-neutral-fg: var(--aq-c-ink);
 
   --aq-link-hq: var(--aq-c-good-light);
   --aq-link-poor: var(--aq-c-unhealthy-light);

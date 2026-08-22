@@ -106,8 +106,8 @@ withDefaults(
 }
 
 .tile__icon--neutral {
-  color: var(--aq-ink);
-  background: var(--aq-surface-sunken);
+  color: var(--aq-status-neutral-fg);
+  background: var(--aq-status-neutral-bg);
 }
 
 .tile__value {
