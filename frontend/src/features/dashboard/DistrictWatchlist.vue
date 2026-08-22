@@ -126,6 +126,14 @@ const rows = computed(() =>
   list-style: none;
 }
 
+/* Between the tablet breakpoint and the desktop split, the panel spans the full
+   width and a single column of rows would be mostly empty space. */
+@media (700px <= width <= 1100px) {
+  .watchlist {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 .watchlist__item {
   position: relative;
   background: var(--aq-surface-sunken);
