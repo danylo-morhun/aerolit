@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { type SortableRow, SERVER_ORDERED_KEYS, sortRows } from './sort';
+import { isServerOrder, type SortableRow, sortRows } from './sort';
 import type { AqiCategory, ConnectionState, Station, StationMetrics } from './types';
 
 function row(
@@ -89,7 +89,11 @@ describe('sortRows', () => {
     expect(ids(sortRows(rows, 'pm25', 'asc'))).toEqual(['a', 'b']);
   });
 
-  it('names id as the only ordering the server itself provides', () => {
-    expect(SERVER_ORDERED_KEYS).toEqual(['id']);
+  it('treats ascending id as the only ordering the server itself provides', () => {
+    expect(isServerOrder('id', 'asc')).toBe(true);
+    // Reversing the id order is not free: page one reversed is stations 1–20
+    // backwards, never 240–221, so it is a whole-collection question too.
+    expect(isServerOrder('id', 'desc')).toBe(false);
+    expect(isServerOrder('pm25', 'asc')).toBe(false);
   });
 });

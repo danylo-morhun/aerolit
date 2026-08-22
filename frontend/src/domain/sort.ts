@@ -9,14 +9,19 @@ export interface SortableRow {
 }
 
 /**
- * Columns the server can order by.
+ * Whether the server already returns the collection in this order.
  *
- * `/stations` returns stations sorted by id and offers no sort parameter, so
- * this is the only ordering that survives cursor pagination. Sorting by
- * anything else means holding the rows being sorted — which is why the table
- * changes mode rather than pretending a page-local sort is a network-wide one.
+ * `/stations` returns stations sorted by id ascending and offers no sort
+ * parameter, so that one ordering — key *and* direction — is the only one that
+ * survives cursor pagination. Descending by id is not a free reversal: page one
+ * reversed is still stations 1–20, not 240–221, so it is as much a
+ * whole-collection question as sorting by PM2.5 is. Anything this returns false
+ * for means holding the rows being ordered, which is why the table changes mode
+ * rather than pretending a page-local sort is a network-wide one.
  */
-export const SERVER_ORDERED_KEYS: readonly SortKey[] = ['id'];
+export function isServerOrder(key: SortKey, direction: SortDirection): boolean {
+  return key === 'id' && direction === 'asc';
+}
 
 /** Worst-last, so ascending reads "healthiest first". */
 const AQI_RANK: Record<AqiCategory, number> = {
