@@ -97,16 +97,22 @@ export interface NetworkView {
  * pure function of two cached queries, so keeping a copy in a store would only
  * create a second source of truth to keep in sync. The two roll-up passes over
  * 240 × 720 readings run once per data change, not per render.
+ *
+ * @param enabled gates the station index — 240 identities, three requests.
+ * @param readingsEnabled gates the far heavier per-station series, separately.
+ * The sensor table needs the index the moment the operator searches, but the
+ * readings only when the question is about a *measured* column: filtering by
+ * district, or ordering by one, is answered from identity alone, and the twenty
+ * rows actually on screen fetch their own readings. Defaults to `enabled`, which
+ * is what the dashboard wants — it needs every series to roll up the KPIs.
  */
-/**
- * @param enabled gates the whole fetch. The sensor table only needs the full
- * network once the operator searches or sorts by a measured column, so it
- * passes a ref rather than paying for 240 series on page load.
- */
-export function useNetwork(enabled: MaybeRefOrGetter<boolean> = true) {
+export function useNetwork(
+  enabled: MaybeRefOrGetter<boolean> = true,
+  readingsEnabled: MaybeRefOrGetter<boolean> = enabled,
+) {
   const stationsQuery = useAllStations(enabled);
   const stationIds = computed(() => (stationsQuery.data.value ?? []).map((s) => s.id));
-  const readingsQuery = useNetworkReadings(stationIds, enabled);
+  const readingsQuery = useNetworkReadings(stationIds, readingsEnabled);
 
   const view = computed<NetworkView>(() => {
     const stations = stationsQuery.data.value ?? [];
@@ -140,12 +146,19 @@ export function useNetwork(enabled: MaybeRefOrGetter<boolean> = true) {
 
   return {
     view,
-    isLoading: computed(() => stationsQuery.isPending.value || readingsQuery.isPending.value),
+    // A disabled query stays `pending` forever in TanStack Query, so each half
+    // only counts while it is actually switched on.
+    isLoading: computed(
+      () =>
+        (toValue(enabled) && stationsQuery.isPending.value) ||
+        (toValue(readingsEnabled) && readingsQuery.isPending.value),
+    ),
     isError: computed(() => stationsQuery.isError.value || readingsQuery.isError.value),
     error: computed(() => stationsQuery.error.value ?? readingsQuery.error.value),
     refetch: async () => {
       await stationsQuery.refetch();
-      await readingsQuery.refetch();
+      // Retrying must not pull 240 series the caller deliberately switched off.
+      if (toValue(readingsEnabled)) await readingsQuery.refetch();
     },
   };
 }

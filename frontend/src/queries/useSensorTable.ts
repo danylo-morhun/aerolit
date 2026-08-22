@@ -5,7 +5,7 @@ import { fetchReadings, fetchStationPage } from '@/api/stations';
 import { snapshotWindow } from '@/domain/network';
 import { matchesStation } from '@/domain/search';
 import {
-  SERVER_ORDERED_KEYS,
+  isServerOrder,
   sortRows,
   type SortableRow,
   type SortDirection,
@@ -18,6 +18,17 @@ import { queryKeys } from './keys';
 import { useNetwork } from './useNetwork';
 
 export const PAGE_SIZE = 20;
+
+/**
+ * Columns whose values come from a station's readings.
+ *
+ * Ordering by one of these is the only question that cannot be answered without
+ * every station's series — you cannot know which twenty stations have the
+ * highest PM2.5 until you have looked at all 240. Everything else (a text
+ * search, ordering by id, district or neighbourhood) is answered from the
+ * lightweight identity index, and only the twenty rows on screen need readings.
+ */
+const MEASURED_KEYS: readonly SortKey[] = ['pm25', 'pm10', 'aqi', 'connection'];
 
 /**
  * How the table is currently reading the collection.
@@ -44,7 +55,14 @@ export function useSensorTable(query: Ref<string>) {
   const searchOffset = ref(0);
 
   const mode = computed<TableMode>(() =>
-    query.value.trim() !== '' || !SERVER_ORDERED_KEYS.includes(sortKey.value) ? 'search' : 'browse',
+    query.value.trim() !== '' || !isServerOrder(sortKey.value, sortDirection.value)
+      ? 'search'
+      : 'browse',
+  );
+
+  /** Whether the current question needs every station's readings, not just the page's. */
+  const needsNetworkReadings = computed(
+    () => mode.value === 'search' && MEASURED_KEYS.includes(sortKey.value),
   );
 
   // ---------------------------------------------------------------- browse
@@ -60,19 +78,71 @@ export function useSensorTable(query: Ref<string>) {
     queryFn: ({ signal }) => fetchStationPage({ limit: PAGE_SIZE, ...cursor.value }, { signal }),
   });
 
-  const browseStations = computed<readonly Station[]>(() => pageQuery.data.value?.items ?? []);
+  // ---------------------------------------------------------------- search
+
+  /**
+   * The station index, and — only when the sort demands it — every series.
+   *
+   * Both halves are shared with the dashboard's cache, so arriving here after
+   * the dashboard has loaded costs nothing at all.
+   */
+  const network = useNetwork(
+    computed(() => mode.value === 'search'),
+    needsNetworkReadings,
+  );
+
+  const searchMatches = computed<readonly Station[]>(() =>
+    network.view.value.stations.filter((station) => matchesStation(station, query.value)),
+  );
+
+  const searchTotal = computed(() => searchMatches.value.length);
+
+  // ---------------------------------------------------------------- window
+
+  /**
+   * The rows this render will show, before their measured columns are attached.
+   *
+   * Browse takes the server's page as-is — the only ordering it serves is the
+   * one it already returns. Search orders the matches and takes the current
+   * window of twenty; when the ordering is by a measured column the metrics are
+   * already in hand from the roll-up, otherwise the rows arrive bare and are
+   * enriched below.
+   */
+  const windowRows = computed<SortableRow[]>(() => {
+    if (mode.value === 'browse') {
+      return (pageQuery.data.value?.items ?? []).map((station) => ({ station, metrics: null }));
+    }
+
+    const rows: SortableRow[] = searchMatches.value.map((station) => ({
+      station,
+      metrics: needsNetworkReadings.value
+        ? (network.view.value.metricsByStation.get(station.id) ?? null)
+        : null,
+    }));
+
+    return sortRows(rows, sortKey.value, sortDirection.value).slice(
+      searchOffset.value,
+      searchOffset.value + PAGE_SIZE,
+    );
+  });
+
+  // ------------------------------------------------------------ enrichment
 
   /**
    * Readings for the rows on screen, one query each.
    *
    * Per-row queries rather than one bulk call so the cache is shared with the
    * dashboard: arriving here after the dashboard has loaded, every row is
-   * already warm and the table renders without a request. Rows scroll out of
-   * relevance, not out of cache — the snapshot never changes.
+   * already warm and the table renders without a request. Skipped entirely when
+   * the roll-up has already produced the metrics.
    */
+  const rowStations = computed<readonly Station[]>(() =>
+    needsNetworkReadings.value ? [] : windowRows.value.map((row) => row.station),
+  );
+
   const rowReadings = useQueries({
     queries: computed(() =>
-      browseStations.value.map((station) => ({
+      rowStations.value.map((station) => ({
         queryKey: queryKeys.readings(station.id),
         queryFn: ({ signal }: { signal: AbortSignal }) =>
           fetchReadings(station.id, undefined, { signal }),
@@ -80,9 +150,9 @@ export function useSensorTable(query: Ref<string>) {
     ),
   });
 
-  const browseSeries = computed(() => {
+  const rowSeries = computed(() => {
     const map = new Map<string, ReadingSeries>();
-    browseStations.value.forEach((station, index) => {
+    rowStations.value.forEach((station, index) => {
       const data = rowReadings.value[index]?.data;
       if (data) map.set(station.id, data);
     });
@@ -93,16 +163,18 @@ export function useSensorTable(query: Ref<string>) {
    * The snapshot instant, from the series currently loaded.
    *
    * On the dashboard this is exact — every station is present. Here it is the
-   * latest hour among the visible page, which lands on the true "now" unless
-   * every station on the page is offline (17 of 240 are, so a page of 20 all
-   * being offline is vanishingly unlikely). Recorded in NOTES.md.
+   * latest hour among the visible rows, which lands on the true "now" unless
+   * every one of them is offline (17 of 240 are, so a page of 20 all being
+   * offline is vanishingly unlikely). Recorded in NOTES.md.
    */
-  const browseWindow = computed(() => snapshotWindow(browseSeries.value.values()));
+  const rowWindow = computed(() => snapshotWindow(rowSeries.value.values()));
 
-  const browseRows = computed<SortableRow[]>(() => {
-    const window = browseWindow.value;
-    return browseStations.value.map((station) => {
-      const series = browseSeries.value.get(station.id);
+  const rows = computed<SortableRow[]>(() => {
+    if (needsNetworkReadings.value) return windowRows.value;
+
+    const window = rowWindow.value;
+    return windowRows.value.map(({ station }) => {
+      const series = rowSeries.value.get(station.id);
       return {
         station,
         metrics:
@@ -118,32 +190,7 @@ export function useSensorTable(query: Ref<string>) {
     });
   });
 
-  // ---------------------------------------------------------------- search
-
-  const network = useNetwork(computed(() => mode.value === 'search'));
-
-  const searchRows = computed<SortableRow[]>(() =>
-    network.view.value.stations
-      .filter((station) => matchesStation(station, query.value))
-      .map((station) => ({
-        station,
-        metrics: network.view.value.metricsByStation.get(station.id) ?? null,
-      })),
-  );
-
-  const searchTotal = computed(() => searchRows.value.length);
-
-  // ---------------------------------------------------------------- shared
-
-  const rows = computed(() => {
-    if (mode.value === 'browse') {
-      // A page-local sort by id is the server's own order, so this is a no-op
-      // for the default view and a reversal for descending.
-      return sortRows(browseRows.value, sortKey.value, sortDirection.value);
-    }
-    const sorted = sortRows(searchRows.value, sortKey.value, sortDirection.value);
-    return sorted.slice(searchOffset.value, searchOffset.value + PAGE_SIZE);
-  });
+  // ---------------------------------------------------------------- status
 
   /**
    * Blocking load: there are no rows to show yet.
@@ -151,7 +198,9 @@ export function useSensorTable(query: Ref<string>) {
    * Deliberately excludes the per-row readings. Station identity arrives first
    * and those rows are useful immediately; covering them with a spinner while
    * the measured columns stream in would hide content the operator can already
-   * read, and would flicker the pagination controls disabled.
+   * read, and would flicker the pagination controls disabled. A sort *by* a
+   * measured column is the exception — showing rows in an order the data has
+   * not confirmed yet would reshuffle them under the operator's eyes.
    */
   const isLoading = computed(() =>
     mode.value === 'browse' ? pageQuery.isPending.value : network.isLoading.value,
@@ -159,7 +208,7 @@ export function useSensorTable(query: Ref<string>) {
 
   /** Non-blocking: rows are on screen, their measured columns still filling in. */
   const isEnriching = computed(
-    () => mode.value === 'browse' && rowReadings.value.some((query) => query.isPending),
+    () => !isLoading.value && rowReadings.value.some((query) => query.isPending),
   );
 
   const isError = computed(() =>
