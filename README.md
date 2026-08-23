@@ -74,7 +74,9 @@ the table to a mode that can answer that question across the whole network; the
 footer says which mode is active. See [ADR 0006](docs/adr/0006-table-pagination-search-sort.md).
 
 **Throughout** — light and dark themes from one token set, covering map tiles
-and chart palette, surviving a reload and defaulting to the OS preference.
+and chart palette, surviving a reload and defaulting to the OS preference. The
+dashboard's selection lives in the URL (`?station=&range=&pollutant=`), so what
+an operator is looking at survives a reload and can be sent to someone else.
 
 ## How it's put together
 
@@ -110,7 +112,7 @@ not convention — see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## Tests
 
-**177 Vitest + 77 Playwright**, all green (34 browser tests run at desktop and
+**189 Vitest + 83 Playwright**, all green (37 browser tests run at desktop and
 at iPad width, plus 9 that only make sense at phone width).
 
 ```bash
