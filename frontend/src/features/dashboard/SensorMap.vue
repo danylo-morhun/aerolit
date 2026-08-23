@@ -50,6 +50,16 @@ const legend = computed(() =>
   })),
 );
 
+/**
+ * The live marker objects, by station id.
+ *
+ * Held rather than rebuilt because a selection changes two of them and a
+ * pollutant switch changes only their appearance. Tearing down 240
+ * `circleMarker`s and their tooltips on every tap — which is what an
+ * unconditional redraw does — is measurable as a hitch on an iPad, and it is
+ * the one interaction an operator repeats all day.
+ */
+const markers = new Map<string, L.CircleMarker>();
 let markerLayer: L.LayerGroup | null = null;
 
 function categoryOf(stationId: string): AqiCategory | null {
@@ -59,24 +69,55 @@ function categoryOf(stationId: string): AqiCategory | null {
   return classify(value, pollutant.value);
 }
 
+function tooltipFor(station: Station): string {
+  const metrics = props.metricsByStation.get(station.id);
+  const value = pollutant.value === 'pm25' ? metrics?.pm25 : metrics?.pm10;
+  const label = pollutant.value === 'pm25' ? 'PM2.5' : 'PM10';
+
+  return `<strong>${station.district}</strong><br>${station.location} · ${station.id}<br>${label} ${formatConcentration(value ?? null)} µg/m³`;
+}
+
+/**
+ * Paints one marker for its category and selection state.
+ *
+ * The category rides on a class rather than an inline colour, so the fill
+ * resolves from the same CSS variables as the badges instead of a second
+ * palette. Leaflet only applies `className` when it creates the path, so a
+ * later change is written to the element directly — keeping
+ * `leaflet-interactive`, which Leaflet itself relies on for hit-testing.
+ */
+function paint(stationId: string): void {
+  const marker = markers.get(stationId);
+  if (!marker) return;
+
+  const selected = stationId === props.selectedId;
+  marker.setRadius(selected ? 9 : 6);
+  marker.setStyle({ weight: selected ? 3 : 1.5 });
+
+  const category = categoryOf(stationId);
+  const element = marker.getElement();
+  if (element) {
+    element.setAttribute(
+      'class',
+      `leaflet-interactive marker marker--${category ?? 'none'}${selected ? ' marker--selected' : ''}`,
+    );
+  }
+}
+
+/** Rebuilds the layer — only when the set of stations on the map changes. */
 function drawMarkers(): void {
   const instance = map.value;
   if (!instance) return;
 
   markerLayer?.remove();
+  markers.clear();
   markerLayer = L.layerGroup().addTo(instance as L.Map);
 
   for (const station of props.stations) {
-    const category = categoryOf(station.id);
-    const metrics = props.metricsByStation.get(station.id);
-    const selected = station.id === props.selectedId;
-
     const marker = L.circleMarker([station.coordinates.lat, station.coordinates.lng], {
-      radius: selected ? 9 : 6,
-      // `className` rather than inline colours, so the marker fill resolves
-      // from the same CSS variables as the badges instead of a second palette.
-      className: `marker marker--${category ?? 'none'}${selected ? ' marker--selected' : ''}`,
-      weight: selected ? 3 : 1.5,
+      radius: 6,
+      className: `marker marker--${categoryOf(station.id) ?? 'none'}`,
+      weight: 1.5,
       fillOpacity: 1,
       // Keyboard users reach stations through the watchlist and the sensor
       // table; 240 tab stops on a map would be a worse experience than none.
@@ -84,24 +125,49 @@ function drawMarkers(): void {
       bubblingMouseEvents: false,
     });
 
-    const value = pollutant.value === 'pm25' ? metrics?.pm25 : metrics?.pm10;
-    marker.bindTooltip(
-      `<strong>${station.district}</strong><br>${station.location} · ${station.id}<br>${pollutant.value === 'pm25' ? 'PM2.5' : 'PM10'} ${formatConcentration(value ?? null)} µg/m³`,
-      { direction: 'top', offset: [0, -8], className: 'marker-tip' },
-    );
+    marker.bindTooltip(tooltipFor(station), {
+      direction: 'top',
+      offset: [0, -8],
+      className: 'marker-tip',
+    });
 
     // Tap and click both fire `click` in Leaflet, so selection never depends
     // on hover — the tooltip is the enhancement, not the interaction.
     marker.on('click', () => emit('select', station.id));
 
     marker.addTo(markerLayer);
+    markers.set(station.id, marker);
+    paint(station.id);
   }
 }
 
+/** Readings arrived, or the pollutant changed: same markers, new colours. */
+function repaintAll(): void {
+  for (const station of props.stations) {
+    markers.get(station.id)?.setTooltipContent(tooltipFor(station));
+    paint(station.id);
+  }
+}
+
+/**
+ * Identity of the *set* on the map. The dashboard hands us a fresh array
+ * whenever anything it derives changes, so keying on the ids is what
+ * distinguishes "the search narrowed the network" from "the readings landed".
+ */
+const stationKey = computed(() => props.stations.map((station) => station.id).join(','));
+
+watch([map, stationKey], drawMarkers, { immediate: true });
+
+watch([() => props.metricsByStation, pollutant], repaintAll);
+
+// The selection touches exactly two markers: the one leaving it and the one
+// taking it.
 watch(
-  [map, () => props.stations, () => props.metricsByStation, () => props.selectedId, pollutant],
-  drawMarkers,
-  { immediate: true },
+  () => props.selectedId,
+  (selected, previous) => {
+    if (previous) paint(previous);
+    if (selected) paint(selected);
+  },
 );
 
 /**
@@ -111,7 +177,7 @@ watch(
  * had panned somewhere deliberately.
  */
 watch(
-  [map, () => props.stations.map((station) => station.id).join(',')],
+  [map, stationKey],
   () => fitTo(props.stations.map((station) => [station.coordinates.lat, station.coordinates.lng])),
   { immediate: true },
 );
