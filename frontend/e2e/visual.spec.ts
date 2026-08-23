@@ -42,6 +42,14 @@ for (const page_ of PAGES) {
         (value) => window.localStorage.setItem('aerolit:theme', value),
         theme,
       );
+
+      // The chart animates in over 240 ms on a canvas, and `animations:
+      // 'disabled'` below only reaches CSS — under parallel load the shot
+      // caught a different frame each time, which is how these baselines went
+      // from a test to a coin flip. Asking for reduced motion turns the
+      // canvas animation off through `theme/motion.ts`, the same path a viewer
+      // with the OS setting takes.
+      await page.emulateMedia({ reducedMotion: 'reduce' });
       await page.goto(page_.path);
       await expect(page.getByRole('heading', { name: page_.ready })).toBeVisible({
         timeout: 30_000,
@@ -52,6 +60,17 @@ for (const page_ of PAGES) {
       if (page_.name === 'dashboard') {
         await expect(page.getByText('223', { exact: true })).toBeVisible({ timeout: 30_000 });
         await expect.poll(() => page.locator('path.marker').count()).toBe(240);
+
+        // The watchlist scrolls the selected row into view, and *when* the
+        // selection settles decides where that leaves the panel — which is how
+        // these baselines picked up a scrollbar and a two-pixel shift of every
+        // sparkline, deterministically, but only under parallel load. Scroll
+        // position is not something a baseline should encode, so it is reset
+        // once the selection has actually happened.
+        await expect(page.locator('.watchlist__item--selected')).toHaveCount(1);
+        await page.locator('.watchlist').evaluate((el) => {
+          el.scrollTop = 0;
+        });
       } else {
         await expect(page.getByText('BLN-0020')).toBeVisible({ timeout: 30_000 });
         await expect(page.getByText(/HQ link|Poor link|Offline/).first()).toBeVisible();
