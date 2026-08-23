@@ -332,11 +332,18 @@ than the screens, found five more:
 
 ## 4 · What I'd do next, with more time
 
-1. **Server-side aggregation.** This architecture is honest at 240 stations and
-   is the wrong shape at the 10 000 the brief mentions: 10 000 series is not a
-   client's job. The right answer is `/kpis?at=` and `/stations?bbox=` endpoints,
-   with the client rendering rather than reducing. The domain functions would
-   move to the server largely unchanged — they are already pure.
+1. **Server-side aggregation**, written up with numbers in
+   [ADR 0011](docs/adr/0011-scaling-to-ten-thousand-stations.md). This
+   architecture is honest at 240 stations and is the wrong shape at the 10 000
+   the brief names: the series are 9.2 MB here and **382 MB** there, which no
+   pool size or rendering technique touches. The answer is `/kpis?at=`,
+   `/stations?bbox=` and server-side ordering, with the client rendering rather
+   than reducing. The part I would want to be judged on is how short the
+   migration is: **four files change** — the ones whose job is fetching — while
+   the 13 modules and 1 004 lines of `src/domain/` move to the server unchanged, because they
+   are pure by contract with the instant passed in as `at`. That is what the
+   boundary was for. The ADR also puts virtualisation where it belongs: a
+   consequence of that migration, not a precursor to it.
 2. ~~**Virtualised table** with infinite scroll over the cursor stream.~~
    Measured and decided against, written up in
    [ADR 0006](docs/adr/0006-table-pagination-search-sort.md): all 240 matched
