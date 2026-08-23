@@ -105,21 +105,22 @@ not convention — see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 | `npm run dev` / `dev:full` | Vite dev server, alone or with the mock API |
 | `npm run build` | Type-check, then production build |
 | `npm run test` / `test:coverage` | Vitest; coverage gates the domain and API layers |
-| `npm run test:e2e` | Playwright, desktop + iPad + phone (first run: `npx playwright install chromium`) |
+| `npm run test:e2e` | Playwright: desktop, iPad on Chromium **and** WebKit, phone, plus visual baselines (first run: `npx playwright install chromium webkit`) |
 | `npm run test:all` | The whole gate: lint → types → unit → e2e |
 | `npm run lint` / `format` | ESLint (zero warnings allowed) · Prettier |
 | `npm run typecheck` | `vue-tsc` across app, tests and config projects |
 
 ## Tests
 
-**189 Vitest + 83 Playwright**, all green (37 browser tests run at desktop and
-at iPad width, plus 9 that only make sense at phone width).
+**189 Vitest + 124 Playwright**, all green: 37 browser tests at desktop and at
+iPad width on two engines, 9 that only make sense at phone width, and 4 pixel
+baselines.
 
 ```bash
 cd frontend
 npm run test                        # unit, component and integration
-npx playwright install chromium     # once
-npm run test:e2e                    # browser, desktop + iPad + phone
+npx playwright install chromium webkit   # once
+npm run test:e2e                    # builds, then runs every viewport
 ```
 
 Four layers, each answering a different question:
@@ -129,6 +130,7 @@ Four layers, each answering a different question:
 | **Unit** (`src/**/*.spec.ts`) | The domain functions are right at their boundaries — AQI band edges, missing hours, the offline rule, nulls-last sorting. |
 | **Dataset** ([`tests/dataset.spec.ts`](frontend/tests/dataset.spec.ts)) | The *definitions* are right. The domain layer runs against the real shipped data and is pinned to figures computed independently, so redefining the stability window fails a test instead of quietly producing a plausible wrong dashboard. |
 | **Integration** (`tests/*.spec.ts`, MSW) | The pages wire up — real router, store and query client, stubbed network. |
-| **End-to-end** (`e2e/`, Playwright) | The whole thing works against the **real mock API**: the cursor round-trip, the map and chart rendering, the theme surviving a reload. Runs at 1512 px, 768 px and — for the layout that differs rather than shrinks — 390 px, and includes an `axe-core` accessibility pass over both pages in **both themes** at every one of them. |
+| **End-to-end** (`e2e/`, Playwright) | The **built bundle** against the **real mock API**: the cursor round-trip, the map and chart rendering, the theme surviving a reload. Runs at 1512 px, 768 px on Chromium *and* WebKit — an iPad is a Safari — and 390 px for the layout that differs rather than shrinks, with an `axe-core` pass over both pages in **both themes** at every one of them. |
+| **Visual** (`e2e/visual.spec.ts`) | Pixel baselines for both pages in both themes: the one class of defect the others cannot see — a token pointed at the wrong colour, a card that lost its border. Map tiles masked; baselines are macOS-captured and skip elsewhere. |
 
 CI runs all of it: [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
