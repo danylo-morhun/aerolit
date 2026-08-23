@@ -337,8 +337,14 @@ than the screens, found five more:
    client's job. The right answer is `/kpis?at=` and `/stations?bbox=` endpoints,
    with the client rendering rather than reducing. The domain functions would
    move to the server largely unchanged — they are already pure.
-2. **Virtualised table** with infinite scroll over the cursor stream, once page
-   size stops being 20.
+2. ~~**Virtualised table** with infinite scroll over the cursor stream.~~
+   Measured and decided against, written up in
+   [ADR 0006](docs/adr/0006-table-pagination-search-sort.md): all 240 matched
+   rows render in 10.6 ms, so there is no DOM cost to remove, and the twenty-row
+   window exists to bound *requests* — each visible row fetches its own series —
+   which scrolling would not change, only re-trigger. It also wants a fixed row
+   height, and the neighbourhood column wraps. The condition that flips it is
+   recorded: a page that stops being twenty rows, fed by an aggregate endpoint.
 3. ~~**Deep links** for the selected station, range and pollutant.~~ Built:
    `?station=&range=&pollutant=`, defaults left out of the URL so a link carries
    choices rather than noise (`useSelectionUrl.ts`). The one thing that made it
