@@ -96,12 +96,19 @@ Four layers, each answering a different question:
   a wrong *definition*, which a fixture-based unit test cannot.
 - **Integration** (`tests/*.spec.ts`) — the two pages with the real router,
   store and query client, network stubbed by MSW.
-- **End-to-end** (`e2e/`, Playwright) — the app against the real mock API at
-  1512 px, 768 px and 390 px, including an axe accessibility pass over both
-  pages in both themes at each width. The phone project runs only
-  `phone.spec.ts`: below 640 px the sensor table is a card list rather than a
-  narrow table, so the desktop suite's assertions would be checking a layout
-  they were not written against.
+- **End-to-end** (`e2e/`, Playwright) — the **built bundle** against the real
+  mock API at 1512 px, 768 px and 390 px, including an axe accessibility pass
+  over both pages in both themes at each width. 768 px runs on Chromium *and*
+  WebKit, because an iPad is a Safari and a layout that holds in one engine is
+  evidence rather than proof. The suite serves `vite preview` rather than the
+  dev server: under parallel load the dev server intermittently failed a dynamic
+  import in WebKit, and testing the artefact that ships is the right default
+  anyway. The phone project runs only `phone.spec.ts`: below 640 px the sensor
+  table is a card list rather than a narrow table, so the desktop suite's
+  assertions would be checking a layout they were not written against.
+- **Visual** (`e2e/visual.spec.ts`) — pixel baselines for both pages in both
+  themes, with the map tiles masked. Captured on macOS and skipped elsewhere;
+  running them in CI means capturing a set inside the CI container.
 
 Coverage thresholds gate `domain/` and `api/`; views are thin by construction
 and are covered through the integration and e2e layers instead.
