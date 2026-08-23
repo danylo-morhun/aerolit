@@ -65,6 +65,12 @@ export default defineConfig({
    */
   preview: {
     port: 5173,
+    // Without this, `vite preview` walks to the next free port when 5173 is
+    // taken, and Playwright — which reuses an existing server locally — points
+    // its tests at whatever *is* on 5173. That is how the suite could silently
+    // go back to exercising the dev server, the configuration this preview
+    // block exists to get away from. Failing loudly is the point.
+    strictPort: true,
     proxy: {
       '/api': {
         target: MOCK_API,
