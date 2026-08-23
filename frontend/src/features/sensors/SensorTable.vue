@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+
 import AppButton from '@/components/ui/AppButton.vue';
+import AppSelect from '@/components/ui/AppSelect.vue';
 import AqiBadge from '@/components/ui/AqiBadge.vue';
 import ConnectionBadge from '@/components/ui/ConnectionBadge.vue';
 import DataGrid, { type GridColumn } from '@/components/ui/DataGrid.vue';
@@ -10,7 +13,7 @@ import type { SortableRow, SortDirection, SortKey } from '@/domain/sort';
 import type { AqiCategory } from '@/domain/types';
 import type { TableMode } from '@/queries/useSensorTable';
 
-defineProps<{
+const props = defineProps<{
   rows: readonly SortableRow[];
   sortKey: SortKey;
   sortDirection: SortDirection;
@@ -54,6 +57,35 @@ const COLUMNS: GridColumn<SortKey | 'watch'>[] = [
 function pmClass(category: AqiCategory | null | undefined): string {
   return `cell-value cell-value--${category ?? 'none'}`;
 }
+
+/**
+ * The sort control the phone layout needs.
+ *
+ * Below 640 px the rows are cards and the column headers — which are where
+ * sorting normally lives — are visually hidden. They stay in the accessibility
+ * tree, so keyboard and screen-reader users keep sorting from the header; this
+ * is the equivalent for everyone looking at the screen. It writes to the same
+ * `sort` event, so there is one ordering model, not two.
+ */
+const SORT_OPTIONS = COLUMNS.filter((column) => column.sortable !== false).map((column) => ({
+  value: column.key as SortKey,
+  label: column.label,
+}));
+
+const phoneSortKey = computed<SortKey>({
+  get: () => props.sortKey,
+  // Selecting the column already sorted would toggle its direction, which is
+  // not what picking the same entry from a list means.
+  set: (key) => {
+    if (key !== props.sortKey) emit('sort', key);
+  },
+});
+
+const directionLabel = computed(() =>
+  props.sortDirection === 'asc'
+    ? 'Sorted ascending — switch to descending'
+    : 'Sorted descending — switch to ascending',
+);
 
 /**
  * Where the operator is in the collection.
@@ -151,6 +183,24 @@ function position(props: {
           <template v-else>Browsing the network one page at a time</template>
         </p>
 
+        <!-- Phone only: the column headers that normally carry sorting are
+             visually hidden once the rows become cards. -->
+        <div class="table__sort">
+          <AppSelect
+            v-model="phoneSortKey"
+            size="sm"
+            field-label="Sort the sensor list by"
+            :options="SORT_OPTIONS"
+          />
+          <AppButton
+            size="sm"
+            variant="ghost"
+            :icon="sortDirection === 'asc' ? 'pi pi-sort-amount-up' : 'pi pi-sort-amount-down'"
+            :aria-label="directionLabel"
+            @click="emit('sort', sortKey)"
+          />
+        </div>
+
         <div class="table__pager">
           <AppButton
             label="Previous"
@@ -209,6 +259,29 @@ function position(props: {
 .table__pager {
   display: flex;
   gap: var(--aq-space-2);
+}
+
+/* Hidden wherever the column headers are visible and already do this job. */
+.table__sort {
+  display: none;
+  gap: var(--aq-space-2);
+  align-items: center;
+}
+
+@media (width <= 640px) {
+  .table__sort {
+    display: flex;
+  }
+
+  /* The footer becomes two rows on a phone: the status line, then the sort
+     control and the pager side by side. */
+  .table__footer {
+    padding: var(--aq-space-4);
+  }
+
+  .table__status {
+    flex-basis: 100%;
+  }
 }
 
 /* A station id is one token: letting it wrap turns "BLN-0001" into two lines
