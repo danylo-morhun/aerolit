@@ -98,6 +98,14 @@ Dependency direction is `pages → features → (ui, queries, stores) → (api,
 domain)`, and `domain/` depends on nothing. That boundary is enforced by ESLint,
 not convention — see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
+What it buys is measurable rather than aesthetic. The brief names a network of
+~10 000 stations; at that size the per-station series are **382 MB** against
+9.2 MB here, so the roll-up has to move to the server.
+[ADR 0011](docs/adr/0011-scaling-to-ten-thousand-stations.md) works that through:
+**four files change** — the ones whose job is fetching — and the 13 modules of
+`src/domain/` move server-side unchanged, because they are pure by contract with
+the snapshot instant passed in rather than read from a clock.
+
 ## Scripts
 
 | Command | |
