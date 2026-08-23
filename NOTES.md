@@ -192,6 +192,7 @@ eyeballed.
 | **Fonts are bundled, not loaded from Google's CDN** | The mockup is clearly not set in a system font, but embedding Google Fonts sends the visitor's IP to the US without consent — held to breach the GDPR by a German court in 2022, which is not a footnote for a Berlin network run from the EU. Only the latin subset and the seven weights this UI uses are shipped: 112 kB. A system-font stack still backs them. |
 | **The map card says "Particulate readings", where the mockup says "Real-time particulate readings"** | The dataset is a fixed snapshot the brief says not to poll. Calling it real-time would be the one piece of copy on the page that isn't true. |
 | **Tablet layout** | No mockup was given. KPIs go 4→2 columns at 900 px; the map/watchlist split stacks at 1100 px, where the watchlist becomes two columns to use the width. Verified at 768 px and 1024 px in both orientations. |
+| **Phone widths are not a supported layout, but the shell still has to look intact** | The brief says no phone layout is required, and I did not build one — the KPI tiles, the map and the chart are all sized for 768 px and up. What I did fix is the app bar: below 480 px it wraps so the two tabs take a full-width row instead of being clipped mid-word inside a scroller with no scrollbar. Everything else already stayed inside the viewport at 320 px, which is the property worth having when the layout itself is out of scope. |
 
 ---
 
