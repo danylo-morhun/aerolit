@@ -207,8 +207,13 @@ eyeballed.
   endpoint; inventing one felt out of scope.
 - **No keyboard access to individual map markers.** 240 tab stops would be worse
   than none; keyboard and screen-reader users reach every station through the
-  watchlist and the table, which are ordinary buttons and rows. A production
-  version would add a "jump to station" combobox over the map.
+  watchlist, the table, and — for any station at all — the header search, which
+  narrows the map to one marker and selects it, chart and URL included. I had
+  written here that a production version would add a "jump to station" combobox
+  over the map; going back to check, that would duplicate the search field a tab
+  stop away. What is genuinely missing is picking a marker *spatially* — "the
+  one in the north-east" — which a combobox would not give either. The keyboard
+  path is pinned in `e2e/shell.spec.ts`.
 - **`GET /stations/:id/readings/count` is implemented but unused.** The
   dashboard already holds each full series, so the tally is free from data in
   hand (ADR 0005). It stays in the client as the right tool the moment a caller
