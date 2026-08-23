@@ -82,6 +82,28 @@ test('the page never scrolls sideways on a tablet', async ({ page }) => {
 });
 
 /**
+ * A phone layout is not part of the brief and this is not one. What this holds
+ * is that the shell degrades honestly at a width nobody designed for: the tab
+ * pair used to be clipped mid-word inside a strip that scrolled with no visible
+ * scrollbar, which reads as a rendering fault rather than as a hint to swipe.
+ */
+test('the tabs fit at phone width instead of hiding in a scroller', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 760 });
+  await page.goto('/dashboard');
+  await expect(page.getByRole('link', { name: 'Sensor List' })).toBeVisible({ timeout: 30_000 });
+
+  const nav = await page
+    .locator('.shell__nav')
+    .evaluate((el) => ({ scroll: el.scrollWidth, client: el.clientWidth }));
+  expect(nav.scroll, 'the tab strip is clipped').toBe(nav.client);
+
+  const overflows = await page.evaluate(
+    () => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
+  );
+  expect(overflows, 'the page overflows horizontally at 320 px').toBe(false);
+});
+
+/**
  * Accessibility, in both themes.
  *
  * Running only the default theme would have missed half the palette: the chips
