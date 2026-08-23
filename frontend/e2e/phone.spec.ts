@@ -55,41 +55,63 @@ test('every column reaches the screen as a card', async ({ page }) => {
 });
 
 /**
- * The column headers are collapsed to a pixel on a phone, so the footer
- * control is the only way a sighted operator can sort — and it has to mean the
- * same thing the header does: order the whole network, not the page.
+ * The column headers are collapsed to a pixel on a phone, so the footer control
+ * is the only way a sighted operator can sort — and it has to mean the same
+ * thing the header does: order the whole network, not the page.
+ *
+ * It sorts by *district* rather than by PM2.5 deliberately. Both are
+ * whole-network questions; only one of them needs every station's readings.
+ * Ordering by a measured column pulls 240 series and then rolls them up in a
+ * single synchronous pass that holds the main thread for ~595 ms (measured with
+ * a long-task observer) — worth asserting exactly once, which the desktop suite
+ * already does. Repeating it in four more projects bought no coverage and cost
+ * four more request storms against a single-threaded mock server, which is what
+ * turned this test into a coin flip under a full run.
  */
 test('the footer control sorts the whole network', async ({ page }) => {
   await page.goto('/sensors');
   await expect(page.getByText('BLN-0001')).toBeVisible({ timeout: 30_000 });
 
-  await page.getByLabel('Sort the sensor list by').click();
-  await page.getByRole('option', { name: 'PM2.5', exact: true }).click();
+  // The control lives in the table footer, thousands of pixels down. Clicking
+  // it while the browser is still settling that scroll is how the overlay
+  // failed to open on WebKit: the tap landed mid-flight and nothing happened.
+  const sortBy = page.getByLabel('Sort the sensor list by');
+  await sortBy.scrollIntoViewIfNeeded();
+  await expect(sortBy).toBeInViewport();
+  await sortBy.click();
 
-  // Sorting by a measured column is the one question that needs every series,
-  // so the table says it is searching before it answers.
+  const district = page.getByRole('option', { name: 'District', exact: true });
+  await expect(district).toBeVisible();
+  await district.click();
+
   await expect(page.getByText(/matching stations/)).toBeVisible({ timeout: 30_000 });
 
-  const first = await page
-    .locator('tbody tr')
-    .first()
-    .locator('td[data-label="PM2.5"]')
-    .innerText();
-  // Ascending by PM2.5 across 240 stations starts in the low single digits.
-  // The first cursor page — stations BLN-0001 onwards — does not go that low,
-  // so this only passes if the ordering saw the whole network.
-  expect(Number(first)).toBeLessThanOrEqual(5);
+  // Every station on the first cursor page is in Mitte, and Mitte is not first
+  // alphabetically. Charlottenburg-Wilmersdorf only appears if the ordering was
+  // applied to all 240 rather than to the twenty on screen.
+  const firstRow = page.locator('tbody tr').first();
+  await expect(firstRow.locator('td[data-label="District"]')).toHaveText(
+    'Charlottenburg-Wilmersdorf',
+  );
+  await expect(firstRow.locator('td[data-label="ID"]')).toHaveText('BLN-0061');
 });
 
 test('the sort direction control reverses the order', async ({ page }) => {
   await page.goto('/sensors');
   await expect(page.getByText('BLN-0001')).toBeVisible({ timeout: 30_000 });
 
-  const firstAscending = await page.locator('tbody tr').first().textContent();
+  // The id cell, not the whole row's text: the measured columns fill in
+  // asynchronously, so comparing rendered rows compares loading states as much
+  // as ordering. Reversing id ascending must reach the end of the *network*.
+  const firstId = page.locator('tbody tr').first().locator('td[data-label="ID"]');
+  await expect(firstId).toHaveText('BLN-0001');
 
-  await page.getByLabel(/Sorted ascending/).click();
+  const direction = page.getByLabel(/Sorted ascending/);
+  await direction.scrollIntoViewIfNeeded();
+  await expect(direction).toBeInViewport();
+  await direction.click();
 
-  await expect(page.locator('tbody tr').first()).not.toHaveText(firstAscending ?? '');
+  await expect(firstId).toHaveText('BLN-0240', { timeout: 30_000 });
   await expect(page.getByLabel(/Sorted descending/)).toBeVisible();
 });
 
