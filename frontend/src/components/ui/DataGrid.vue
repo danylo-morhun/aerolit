@@ -3,6 +3,8 @@ import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 import { computed } from 'vue';
 
+import { isPhone } from '@/theme/breakpoints';
+
 import StateBlock from './StateBlock.vue';
 
 export interface GridColumn<K extends string> {
@@ -17,6 +19,16 @@ export interface GridColumn<K extends string> {
   labelHidden?: boolean;
 }
 
+/**
+ * Wraps PrimeVue's DataTable so no feature imports it directly.
+ *
+ * Two things this buys, both of which the brief asks for explicitly: table
+ * chrome is restyled in one place (the theme preset, not here), and the
+ * sorting contract is ours — the parent decides what ordering *means*, because
+ * outside the table's own page it has to apply to more rows than are on
+ * screen. DataTable's built-in sort would silently reorder only what it was
+ * handed.
+ */
 const props = defineProps<{
   rows: readonly Row[];
   columns: readonly GridColumn<Key>[];
@@ -35,16 +47,6 @@ defineSlots<{
   [key: `cell-${string}`]: (props: { row: Row }) => unknown;
 }>();
 
-/**
- * Wraps PrimeVue's DataTable so no feature imports it directly.
- *
- * Two things this buys, both of which the brief asks for explicitly: table
- * chrome is restyled in one place (the theme preset, not here), and the
- * sorting contract is ours — the parent decides what ordering *means*, because
- * outside the table's own page it has to apply to more rows than are on
- * screen. DataTable's built-in sort would silently reorder only what it was
- * handed.
- */
 /**
  * `DataTable` wants a mutable array and the rows arrive readonly. Copying in a
  * computed rather than inline in the template means the copy is made when the
@@ -65,7 +67,25 @@ function sortIcon(key: Key): string {
 </script>
 
 <template>
-  <DataTable :value="tableRows" :data-key="rowKey" :loading="loading" scrollable class="grid">
+  <DataTable
+    :value="tableRows"
+    :data-key="rowKey"
+    :loading="loading"
+    :scrollable="!isPhone"
+    class="grid"
+    :pt="{
+      // Roles spelled out rather than left implicit: below the phone
+      // breakpoint the rows are laid out as cards, and changing a `tr` or `td`
+      // away from its table `display` is exactly what makes a browser drop the
+      // implicit table semantics from the accessibility tree. At desktop these
+      // restate what the markup already means and cost nothing.
+      table: { role: 'table' },
+      thead: { role: 'rowgroup' },
+      headerRow: { role: 'row' },
+      tbody: { role: 'rowgroup' },
+      bodyRow: { role: 'row' },
+    }"
+  >
     <Column
       v-for="column in columns"
       :key="column.key"
@@ -73,7 +93,13 @@ function sortIcon(key: Key): string {
       :pt="{
         // `aria-sort` belongs on the header cell itself, not on a control
         // inside it — assistive tech reads it off the column header.
-        headerCell: column.sortable === false ? {} : { 'aria-sort': sortState(column.key) },
+        headerCell: {
+          role: 'columnheader',
+          ...(column.sortable === false ? {} : { 'aria-sort': sortState(column.key) }),
+        },
+        // The label travels with the cell so the card layout can print it
+        // beside the value; a card with a bare number in it says nothing.
+        bodyCell: { role: 'cell', 'data-label': column.labelHidden ? '' : column.label },
       }"
     >
       <template #header>
@@ -134,5 +160,77 @@ function sortIcon(key: Key): string {
 .grid__sort-icon {
   font-size: 9px;
   opacity: 0.7;
+}
+
+/**
+ * Phone: one card per row instead of eight columns.
+ *
+ * A table this wide on a 390 px screen shows three columns and hides the four
+ * that carry the readings behind a sideways scroll — the half an operator
+ * opened it for. Each row becomes a card and each cell a label/value line,
+ * with the label coming from the `data-label` the column already carries.
+ *
+ * The header is hidden with the `sr-only` technique rather than
+ * `display: none`: that keeps the column headers in the accessibility tree,
+ * keeps their `aria-sort`, and leaves the sort buttons reachable by keyboard.
+ * Sighted phone users get the equivalent control in the table footer.
+ */
+@media (width <= 640px) {
+  /* Collapsed by height and clipping rather than by `position: absolute`:
+     PrimeVue writes `position: sticky` inline on the thead, and an inline
+     declaration beats any stylesheet rule no matter how it is written. This
+     needs no position at all — and unlike `display: none` or
+     `visibility: hidden` it leaves the column headers, their `aria-sort` and
+     the sort buttons in the accessibility tree. */
+  .grid :deep(thead) {
+    display: block;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .grid :deep(table),
+  .grid :deep(tbody),
+  .grid :deep(tr),
+  .grid :deep(td) {
+    display: block;
+    width: auto;
+  }
+
+  .grid :deep(tbody tr) {
+    padding: var(--aq-space-3) var(--aq-space-4);
+    margin: var(--aq-space-3) var(--aq-space-4);
+    background: var(--aq-surface-sunken);
+    border: 1px solid var(--aq-border);
+    border-radius: var(--aq-radius-lg);
+  }
+
+  .grid :deep(tbody td) {
+    display: flex;
+    gap: var(--aq-space-4);
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 3px 0;
+    border: 0;
+  }
+
+  /* The label sits opposite its value, so the card reads as a definition list
+     rather than as a column that lost its heading. */
+  .grid :deep(tbody td[data-label]:not([data-label='']))::before {
+    content: attr(data-label);
+    font-size: var(--aq-text-2xs);
+    font-weight: 600;
+    color: var(--aq-ink-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* The watch star has no label to print and belongs at the card's top edge,
+     next to the id it applies to. */
+  .grid :deep(tbody td[data-label='']) {
+    justify-content: flex-end;
+    padding: 0;
+  }
 }
 </style>
