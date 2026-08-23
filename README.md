@@ -52,9 +52,11 @@ No interaction depends on hover.
 **Dashboard** (`/dashboard`) — four KPI tiles with **real week-over-week trend
 badges** (not placeholders), an OpenStreetMap sensor map with AQI-coloured
 markers and a PM2.5/PM10 toggle, a persisted district watchlist with 24-hour
-sparklines, and a full-width PM10-bars / PM2.5-line chart over 24H, 7D or 30D.
-Selecting a station anywhere — map marker, watchlist row — loads it into the
-chart.
+sparklines, and a full-width PM10-bars / PM2.5-line chart over 24H, 7D or 30D. The window
+trails the snapshot hour while the bars are cut on the Berlin clock, which is
+two decisions rather than one — [ADR 0010](docs/adr/0010-chart-windows-and-buckets.md)
+says why. Selecting a station anywhere — map marker, watchlist row — loads it
+into the chart.
 
 **Sensor List** (`/sensors`) — the network as a sortable table, cursor-paginated
 in both directions with controls that disable exactly when the API omits the
