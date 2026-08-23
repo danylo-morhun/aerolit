@@ -44,10 +44,17 @@ server, so there is no CORS setup and no environment file to fill in.
 | **Dashboard** | ![Dashboard, light theme](docs/screenshots/dashboard-light.png) | ![Dashboard, dark theme](docs/screenshots/dashboard-dark.png) |
 | **Sensor List** | ![Sensor list, light theme](docs/screenshots/sensor-list-light.png) | ![Sensor list, dark theme](docs/screenshots/sensor-list-dark.png) |
 
-Both pages hold up from 2560 px down to a 768 px iPad in either orientation.
-No interaction depends on hover. Below 768 px there is no phone layout — the
-brief does not ask for one — but the shell still fits both tabs and neither
-page scrolls sideways down to 320 px.
+At phone width the table becomes one card per station, and the sorting that
+lives in the column headers moves into the footer:
+
+| Dashboard, 390 px | Sensor List, 390 px |
+| --- | --- |
+| ![Dashboard on a phone](docs/screenshots/phone-dashboard.png) | ![Sensor list on a phone](docs/screenshots/phone-sensor-list.png) |
+
+Both pages hold up from 2560 px down to a 768 px iPad in either orientation,
+and there is a phone layout below that — not required by the brief, but the
+sensor table needed to stop being a table rather than merely get narrower. No
+interaction depends on hover.
 
 ## What's implemented
 
