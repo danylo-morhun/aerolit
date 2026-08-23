@@ -54,6 +54,26 @@ export default defineConfig({
       },
     },
   },
+  /**
+   * `vite preview` serves the built bundle, and the e2e suite points at it
+   * rather than at the dev server — so the proxy has to exist here too.
+   * Measured reason: under parallel load the dev server intermittently fails a
+   * dynamic import in WebKit ("Importing a module script failed"), which leaves
+   * the router with no component and the suite with a flake. The built bundle,
+   * with its chunks already on disk, did not reproduce it once. Testing the
+   * artefact that ships is the right default anyway.
+   */
+  preview: {
+    port: 5173,
+    proxy: {
+      '/api': {
+        target: MOCK_API,
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    },
+  },
+
   build: {
     target: 'es2022',
     // Kept on deliberately: this is a submission meant to be read, and a

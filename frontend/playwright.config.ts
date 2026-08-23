@@ -46,7 +46,10 @@ export default defineConfig({
         hasTouch: true,
         isMobile: false,
       },
-      testIgnore: /phone\.spec\.ts/,
+      // Visual baselines are captured once, at desktop width on Chromium.
+      // Repeating them per project would triple the images for the same
+      // information — the layout at other widths is asserted by measurement.
+      testIgnore: /(phone|visual)\.spec\.ts/,
     },
     {
       /**
@@ -69,7 +72,7 @@ export default defineConfig({
         hasTouch: true,
         isMobile: false,
       },
-      testIgnore: /phone\.spec\.ts/,
+      testIgnore: /(phone|visual)\.spec\.ts/,
     },
     {
       /**
@@ -99,10 +102,13 @@ export default defineConfig({
       stdout: 'ignore',
     },
     {
-      command: 'npm run dev',
+      // The built bundle, not the dev server: see the note in vite.config.ts.
+      // Costs a build per run and buys a suite that exercises what ships.
+      command: 'npm run build && npm run preview',
       url: 'http://localhost:5173',
       reuseExistingServer: !process.env['CI'],
       stdout: 'ignore',
+      timeout: 120_000,
     },
   ],
 });
