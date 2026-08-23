@@ -91,6 +91,25 @@ export default defineConfig({
         isMobile: false,
       },
     },
+    {
+      /**
+       * The phone on the engine phones actually run.
+       *
+       * Chromium above is the fast one; this is the honest one. A 390 px screen
+       * is overwhelmingly an iPhone, and the card layout leans on exactly the
+       * features engines disagree about — `clip-path` to collapse the header
+       * row, `::before` content from a `data-label`, and a table whose `tr` and
+       * `td` are laid out as blocks while keeping their roles.
+       */
+      name: 'phone-webkit',
+      testMatch: /phone\.spec\.ts/,
+      use: {
+        ...devices['Desktop Safari'],
+        viewport: { width: 390, height: 844 },
+        hasTouch: true,
+        isMobile: false,
+      },
+    },
   ],
 
   /** Both servers are started for the run and torn down after it. */
