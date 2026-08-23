@@ -148,3 +148,37 @@ test('"View all" leads to the sensor list', async ({ page }) => {
   await expect(page).toHaveURL(/\/sensors$/);
   await expect(page.getByRole('heading', { name: 'Sensor List' })).toBeVisible();
 });
+
+/**
+ * The selection lives in the address bar.
+ *
+ * Without it "look at Pankow over 30 days" is a sentence rather than a link,
+ * and a reload drops back to the first tracked station. These two tests are the
+ * round trip: what the app writes, and what it reads back.
+ */
+test('a deep link opens the station, range and pollutant it names', async ({ page }) => {
+  await page.goto('/dashboard?station=BLN-0041&range=30d&pollutant=pm10');
+
+  await expect(page.getByText(/Pankow · Schoenhauser Allee · 30D · µg\/m³/)).toBeVisible({
+    timeout: 30_000,
+  });
+  await expect(page.getByRole('button', { name: 'PM10', exact: true })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await expect(page.getByText('Good · 0–24')).toBeVisible();
+});
+
+test('choosing a station writes it to the url, defaults left out', async ({ page }) => {
+  await page.goto('/dashboard');
+  await expect.poll(() => page.locator('path.marker').count(), { timeout: 30_000 }).toBe(240);
+
+  // 24H and PM2.5 are the defaults, so the link carries only the station.
+  await expect(page).toHaveURL(/\?station=BLN-\d+$/);
+
+  await page.getByRole('button', { name: '7D', exact: true }).click();
+  await expect(page).toHaveURL(/range=7d/);
+
+  await page.reload();
+  await expect(page.getByText(/· 7D · µg\/m³/)).toBeVisible({ timeout: 30_000 });
+});
