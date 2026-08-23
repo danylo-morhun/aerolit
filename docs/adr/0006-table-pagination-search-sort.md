@@ -82,6 +82,33 @@ first pass and fixing them is what makes the mode boundary principled:
 - In search mode the snapshot instant is derived from the rows on screen, as
   it is in browse — the same trade-off, recorded in `NOTES.md`.
 
+## Virtualisation, and why the window is not about the DOM
+
+Revisited with measurements rather than instinct, because "virtualise the
+table" is the reflex answer to a paginated list and it is the wrong one here.
+
+Rendering the entire 240-station match set costs **10.6 ms** at desktop width
+and **10.9 ms** at 768 px — 1920 cells, inside a single 16 ms frame. There is
+no rendering problem to solve.
+
+The window is not there to bound DOM nodes. It is there to bound *requests*:
+each visible row fetches its own 30-day series, so twenty rows is twenty calls.
+A virtualised list of all 240 matches would have to fetch readings for whatever
+the scroll position exposes — which is the same twenty-at-a-time enrichment,
+triggered by scrolling instead of by a click. Virtualisation would buy a
+different interaction, not a different cost.
+
+Against that it asks for a fixed `itemSize`: PrimeVue's virtual scroller
+positions rows arithmetically, so every row must be the same height. The
+neighbourhood column wraps for the longer names at narrower widths, and making
+it uniform means truncating one of the columns the table exists to show.
+
+So it stays paginated, and the condition that would change the answer is
+recorded instead of guessed: virtualisation becomes right when a page stops
+being twenty rows — the network-wide roll-up the brief's 10 000 stations would
+need, served by an aggregate endpoint, with rows that no longer each carry a
+request of their own.
+
 ## Reversibility
 
 If Wised confirms reading (1), the change is a deletion: drop the `search`
