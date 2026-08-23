@@ -35,6 +35,15 @@ technique moves that figure. This is the only thing that has to change.
 coordinates is a large-ish JSON file, not a crisis. The map would want spatial
 paging for rendering reasons, but the index itself is affordable.
 
+There is a third figure, and it is the one that decides this is not a
+someday problem. The roll-up is a synchronous pass over every reading, and a
+long-task observer measures it at **595 ms** on one continuous task at 240
+stations — already a visible freeze on a phone, already long enough that a tap
+landing inside it is dropped. It scales with the data, so the same pass at
+10 000 stations is roughly half a minute of a wedged main thread. No amount of
+`requestIdleCallback` makes that acceptable; the reduction has to happen
+somewhere else.
+
 ## Decision
 
 The reduction moves to the server; the client renders.
