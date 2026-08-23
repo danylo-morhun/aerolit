@@ -54,6 +54,54 @@ test('the pollutant toggle re-colours the map', async ({ page }) => {
   await expect(page.getByText('Good · 0–24')).toBeVisible();
 });
 
+/**
+ * The markers are not rebuilt when the selection moves — two of them are
+ * repainted in place, which means the selected style is written to the SVG
+ * element rather than handed to Leaflet at construction. This is the test that
+ * catches that going wrong: exactly one marker is ever selected, and clicking
+ * another moves the highlight and the chart together.
+ */
+test('exactly one marker is selected, and clicking another moves it', async ({ page }) => {
+  await expect
+    .poll(() => page.locator('path.marker--good').count(), { timeout: 30_000 })
+    .toBeGreaterThan(0);
+
+  // The dashboard seeds the chart with the first tracked station, so a marker
+  // carries the selected style before anything is clicked.
+  await expect.poll(() => page.locator('path.marker--selected').count()).toBe(1);
+
+  const subtitle = page.getByText(/· 24H · µg\/m³/);
+  const before = await subtitle.textContent();
+
+  // `force`: stations sit close enough together in central Berlin that their
+  // markers overlap, so Playwright's hit-test refuses a click it would happily
+  // deliver in a browser. Which of the overlapping stations is picked does not
+  // matter here — only that picking one moves the highlight and the chart.
+  await page.locator('path.marker:not(.marker--selected)').nth(120).click({ force: true });
+
+  await expect.poll(() => page.locator('path.marker--selected').count()).toBe(1);
+  await expect(subtitle).not.toHaveText(before ?? '');
+});
+
+/** The tooltips are updated in place too, so their pollutant has to follow. */
+test('a marker names the pollutant currently on the map', async ({ page }) => {
+  await expect
+    .poll(() => page.locator('path.marker--good').count(), { timeout: 30_000 })
+    .toBeGreaterThan(0);
+
+  await page.locator('path.marker').nth(60).click({ force: true });
+  await expect(page.locator('.leaflet-tooltip.marker-tip').first()).toContainText('PM2.5');
+
+  await page.getByRole('button', { name: 'PM10', exact: true }).click();
+  await page.locator('path.marker').nth(90).click({ force: true });
+
+  // Not one tooltip left naming the old pollutant — including the one that was
+  // already open when the toggle was thrown. That is the difference between
+  // updating the tooltips in place and only rewriting the ones drawn since.
+  await expect(page.locator('.leaflet-tooltip.marker-tip').first()).toContainText('PM10');
+  await expect(page.locator('.leaflet-tooltip.marker-tip', { hasText: 'PM2.5' })).toHaveCount(0);
+});
+
 test('selecting a watchlist row loads that station into the chart', async ({ page }) => {
   const pankow = page.getByRole('button').filter({ hasText: 'Pankow' }).first();
   await expect(pankow).toBeVisible({ timeout: 30_000 });
