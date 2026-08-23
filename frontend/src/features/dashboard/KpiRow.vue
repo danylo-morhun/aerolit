@@ -86,4 +86,15 @@ const avgLabel = computed(() => {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* Small phones only. Two columns still read at 390 px — only the longest label
+   wraps — and they keep the map near the top of the page instead of behind
+   four full-width tiles. At 360 px and below the short labels wrap too
+   ("Poor Connection" over two lines under a 34 px figure reads as a fault),
+   and one column is the honest answer. */
+@media (width <= 360px) {
+  .kpis {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
 </style>
