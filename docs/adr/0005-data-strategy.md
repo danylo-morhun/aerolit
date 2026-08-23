@@ -14,8 +14,10 @@ in the data, not wall-clock time.
 
 On the dashboard, load the full station identity list (`/stations?limit=100`,
 3 pages — legitimate here; the §8 prohibition targets the *table*), then
-fetch `GET /stations/:id/readings?range=30d` once per station through the
-query cache, with bounded request concurrency. Every derived value — current
+fetch `GET /stations/:id/readings` once per station through the query cache,
+with bounded request concurrency. The `range` parameter is deliberately
+omitted: the whole 30-day series is what every consumer needs between them,
+and asking for it by name would imply the client could ask for less. Every derived value — current
 PM2.5/PM10, AQI, offline state, stability %, 24 h sparkline, the four KPIs and
 their week-over-week deltas — is computed in `src/domain/` from those series.
 
