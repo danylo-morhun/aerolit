@@ -71,7 +71,8 @@ and chart palette, surviving a reload and defaulting to the OS preference.
 frontend/src/
   api/          typed client — the only place that knows URLs and wire formats
   domain/       pure functions: AQI, stability, connection, KPIs, trends,
-                bucketing, sorting. No Vue, no I/O, no ambient clock.
+                bucketing, axis labelling, sorting. No Vue, no I/O, no
+                ambient clock.
   queries/      TanStack Query composables — caching and request lifecycle
   stores/       Pinia — theme, selection, watchlist (UI state only)
   components/   ui/ = shared elements on top of PrimeVue · layout/ = app shell
