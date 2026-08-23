@@ -1,4 +1,4 @@
-import { watch } from 'vue';
+import { onScopeDispose, watch } from 'vue';
 import {
   onBeforeRouteLeave,
   useRoute,
@@ -148,12 +148,39 @@ export function useSelectionUrl(): void {
     leaving = true;
   });
 
-  watch(
-    () => [selection.stationId, selection.range, selection.pollutant] as const,
-    ([stationId, range, pollutant]) => {
-      if (leaving) return;
-      const query = selectionQuery({ stationId, range, pollutant }, route.query);
-      if (query !== null) void router.replace({ query });
-    },
-  );
+  /**
+   * A leave guard fires on *attempted* navigations, not confirmed ones. Tapping
+   * "Sensor List" and then "Dashboard" before the first settles leaves this
+   * page mounted with the latch stuck on, and every later change would be
+   * silently dropped from the URL for the rest of its life. `afterEach` reports
+   * the failure, which is the only place that is observable.
+   */
+  const stopWatchingFailures = router.afterEach((_to, _from, failure) => {
+    if (failure) leaving = false;
+  });
+  onScopeDispose(stopWatchingFailures);
+
+  function sync(): void {
+    if (leaving) return;
+    const query = selectionQuery(
+      {
+        stationId: selection.stationId,
+        range: selection.range,
+        pollutant: selection.pollutant,
+      },
+      route.query,
+    );
+    if (query !== null) void router.replace({ query });
+  }
+
+  watch(() => [selection.stationId, selection.range, selection.pollutant] as const, sync);
+
+  /**
+   * Once at mount, not only on change: the store outlives the page. Leaving the
+   * dashboard on 7D and coming back through the tab link arrives at a bare
+   * `/dashboard`, and with a change-only watcher nothing would ever correct it
+   * — the chart would show 7D while the URL promised 24H, which is precisely
+   * the mismatch this composable exists to prevent.
+   */
+  sync();
 }
