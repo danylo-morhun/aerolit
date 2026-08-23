@@ -141,3 +141,30 @@ test('tracking a station here shows it on the dashboard watchlist', async ({ pag
   const watchlist = page.getByRole('list', { name: 'Tracked stations' });
   await expect(watchlist.getByText('BLN-0003', { exact: false })).toBeVisible({ timeout: 30_000 });
 });
+
+/**
+ * All eight columns fit an iPad in portrait.
+ *
+ * They did not: the row came to 796 px against 734 px of card, so the
+ * connection column — the stability figure with it — sat behind a sideways
+ * scroll on the one tablet size the brief names outright. The gutters were
+ * paying for it, so the gutters gave it back (`--aq-table-cell-padding`).
+ * Trivially true on the desktop project; the iPad project is where this bites.
+ */
+test('the table fits its columns without a sideways scroll', async ({ page }) => {
+  await expect(page.getByText('BLN-0001')).toBeVisible({ timeout: 30_000 });
+
+  const scrolls = await page
+    .locator('.p-datatable-table-container')
+    .evaluate((el) => el.scrollWidth > el.clientWidth + 1);
+  expect(scrolls, 'the table scrolls sideways inside its card').toBe(false);
+
+  // The last column is not merely present but wholly on screen, percentage
+  // included — a clipped "HQ link" reads as a working table until you look.
+  const connection = page.locator('tbody td').last();
+  await expect(connection).toContainText(/\d+%/);
+
+  const box = await connection.boundingBox();
+  const width = page.viewportSize()?.width ?? 0;
+  expect(box!.x + box!.width).toBeLessThanOrEqual(width);
+});
