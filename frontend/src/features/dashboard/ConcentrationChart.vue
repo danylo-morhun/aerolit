@@ -13,6 +13,7 @@ import { axisLabels, bucketSpanLabel } from '@/domain/chart-axis';
 import { chartSeries } from '@/domain/downsample';
 import type { ChartRange, ReadingSeries, Station } from '@/domain/types';
 import { cssVars } from '@/theme/cssVar';
+import { reducedMotion } from '@/theme/motion';
 import { useThemeStore } from '@/stores/theme';
 
 const props = defineProps<{
@@ -76,6 +77,9 @@ const option = computed(() => {
   const data = points.value;
 
   return {
+    // The chart draws to a canvas, so `prefers-reduced-motion` in the
+    // stylesheet never reaches it — it has to ask the same question itself.
+    animation: !reducedMotion.value,
     animationDuration: 240,
     // ECharts' own accessibility layer: it renders the series into a
     // description on the canvas element, which is the only way a screen reader
