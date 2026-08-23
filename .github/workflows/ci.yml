@@ -40,10 +40,13 @@ jobs:
       - name: Build
         run: npm run build
 
-      # Only Chromium: the e2e projects both run on it (see playwright.config.ts),
-      # so pulling the other engines would be download time for nothing.
-      - name: Install browser
-        run: npx playwright install --with-deps chromium
+      # Chromium for the desktop, iPad and phone projects; WebKit because an
+      # iPad is a Safari, and the engine differences are the point of that
+      # project. The visual-baseline spec skips itself here: its images were
+      # captured on macOS, and matching them would mean capturing a set inside
+      # this container.
+      - name: Install browsers
+        run: npx playwright install --with-deps chromium webkit
 
       - name: End-to-end tests
         run: npm run test:e2e
