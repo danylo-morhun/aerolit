@@ -76,6 +76,9 @@ Dependency direction: `pages → features → (ui, queries, stores) → (api, do
 ## Theming
 
 One token set (PrimeVue v4 preset) is the single source for both themes.
+`theme/breakpoints.ts` holds the one breakpoint that is a *value* rather than a
+media query — the sensor table turns off PrimeVue's scrollable machinery below
+it — and must be kept in step with the stylesheets that lay the cards out.
 Dark mode toggles a class on the root element; the map swaps CARTO
 light/dark base tiles and the chart reads its palette from the same CSS
 variables. Default follows `prefers-color-scheme`; an explicit user choice is
@@ -94,8 +97,11 @@ Four layers, each answering a different question:
 - **Integration** (`tests/*.spec.ts`) — the two pages with the real router,
   store and query client, network stubbed by MSW.
 - **End-to-end** (`e2e/`, Playwright) — the app against the real mock API at
-  1512 px and 768 px, including an axe accessibility pass over both pages in
-  both themes.
+  1512 px, 768 px and 390 px, including an axe accessibility pass over both
+  pages in both themes at each width. The phone project runs only
+  `phone.spec.ts`: below 640 px the sensor table is a card list rather than a
+  narrow table, so the desktop suite's assertions would be checking a layout
+  they were not written against.
 
 Coverage thresholds gate `domain/` and `api/`; views are thin by construction
 and are covered through the integration and e2e layers instead.
