@@ -70,8 +70,11 @@ test('exactly one marker is selected, and clicking another moves it', async ({ p
   // carries the selected style before anything is clicked.
   await expect.poll(() => page.locator('path.marker--selected').count()).toBe(1);
 
-  const subtitle = page.getByText(/· 24H · µg\/m³/);
-  const before = await subtitle.textContent();
+  // The station id, not the chart's subtitle: 60 of the 240 stations share a
+  // `district · location` pair, so comparing subtitles depended on the two
+  // particular stations involved differing. The id is in the URL now.
+  const before = new URL(page.url()).searchParams.get('station');
+  expect(before).not.toBeNull();
 
   // `force`: stations sit close enough together in central Berlin that their
   // markers overlap, so Playwright's hit-test refuses a click it would happily
@@ -80,7 +83,7 @@ test('exactly one marker is selected, and clicking another moves it', async ({ p
   await page.locator('path.marker:not(.marker--selected)').nth(120).click({ force: true });
 
   await expect.poll(() => page.locator('path.marker--selected').count()).toBe(1);
-  await expect(subtitle).not.toHaveText(before ?? '');
+  await expect.poll(() => new URL(page.url()).searchParams.get('station')).not.toBe(before);
 });
 
 /** The tooltips are updated in place too, so their pollutant has to follow. */
@@ -181,4 +184,29 @@ test('choosing a station writes it to the url, defaults left out', async ({ page
 
   await page.reload();
   await expect(page.getByText(/· 7D · µg\/m³/)).toBeVisible({ timeout: 30_000 });
+});
+
+/**
+ * The store outlives the page; the URL has to catch up when you come back.
+ *
+ * The tab link navigates to a bare `/dashboard`, and the selection store still
+ * holds whatever range was picked before leaving. With a change-only watcher
+ * nothing corrected that: the chart showed 7D while the address bar promised
+ * 24H, so copying the link handed a colleague a different view and a refresh
+ * silently dropped back. Found in review.
+ */
+test('returning to the dashboard puts the range back in the url', async ({ page }) => {
+  await page.goto('/dashboard');
+  await expect.poll(() => page.locator('path.marker').count(), { timeout: 30_000 }).toBe(240);
+
+  await page.getByRole('button', { name: '7D', exact: true }).click();
+  await expect(page).toHaveURL(/range=7d/);
+
+  await page.getByRole('link', { name: 'Sensor List' }).click();
+  await expect(page).toHaveURL(/\/sensors/);
+
+  await page.getByRole('link', { name: 'Dashboard' }).click();
+
+  await expect(page.getByText(/· 7D · µg\/m³/)).toBeVisible({ timeout: 30_000 });
+  await expect(page).toHaveURL(/range=7d/);
 });
