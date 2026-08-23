@@ -192,7 +192,7 @@ eyeballed.
 | **Fonts are bundled, not loaded from Google's CDN** | The mockup is clearly not set in a system font, but embedding Google Fonts sends the visitor's IP to the US without consent — held to breach the GDPR by a German court in 2022, which is not a footnote for a Berlin network run from the EU. Only the latin subset and the seven weights this UI uses are shipped: 112 kB. A system-font stack still backs them. |
 | **The map card says "Particulate readings", where the mockup says "Real-time particulate readings"** | The dataset is a fixed snapshot the brief says not to poll. Calling it real-time would be the one piece of copy on the page that isn't true. |
 | **Tablet layout** | No mockup was given. KPIs go 4→2 columns at 900 px; the map/watchlist split stacks at 1100 px, where the watchlist becomes two columns to use the width. Verified at 768 px and 1024 px in both orientations. |
-| **Phone widths are not a supported layout, but the shell still has to look intact** | The brief says no phone layout is required, and I did not build one — the KPI tiles, the map and the chart are all sized for 768 px and up. What I did fix is the app bar: below 480 px it wraps so the two tabs take a full-width row instead of being clipped mid-word inside a scroller with no scrollbar. Everything else already stayed inside the viewport at 320 px, which is the property worth having when the layout itself is out of scope. |
+| **There is a phone layout, though the brief does not ask for one** | Going through the app at 320–430 px found the shell clipping "Sensor List" mid-word and the sensor table hiding PM2.5, PM10, AQI and connection behind a sideways scroll — three columns of eight, and not the three anyone opens the table for. Since the layout had to change rather than merely narrow, it changed properly: the app bar wraps, the KPI row goes to one column below 360 px, the map legend moves under the canvas, the watchlist stops scrolling inside itself, and each table row becomes a card of labelled fields. Sorting moves with it — the column headers are collapsed to a pixel, so the footer carries a sort control that writes to the same event. Covered by its own Playwright project at 390 px, axe included. |
 
 ---
 
@@ -235,6 +235,19 @@ eyeballed.
   claims a fixed duration. The consequence is that 24H crosses midnight
   somewhere in the middle, so the bar that opens the day carries its date
   instead of its hour. Written up as [ADR 0010](docs/adr/0010-chart-windows-and-buckets.md).
+- **The phone table is a card list, and that is a real design decision rather
+  than a fallback.** Eight columns do not fit a 390 px screen under any amount
+  of squeezing, so below 640 px each row becomes a card of labelled fields. Two
+  details are what make it defensible rather than a CSS trick. The column
+  headers are collapsed with height and clipping, never `display: none` — that
+  keeps them, their `aria-sort` and their sort buttons in the accessibility
+  tree, so a screen-reader user still sorts from the header while the footer
+  control serves everyone looking at the screen; both write to the same event,
+  so there is one ordering model. And the roles are spelled out explicitly,
+  because laying a `tr` out as a block is exactly what makes a browser drop the
+  implicit table semantics. The alternative — dropping columns on a phone —
+  would have hidden the readings, which is what the layout was broken for in
+  the first place.
 - **The tablet e2e project runs Chromium, not WebKit.** What it verifies —
   responsive layout, no hover-only interaction, tap targets — is
   engine-independent, and requiring a second browser engine would mean anyone
