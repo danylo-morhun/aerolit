@@ -281,6 +281,36 @@ rather than the code, found four more:
   matching stations" for as long as the index took to arrive. It now says it is
   still searching, because zero is an answer and the table did not have one yet.
 
+A third pass, this one auditing the running app and the build output rather
+than the screens, found five more:
+
+- **Every tap on the map rebuilt all 240 markers.** The redraw watcher covered
+  the selection and the pollutant alongside the station set, so selecting a
+  station tore down 240 `circleMarker`s and their tooltips to change two of
+  them. Now the layer is rebuilt only when the set of stations changes; a
+  selection repaints exactly the marker leaving it and the one taking it, and a
+  pollutant switch repaints in place. This is the interaction an operator
+  repeats all day, and it was the most expensive thing on the page.
+- **The axis labelling lived in the component**, where it could not be tested
+  without mounting ECharts — and it was the one derived value not in
+  `src/domain/`, against this repo's own rule. It is now `domain/chart-axis.ts`
+  with its own spec, which is also what surfaced the missing day boundary on the
+  24H axis (above).
+- **`prefers-reduced-motion` was only half honoured.** `tokens.css` zeroes the
+  CSS transitions, but ECharts animates on a canvas and Leaflet animates its own
+  panes — neither reads the stylesheet. Both now ask (`theme/motion.ts`), and
+  reactively, so changing the OS setting reaches an open page.
+- **The icon font shipped in five formats.** PrimeIcons declares `eot`, `woff2`,
+  `woff`, `ttf` and an SVG font that is 342 kB on its own; Vite copied all five
+  into `dist/` although every target browser takes the woff2 and ignores the
+  rest. A six-line build plugin rewrites the `src` descriptor: **597 kB** of
+  assets nothing would ever request, gone.
+- **`npm test` printed two unhandled rejections** while reporting all green —
+  jsdom has no `scrollIntoView`, and the watchlist's scroll-into-view watcher
+  rejected on it. Cosmetic behaviour should not fail loudly in a test log, so
+  the call is optional. Worth saying plainly: the suite was green and the output
+  was not, and only one of those is what a reviewer sees first.
+
 ## 4 · What I'd do next, with more time
 
 1. **Server-side aggregation.** This architecture is honest at 240 stations and
