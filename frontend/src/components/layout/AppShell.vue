@@ -119,4 +119,39 @@ const NAV = [
     padding: var(--aq-space-4);
   }
 }
+
+/**
+ * Below the narrowest tablet the brand, the tabs and the theme control stop
+ * fitting on one line, and it is the tabs that lose: "Sensor List" is clipped
+ * mid-word inside a strip that scrolls with no visible scrollbar, which reads
+ * as a broken layout rather than as an invitation to swipe.
+ *
+ * A phone layout is outside the brief, and this is not one — the shell is
+ * simply the first thing anyone opens on a phone, and it costs four rules for
+ * it to degrade honestly instead of looking unfinished. The bar wraps:
+ * identity and theme keep the first line, the tab pair takes the second at
+ * full width and splits it evenly.
+ */
+@media (width <= 480px) {
+  .shell__bar {
+    flex-wrap: wrap;
+  }
+
+  .shell__brand {
+    flex: 1;
+  }
+
+  .shell__nav {
+    /* Last in the visual order, so it wraps below the two controls that
+       precede it in the DOM. */
+    order: 1;
+    flex-basis: 100%;
+    overflow-x: visible;
+  }
+
+  .shell__tab {
+    flex: 1;
+    text-align: center;
+  }
+}
 </style>
