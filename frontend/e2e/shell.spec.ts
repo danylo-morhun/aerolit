@@ -11,14 +11,17 @@ import { expect, test } from '@playwright/test';
 
 test('each page has its own URL and the tabs navigate between them', async ({ page }) => {
   await page.goto('/');
-  await expect(page).toHaveURL(/\/dashboard$/);
+  // Not `/dashboard$`: the dashboard writes its selection into the query as
+  // soon as the data settles, and whether that has happened by now is a race
+  // this test has no business asserting on. WebKit lost it first.
+  await expect(page).toHaveURL(/\/dashboard(\?|$)/);
 
   await page.getByRole('link', { name: 'Sensor List' }).click();
   await expect(page).toHaveURL(/\/sensors$/);
   await expect(page).toHaveTitle(/Sensor List/);
 
   await page.goBack();
-  await expect(page).toHaveURL(/\/dashboard$/);
+  await expect(page).toHaveURL(/\/dashboard(\?|$)/);
   await expect(
     page.getByRole('heading', { name: 'Berlin · Particulate Monitoring' }),
   ).toBeVisible();
@@ -47,11 +50,30 @@ test('the theme toggle survives a reload and takes the map with it', async ({ pa
   expect(tileSrc).toContain(wasDark ? 'dark_all' : 'light_all');
 });
 
-test('the first tab stop is a skip link to the content', async ({ page }) => {
+test('the first tab stop is a skip link to the content', async ({ page, browserName }) => {
   await page.goto('/dashboard');
-  await page.keyboard.press('Tab');
 
-  await expect(page.getByRole('link', { name: 'Skip to content' })).toBeFocused();
+  const skip = page.getByRole('link', { name: 'Skip to content' });
+  await expect(skip).toHaveAttribute('href', '#main');
+
+  // The guarantee the page can actually make: nothing focusable precedes it.
+  const first = await page.evaluate(() => {
+    const focusable = document.querySelector<HTMLElement>(
+      'a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])',
+    );
+    return focusable?.className ?? null;
+  });
+  expect(first).toContain('aq-skip-link');
+
+  // Whether Tab *reaches* it is the engine's policy, not the page's: measured
+  // on WebKit, Tab skips every `<a>` and lands on the first `<input>`, because
+  // macOS Safari ships "Press Tab to highlight each item" switched off. iOS
+  // Safari with a hardware keyboard does traverse links. So the traversal is
+  // asserted where traversal exists, and the link is focusable everywhere.
+  if (browserName === 'webkit') await skip.focus();
+  else await page.keyboard.press('Tab');
+
+  await expect(skip).toBeFocused();
 });
 
 test('a station can be reached and selected with the keyboard alone', async ({ page }) => {
