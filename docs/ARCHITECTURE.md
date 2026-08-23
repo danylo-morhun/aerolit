@@ -26,7 +26,7 @@ Two pages behind a shared app shell, one data source (the mock API on
 | Layer | Path | Rule |
 | --- | --- | --- |
 | API client | `src/api/` | The only place that knows URLs and DTO shapes. Typed, no business logic. |
-| Domain | `src/domain/` | Pure functions only — AQI classification, stability, connection state, KPI roll-ups, week-over-week trends, series downsampling. No Vue imports, no I/O. Fully unit-tested. |
+| Domain | `src/domain/` | Pure functions only — AQI classification, stability, connection state, KPI roll-ups, week-over-week trends, series downsampling, chart axis labelling. No Vue imports, no I/O. Fully unit-tested. |
 | Queries | `src/queries/` | TanStack Query composables — caching, deduplication, request lifecycle. Bridge between API and views. |
 | Stores | `src/stores/` | Pinia, UI state only: theme, station selection, watchlist. Server data never lives here. |
 | Shared UI | `src/components/ui/` | Project-level components on top of PrimeVue primitives (AppButton, DataGrid, StatTile, TrendBadge, AqiBadge, ConnectionBadge, Sparkline, WatchStar, …). A design change propagates from one edit point. **This is the only layer allowed to import `primevue/*`** — enforced by ESLint. |
@@ -70,6 +70,8 @@ Dependency direction: `pages → features → (ui, queries, stores) → (api, do
 | Stability % | readings present ÷ hours expected over the trailing 30 d (720) |
 | Connection | Offline = no reading in the most recent expected hour; else Poor < 86 %, HQ ≥ 86 % |
 | KPI trend | KPI(now) − KPI(now − 168 h), in the KPI's own unit; badge colour encodes better/worse, not sign |
+| Chart window | Trailing from the snapshot hour: 24 h / 168 h / 720 h ending at "now" (14:00 Berlin), never snapped to midnight |
+| Chart buckets | 24H raw hourly · 7D 6-hour · 30D daily, the latter two cut on the Berlin clock, partial at each end (ADR 0010) |
 
 ## Theming
 
