@@ -309,6 +309,38 @@ watch(
     min-height: 340px;
   }
 }
+
+/* Phone: the map keeps enough height to show Berlin's spread without pushing
+   the watchlist and the chart off the end of a long scroll. */
+@media (width <= 640px) {
+  /* The legend moves out of the canvas and below it, so the map is no longer
+     the whole of this box — it becomes a column, and the canvas keeps a fixed
+     height instead of filling one. Left as `height: 100%` the canvas eats the
+     box and the legend is clipped by the card's `overflow: hidden`. */
+  .map {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: 0;
+  }
+
+  .map__canvas {
+    flex: 0 0 auto;
+    height: 300px;
+    min-height: 0;
+  }
+
+  /* Four rows of legend would cover a quarter of a phone-sized map, so it sits
+     under the canvas rather than on top of it. */
+  .map__legend {
+    position: static;
+    margin: var(--aq-space-3) var(--aq-space-4) var(--aq-space-4);
+  }
+
+  .map__legend-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
 </style>
 
 <style>
