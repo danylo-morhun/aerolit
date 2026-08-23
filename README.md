@@ -45,7 +45,9 @@ server, so there is no CORS setup and no environment file to fill in.
 | **Sensor List** | ![Sensor list, light theme](docs/screenshots/sensor-list-light.png) | ![Sensor list, dark theme](docs/screenshots/sensor-list-dark.png) |
 
 Both pages hold up from 2560 px down to a 768 px iPad in either orientation.
-No interaction depends on hover.
+No interaction depends on hover. Below 768 px there is no phone layout — the
+brief does not ask for one — but the shell still fits both tabs and neither
+page scrolls sideways down to 320 px.
 
 ## What's implemented
 
