@@ -156,3 +156,23 @@ for (const [name, path] of [
     });
   }
 }
+
+/**
+ * Collapsed does not mean skippable-over.
+ *
+ * The header row survives as one clipped pixel so screen readers keep the
+ * column names, their `aria-sort` and the sort buttons. Left in the tab order,
+ * those same buttons became seven stops with no visible focus ring — a WCAG
+ * 2.4.7 failure that the axe pass cannot see, because focus visibility is not
+ * something it can evaluate. Found in review.
+ */
+test('the collapsed headers are not invisible tab stops', async ({ page }) => {
+  await page.goto('/sensors');
+  await expect(page.getByText('BLN-0001')).toBeVisible({ timeout: 30_000 });
+
+  expect(await page.locator('.grid__sort').count()).toBeGreaterThan(0);
+  expect(await page.locator('.grid__sort:not([tabindex="-1"])').count()).toBe(0);
+
+  // Still named for assistive tech, which is the whole reason they are kept.
+  await expect(page.getByRole('columnheader', { name: /PM2\.5/ })).toBeAttached();
+});

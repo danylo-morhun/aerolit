@@ -84,6 +84,11 @@ function sortIcon(key: Key): string {
       headerRow: { role: 'row' },
       tbody: { role: 'rowgroup' },
       bodyRow: { role: 'row' },
+      // The empty state is PrimeVue's own row, outside the Column loop below,
+      // so it needs the same treatment: on a phone a search that matches
+      // nothing would otherwise leave a `rowgroup` containing no `row`.
+      emptyMessage: { role: 'row' },
+      emptyMessageCell: { role: 'cell' },
     }"
   >
     <Column
@@ -108,7 +113,19 @@ function sortIcon(key: Key): string {
           :class="column.labelHidden ? 'sr-only' : 'grid__label'"
           >{{ column.label }}</span
         >
-        <button v-else type="button" class="grid__sort" @click="emit('sort', column.key)">
+        <!-- `tabindex="-1"` below the phone breakpoint: the header is collapsed
+             to a pixel there, so these seven buttons would be seven tab stops
+             with no visible focus — a 2.4.7 failure that an axe pass cannot
+             see, because it cannot evaluate focus visibility. They stay in the
+             accessibility tree for a screen reader's virtual cursor, and the
+             sensor table's footer carries the equivalent visible control. -->
+        <button
+          v-else
+          type="button"
+          class="grid__sort"
+          :tabindex="isPhone ? -1 : undefined"
+          @click="emit('sort', column.key)"
+        >
           {{ column.label }}
           <i :class="[sortIcon(column.key), 'grid__sort-icon']" aria-hidden="true" />
           <span class="sr-only">
