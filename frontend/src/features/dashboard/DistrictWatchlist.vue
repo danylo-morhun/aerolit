@@ -65,9 +65,11 @@ watch(
   async (id) => {
     if (id === null) return;
     await nextTick();
-    list.value
-      ?.querySelector(`[data-station="${CSS.escape(id)}"]`)
-      ?.scrollIntoView({ block: 'nearest' });
+    const row = list.value?.querySelector(`[data-station="${CSS.escape(id)}"]`);
+    // Optional call, not just optional chaining: jsdom has no `scrollIntoView`,
+    // and a rejected watcher there is a failure in the test output for
+    // behaviour that is purely cosmetic.
+    row?.scrollIntoView?.({ block: 'nearest' });
   },
 );
 </script>
