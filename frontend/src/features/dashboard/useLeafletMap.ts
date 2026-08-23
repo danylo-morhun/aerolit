@@ -1,6 +1,8 @@
 import L from 'leaflet';
 import { onBeforeUnmount, onMounted, ref, watch, type Ref } from 'vue';
 
+import { reducedMotion } from '@/theme/motion';
+
 /** How long the "hold ⌘ to zoom" hint stays up after a plain wheel gesture. */
 const WHEEL_HINT_MS = 1600;
 
@@ -51,6 +53,11 @@ export function useLeafletMap(container: Ref<HTMLElement | null>, isDark: Ref<bo
       // page, or the map traps the reader halfway down the dashboard.
       scrollWheelZoom: true,
       doubleClickZoom: true,
+      // Leaflet animates its panes itself, out of reach of the stylesheet's
+      // reduced-motion rule, so the setting has to be passed in here.
+      zoomAnimation: !reducedMotion.value,
+      fadeAnimation: !reducedMotion.value,
+      markerZoomAnimation: !reducedMotion.value,
     });
 
     L.control.zoom({ position: 'bottomright' }).addTo(instance);
