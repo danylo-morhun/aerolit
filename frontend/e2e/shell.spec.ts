@@ -67,6 +67,29 @@ test('a station can be reached and selected with the keyboard alone', async ({ p
   await expect(page.getByText(/Pankow · Schoenhauser Allee/)).toBeVisible();
 });
 
+/**
+ * Any station, not just a tracked one, from the keyboard alone.
+ *
+ * The map's markers are deliberately not tab stops — 240 of them would be a
+ * worse experience than none. The claim that makes that acceptable is that
+ * every station is still reachable without a mouse, and this is it: the header
+ * search narrows the map to one station, the dashboard selects it because the
+ * previous selection is no longer on screen, and the chart follows. BLN-0137 is
+ * on no watchlist and no first page.
+ */
+test('an arbitrary station is reachable from the keyboard alone', async ({ page }) => {
+  await page.goto('/dashboard');
+  await expect.poll(() => page.locator('path.marker').count(), { timeout: 30_000 }).toBe(240);
+
+  await page.getByRole('searchbox').focus();
+  await page.keyboard.type('BLN-0137');
+
+  await expect.poll(() => page.locator('path.marker').count()).toBe(1);
+  await expect(page.locator('path.marker--selected')).toHaveCount(1);
+  await expect(page.getByText(/Tempelhof-Schoeneberg · Innsbrucker Platz · 24H/)).toBeVisible();
+  await expect(page).toHaveURL(/station=BLN-0137/);
+});
+
 test('the page never scrolls sideways on a tablet', async ({ page }) => {
   // Wide content (the sensor table) is allowed its own scroll container; the
   // document is not.
