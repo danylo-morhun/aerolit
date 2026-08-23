@@ -207,6 +207,18 @@ watch(
   }
 }
 
+/* Phone: the panel stops scrolling inside itself and simply flows.
+   The cap exists so a long watchlist cannot decide the height of a *desktop*
+   dashboard and push the chart off screen. On a phone everything is one column
+   already, nothing is competing for that height, and a scroll region nested
+   inside the page scroll only takes gestures away from the page. */
+@media (width <= 640px) {
+  .watchlist {
+    max-height: none;
+    overflow-y: visible;
+  }
+}
+
 .watchlist__item {
   position: relative;
   background: var(--aq-surface-sunken);
