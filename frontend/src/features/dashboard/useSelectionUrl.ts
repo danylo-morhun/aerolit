@@ -124,6 +124,15 @@ export function useSelectionUrl(): void {
    * whatever the current location is, so one landing mid-navigation cancels it
    * and drops the operator back on the dashboard. The leave guard runs before
    * the navigation completes, which is exactly the window that needs closing.
+   *
+   * Honest about its evidence: this was written after watching navigations get
+   * cancelled under WebKit, and the cause of *those* turned out to be the dev
+   * server failing a dynamic import — the suite now runs against the built
+   * bundle and they stopped. Removing this guard no longer breaks a
+   * behavioural test. The race it closes is still real (the `replace` has no
+   * path of its own), it costs five lines, and the failure it prevents is
+   * silent and infuriating, so it stays — but it is insurance, not a fix for
+   * something currently observable, and no test pins it.
    */
   let leaving = false;
   onBeforeRouteLeave(() => {
