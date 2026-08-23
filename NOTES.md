@@ -339,8 +339,13 @@ than the screens, found five more:
    move to the server largely unchanged — they are already pure.
 2. **Virtualised table** with infinite scroll over the cursor stream, once page
    size stops being 20.
-3. **Deep links** for the selected station, range and pollutant, so an operator
-   can send a colleague exactly what they are looking at.
+3. ~~**Deep links** for the selected station, range and pollutant.~~ Built:
+   `?station=&range=&pollutant=`, defaults left out of the URL so a link carries
+   choices rather than noise (`useSelectionUrl.ts`). The one thing that made it
+   more than an afternoon: the dashboard settles its selection *after* 240
+   series arrive, so a `replace` could land mid-navigation and cancel the
+   operator's tap through to the sensor list. The leave guard closes that
+   window; the round trip is pinned in e2e.
 4. **Visual regression tests** on both themes — the one class of bug the current
    suite still cannot see, now that behaviour and accessibility are covered.
 5. **A real PM10 scale** from the regulator, replacing the doubling assumption.
