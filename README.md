@@ -103,8 +103,8 @@ not convention — see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## Tests
 
-**177 Vitest + 66 Playwright**, all green (33 browser tests, each run at desktop
-and at iPad width).
+**177 Vitest + 75 Playwright**, all green (33 browser tests run at desktop and
+at iPad width, plus 9 that only make sense at phone width).
 
 ```bash
 cd frontend
