@@ -9,8 +9,8 @@ import VChart from 'vue-echarts';
 import AppCard from '@/components/ui/AppCard.vue';
 import SegmentedToggle from '@/components/ui/SegmentedToggle.vue';
 import StateBlock from '@/components/ui/StateBlock.vue';
-import { BUCKET_UNIT, chartSeries, opensLocalDay, type ChartPoint } from '@/domain/downsample';
-import { formatDateTime, formatDay, formatHour } from '@/domain/format';
+import { axisLabels, bucketSpanLabel } from '@/domain/chart-axis';
+import { chartSeries } from '@/domain/downsample';
 import type { ChartRange, ReadingSeries, Station } from '@/domain/types';
 import { cssVars } from '@/theme/cssVar';
 import { useThemeStore } from '@/stores/theme';
@@ -38,35 +38,10 @@ const points = computed(() =>
 const hasData = computed(() => points.value.some((p) => p.pm25 !== null || p.pm10 !== null));
 
 /**
- * Axis labels, one per bar.
- *
- * 24H labels every hour. 30D labels every bar, since every bar is a day. 7D
- * labels only the bars that open a day and leaves the three 6-hour bars between
- * them blank — the dates then sit exactly under the day boundaries instead of
- * repeating four times each or drifting with the window.
+ * Axis labels, one per bar — the rule itself lives in `domain/chart-axis`, so
+ * it is unit-tested rather than inspected on screen.
  */
-const labels = computed(() =>
-  points.value.map((point) => {
-    if (range.value === '24h') return formatHour(point.t);
-    if (range.value === '30d') return formatDay(point.t);
-    return opensLocalDay(point.t) ? formatDay(point.t) : '';
-  }),
-);
-
-/**
- * What one bar covers, spelled out.
- *
- * An hourly bar is an instant's reading; a bucketed one is a mean over a span,
- * and saying so is the difference between a tooltip and a guess. A day that ran
- * to midnight reads "00:00–24:00" rather than "00:00–00:00"; the last bar of
- * the 30D range stops at the snapshot, so it reads as the part-day it is.
- */
-function spanLabel(point: ChartPoint): string {
-  if (BUCKET_UNIT[range.value] === 'hour') return formatDateTime(point.t);
-
-  const end = formatHour(point.coveredTo);
-  return `${formatDay(point.coveredFrom)} ${formatHour(point.coveredFrom)}–${end === '00:00' ? '24:00' : end}`;
-}
+const labels = computed(() => axisLabels(points.value, range.value));
 
 const subtitle = computed(() => {
   if (!props.station) return 'Select a station';
@@ -121,7 +96,7 @@ const option = computed(() => {
         if (!point) return '';
         const fmt = (value: number | null) => (value === null ? '—' : value.toFixed(1));
         return [
-          `<strong>${spanLabel(point)}</strong>`,
+          `<strong>${bucketSpanLabel(point, range.value)}</strong>`,
           `PM2.5 ${fmt(point.pm25)} µg/m³`,
           `PM10 ${fmt(point.pm10)} µg/m³`,
         ].join('<br>');
@@ -132,13 +107,10 @@ const option = computed(() => {
       data: labels.value,
       axisLine: { lineStyle: { color: colours.grid } },
       axisTick: { show: false },
-      axisLabel: {
-        color: colours.axis,
-        fontSize: 11,
-        // 7D has already blanked the labels it does not want; the other two
-        // thin theirs out so 24 or 30 of them don't collide.
-        interval: range.value === '7d' ? 0 : Math.max(0, Math.ceil(labels.value.length / 9) - 1),
-      },
+      // `interval: 0` because the thinning is already done: `axisLabels` blanks
+      // the bars it does not want named, which is the only way to keep a date
+      // on a specific bar rather than on whichever one an even stride lands on.
+      axisLabel: { color: colours.axis, fontSize: 11, interval: 0 },
     },
     yAxis: {
       type: 'value',
