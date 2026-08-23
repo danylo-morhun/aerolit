@@ -6,6 +6,7 @@ import StateBlock from '@/components/ui/StateBlock.vue';
 import DistrictWatchlist from '@/features/dashboard/DistrictWatchlist.vue';
 import KpiRow from '@/features/dashboard/KpiRow.vue';
 import SensorMap from '@/features/dashboard/SensorMap.vue';
+import { useSelectionUrl } from '@/features/dashboard/useSelectionUrl';
 import { matchesStation } from '@/domain/search';
 import { useNetwork } from '@/queries/useNetwork';
 import { useSelectionStore } from '@/stores/selection';
@@ -26,6 +27,9 @@ const ConcentrationChart = defineAsyncComponent(
 
 const query = ref('');
 const selection = useSelectionStore();
+// Station, range and pollutant live in the address bar, so a reload keeps them
+// and the link can be sent to someone else.
+useSelectionUrl();
 const watchlist = useWatchlistStore();
 const { view, isLoading, isError, refetch } = useNetwork();
 
