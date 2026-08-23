@@ -187,6 +187,22 @@
   --aq-radius-pill: 999px;
 
   --aq-transition: 150ms ease;
+
+  /* Table rhythm. A value rather than a literal in the preset because it is the
+     one piece of table chrome that has to respond to width: eight columns and a
+     1rem gutter each side come to 796 px, which overflows an iPad in portrait
+     and pushes the connection column — the stability figure included — off the
+     edge behind a sideways scroll. Tightened below, where the columns stop
+     fitting. */
+  --aq-table-cell-padding: 1rem;
+}
+
+/* iPad portrait and narrower: buy the last column back out of the gutters
+   rather than dropping it or scrolling sideways to reach it. */
+@media (width <= 900px) {
+  :root {
+    --aq-table-cell-padding: 0.625rem;
+  }
 }
 
 /* ------------------------------------------------------------------ *

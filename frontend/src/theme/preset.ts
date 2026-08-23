@@ -151,11 +151,11 @@ export const AerolitPreset = definePreset(Aura, {
         background: 'var(--aq-surface)',
         color: 'var(--aq-ink-muted)',
         borderColor: 'var(--aq-border)',
-        padding: '1rem',
+        padding: 'var(--aq-table-cell-padding)',
       },
       bodyCell: {
         borderColor: 'var(--aq-border)',
-        padding: '1rem',
+        padding: 'var(--aq-table-cell-padding)',
       },
       row: {
         background: 'var(--aq-surface)',
