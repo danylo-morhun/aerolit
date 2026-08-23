@@ -50,6 +50,29 @@ export default defineConfig({
     },
     {
       /**
+       * The iPad on the engine it actually runs.
+       *
+       * The Chromium project above is the fast one and covers behaviour; this
+       * one covers the engine. A real iPad is Safari, and WebKit is where the
+       * differences that matter to this app live — CSS media range syntax,
+       * `clip-path`, `color-mix`, flex and grid rounding, canvas text metrics.
+       * A layout that holds in Chromium at 768 px is evidence, not proof.
+       *
+       * It runs the same specs as the Chromium iPad rather than a subset:
+       * anything worth asserting at that width is worth asserting on the
+       * engine that will render it.
+       */
+      name: 'ipad-webkit',
+      use: {
+        ...devices['Desktop Safari'],
+        viewport: { width: 768, height: 1024 },
+        hasTouch: true,
+        isMobile: false,
+      },
+      testIgnore: /phone\.spec\.ts/,
+    },
+    {
+      /**
        * Phone. The brief does not ask for this layout; the app has one anyway,
        * and it is a different layout rather than a narrower one — the sensor
        * table becomes cards and its sorting moves into the footer. Only the
