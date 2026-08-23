@@ -1,12 +1,41 @@
 import { fileURLToPath, URL } from 'node:url';
 
 import vue from '@vitejs/plugin-vue';
-import { defineConfig } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
 
 const MOCK_API = process.env.VITE_API_PROXY_TARGET ?? 'http://localhost:8787';
 
+/**
+ * Ships the icon font in one format instead of five.
+ *
+ * PrimeIcons declares its face with `eot`, `woff2`, `woff`, `ttf` and an SVG
+ * font — and the SVG alone is 342 kB. Every browser this app targets picks the
+ * woff2 (35 kB) and ignores the rest, but Vite still copies all five into
+ * `dist/` because the stylesheet references them. Rewriting the `src`
+ * descriptor drops ~600 kB of assets nothing will ever request; the fallback
+ * chain it replaces only matters to IE and to Android before 4.4.
+ */
+function primeIconsWoff2Only(): Plugin {
+  return {
+    name: 'primeicons-woff2-only',
+    enforce: 'pre',
+    transform(code, id) {
+      if (!id.includes('primeicons/primeicons.css')) return null;
+
+      const replaced = code.replace(
+        /src:\s*url\([^)]*primeicons\.eot[^;]*;\s*src:[^;]*;/,
+        "src: url('./fonts/primeicons.woff2') format('woff2');",
+      );
+      if (replaced === code) {
+        this.warn('primeicons @font-face no longer matches; all font formats will be emitted.');
+      }
+      return replaced;
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [vue(), primeIconsWoff2Only()],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
