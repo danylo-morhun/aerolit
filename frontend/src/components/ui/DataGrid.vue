@@ -1,6 +1,7 @@
 <script setup lang="ts" generic="Row, Key extends string">
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
+import { computed } from 'vue';
 
 import StateBlock from './StateBlock.vue';
 
@@ -44,6 +45,14 @@ defineSlots<{
  * screen. DataTable's built-in sort would silently reorder only what it was
  * handed.
  */
+/**
+ * `DataTable` wants a mutable array and the rows arrive readonly. Copying in a
+ * computed rather than inline in the template means the copy is made when the
+ * rows actually change, not on every unrelated re-render — a new array
+ * identity is what makes the table re-diff all twenty rows.
+ */
+const tableRows = computed(() => [...props.rows]);
+
 function sortState(key: Key): 'ascending' | 'descending' | 'none' {
   if (props.sortKey !== key) return 'none';
   return props.sortDirection === 'desc' ? 'descending' : 'ascending';
@@ -56,7 +65,7 @@ function sortIcon(key: Key): string {
 </script>
 
 <template>
-  <DataTable :value="[...rows]" :data-key="rowKey" :loading="loading" scrollable class="grid">
+  <DataTable :value="tableRows" :data-key="rowKey" :loading="loading" scrollable class="grid">
     <Column
       v-for="column in columns"
       :key="column.key"
