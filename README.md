@@ -98,7 +98,7 @@ not convention — see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## Tests
 
-**157 Vitest + 60 Playwright**, all green (30 browser tests, each run at desktop
+**177 Vitest + 66 Playwright**, all green (33 browser tests, each run at desktop
 and at iPad width).
 
 ```bash
