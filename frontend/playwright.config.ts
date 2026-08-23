@@ -28,6 +28,7 @@ export default defineConfig({
     {
       name: 'desktop',
       use: { ...devices['Desktop Chrome'], viewport: { width: 1512, height: 950 } },
+      testIgnore: /phone\.spec\.ts/,
     },
     {
       /**
@@ -42,6 +43,24 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         viewport: { width: 768, height: 1024 },
+        hasTouch: true,
+        isMobile: false,
+      },
+      testIgnore: /phone\.spec\.ts/,
+    },
+    {
+      /**
+       * Phone. The brief does not ask for this layout; the app has one anyway,
+       * and it is a different layout rather than a narrower one — the sensor
+       * table becomes cards and its sorting moves into the footer. Only the
+       * phone spec runs here: re-running the desktop suite at 390 px would
+       * assert against a layout it was not written for and prove nothing.
+       */
+      name: 'phone',
+      testMatch: /phone\.spec\.ts/,
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 390, height: 844 },
         hasTouch: true,
         isMobile: false,
       },
