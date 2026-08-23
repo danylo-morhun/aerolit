@@ -28,6 +28,28 @@ describe('readSelectionQuery', () => {
     expect(parsed.pollutant).toBeNull();
   });
 
+  /**
+   * The bug this replaces: validation used `range in RANGE_HOURS`, and `in`
+   * answers true for everything on `Object.prototype`. `?range=constructor`
+   * reached `windowStart` as a *function*, produced a `NaN` window, drew an
+   * empty chart and was written back into the address bar so a reload
+   * reproduced it. `'90d'` — the only case tested before — happens to be
+   * rejected by `in`, which is why the test passed while the check was wrong.
+   */
+  it.each(['toString', 'constructor', 'valueOf', 'hasOwnProperty', '__proto__'])(
+    'drops the inherited object key %s as a range',
+    (key) => {
+      expect(readSelectionQuery({ range: key }).range).toBeNull();
+    },
+  );
+
+  it.each(['toString', 'constructor', 'valueOf'])(
+    'drops the inherited object key %s as a pollutant',
+    (key) => {
+      expect(readSelectionQuery({ pollutant: key }).pollutant).toBeNull();
+    },
+  );
+
   /** The station cannot be checked here; the dashboard replaces it if unknown. */
   it('passes an unrecognised station through', () => {
     expect(readSelectionQuery({ station: 'NOPE-9999' }).station).toBe('NOPE-9999');

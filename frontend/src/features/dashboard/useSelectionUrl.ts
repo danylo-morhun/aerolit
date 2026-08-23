@@ -7,7 +7,6 @@ import {
   type LocationQueryRaw,
 } from 'vue-router';
 
-import { RANGE_HOURS } from '@/domain/time';
 import type { ChartRange, Pollutant } from '@/domain/types';
 import { useSelectionStore } from '@/stores/selection';
 
@@ -24,6 +23,16 @@ import { useSelectionStore } from '@/stores/selection';
  * history entry per tap would make the back button walk through every fiddle
  * instead of leaving the page.
  */
+
+/**
+ * Listed rather than checked against `RANGE_HOURS` with `in`: that operator
+ * also answers true for everything on `Object.prototype`, so `?range=toString`
+ * passed validation, reached `windowStart` as a function and produced a `NaN`
+ * window — an empty chart, written back into the address bar so a reload
+ * reproduced it. Caught in review; the unit test only covered `'90d'`, which
+ * `in` happens to reject.
+ */
+const RANGES: readonly ChartRange[] = ['24h', '7d', '30d'];
 
 const POLLUTANTS: readonly Pollutant[] = ['pm25', 'pm10'];
 
@@ -63,7 +72,7 @@ export function readSelectionQuery(query: LocationQuery): SelectionFromQuery {
 
   return {
     station: station ? station : null,
-    range: range !== null && range in RANGE_HOURS ? (range as ChartRange) : null,
+    range: range !== null && RANGES.includes(range as ChartRange) ? (range as ChartRange) : null,
     pollutant:
       pollutant !== null && POLLUTANTS.includes(pollutant as Pollutant)
         ? (pollutant as Pollutant)
