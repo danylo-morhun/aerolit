@@ -28,6 +28,20 @@ export default defineConfig({
    * means something.
    */
   workers: process.env['CI'] ? 2 : 4,
+
+  /**
+   * A longer per-test budget on CI, where the runner is several times slower
+   * than the machine this was written on and two workers share one fixture.
+   *
+   * The test that walks to the last cursor page is the one that needs it: 11
+   * sequential round-trips, each with the pager deliberately disabled while its
+   * page is in flight. On GitHub's runner each step costs ~3 s against ~0.5 s
+   * locally, so the default 30 s ran out mid-walk while every assertion in the
+   * test was still passing. The clock was the failure, not the app — and
+   * shortening the walk would delete the only assertion that proves the last
+   * page really omits its forward cursor.
+   */
+  timeout: process.env['CI'] ? 90_000 : 30_000,
   forbidOnly: !!process.env['CI'],
   retries: process.env['CI'] ? 1 : 0,
   reporter: process.env['CI'] ? [['github'], ['html', { open: 'never' }]] : [['list']],

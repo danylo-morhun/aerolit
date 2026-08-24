@@ -354,6 +354,15 @@ none of the previous ones did:
   eight-runs-with-two-failures into ten clean ones. Worth saying plainly: for a
   while I was fixing the tests that complained rather than the reason they
   complained.
+- **And then CI found the one place that judgement was still wrong.** Pushing to
+  GitHub, the WebKit iPad project failed on the walk to the last cursor page: 11
+  sequential round-trips, each with the pager disabled while its page is in
+  flight, cost ~3 s a step on a shared runner against ~0.5 s locally, so the
+  default 30 s test budget expired mid-walk with every assertion still passing.
+  The honest fix was the clock (`timeout` is 90 s on CI), because the
+  alternatives — walking fewer pages, or leaving the pager live during a fetch
+  so a second tap could skip a page — would each have deleted something the test
+  is there to prove. Green on one machine is not the same claim as green.
 
 ## 4 · What I'd do next, with more time
 
