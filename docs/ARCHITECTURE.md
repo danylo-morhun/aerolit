@@ -35,7 +35,8 @@ Two pages behind a shared app shell, one data source (the mock API on
 | Theme | `src/theme/` | One PrimeVue preset + design tokens; dark mode via a `.dark` selector on `<html>`. |
 
 Dependency direction: `pages → features → (ui, queries, stores) → (api, domain)`.
-`domain/` depends on nothing.
+`domain/` depends on nothing. Layers rather than feature slices is a decision
+with alternatives, written up in [ADR 0012](adr/0012-layers-not-feature-slices.md).
 
 ## Data flow
 

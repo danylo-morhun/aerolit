@@ -96,7 +96,9 @@ frontend/src/
 
 Dependency direction is `pages → features → (ui, queries, stores) → (api,
 domain)`, and `domain/` depends on nothing. That boundary is enforced by ESLint,
-not convention — see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+not convention — see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). Why layers
+by responsibility rather than feature slices, and what that costs, is
+[ADR 0012](docs/adr/0012-layers-not-feature-slices.md).
 
 What it buys is measurable rather than aesthetic. The brief names a network of
 ~10 000 stations; at that size the per-station series are **382 MB** against

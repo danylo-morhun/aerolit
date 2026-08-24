@@ -17,7 +17,10 @@ Every derived number in the app — AQI category, stability %, connection state,
 the four KPIs, the week-over-week deltas, the chart buckets — is computed by a
 pure function in `src/domain/`. No Vue, no `fetch`, no `Date.now()`. It isn't a
 convention: `eslint.config.ts` restricts imports and the ambient clock inside
-that folder.
+that folder. That rule, rather than the folder names, is why the layout is
+layers by responsibility instead of feature slices — the comparison with FSD and
+the three other layouts I considered is
+[ADR 0012](docs/adr/0012-layers-not-feature-slices.md).
 
 The clock rule is the one that matters. The dataset is a **fixed snapshot**, so
 "now" is a property of the data (the most recent hour any station reported,
