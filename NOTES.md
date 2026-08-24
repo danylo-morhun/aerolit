@@ -7,6 +7,28 @@ Decisions that needed room to breathe are written up as ADRs in
 [`docs/adr/`](docs/adr/) — each records what I rejected as well as what I chose.
 This file is the summary and the honest list of edges.
 
+**If you read one page of it, read this list.** These are the six I would most
+like to be asked about:
+
+1. [The domain layer is pure, and that is enforced](#the-domain-layer-is-pure-and-that-is-enforced)
+   — no Vue, no `fetch`, no clock, checked by ESLint rather than agreed in a
+   README. It is what makes the scaling answer in ADR 0011 more than a claim.
+2. [Verifying the definitions, not just the functions](#verifying-the-definitions-not-just-the-functions)
+   — the four KPIs recomputed independently in Python and pinned against the
+   shipped data, because a green unit test only proves a function matches its
+   own name.
+3. [Real week-over-week badges, and the clamp that makes them true](#real-week-over-week-badges-and-the-clamp-that-makes-them-true)
+   — the brief allows a placeholder; building the real thing surfaced a
+   +22-point network recovery that never happened.
+4. [The table: cursor pagination versus search and sort](#the-table-cursor-pagination-versus-search-and-sort)
+   — where the brief's constraints genuinely conflict, what I asked Wised, and
+   how the answer I did not get is one deletion away.
+5. [Accessibility caught a real defect in the design](#accessibility-caught-a-real-defect-in-the-design)
+   — twelve contrast failures, one of them in the mockup itself.
+6. [Four audit passes, and what they found](#four-audit-passes-and-what-they-found)
+   — twenty defects the test suite was too green to notice, including the one
+   that made the dashboard unusable to actually use.
+
 ---
 
 ## 1 · The decisions I'd most want to defend
@@ -194,8 +216,8 @@ eyeballed.
 | **Dashboard search narrows; list search filters** | On the dashboard the map and watchlist are one view of "the network right now", so the query narrows both. Exhaustive lookup belongs on the Sensor List. |
 | **Fonts are bundled, not loaded from Google's CDN** | The mockup is clearly not set in a system font, but embedding Google Fonts sends the visitor's IP to the US without consent — held to breach the GDPR by a German court in 2022, which is not a footnote for a Berlin network run from the EU. Only the latin subset and the seven weights this UI uses are shipped: 103 kB of woff2, which is what any target browser fetches (the woff fallbacks sit unused in `dist/` for older ones). A system-font stack still backs them. |
 | **The map card says "Particulate readings", where the mockup says "Real-time particulate readings"** | The dataset is a fixed snapshot the brief says not to poll. Calling it real-time would be the one piece of copy on the page that isn't true. |
-| **Tablet layout** | No mockup was given. KPIs go 4→2 columns at 900 px; the map/watchlist split stacks at 1100 px, where the watchlist becomes two columns to use the width. Measured at 768, 820, 1024 and 1180 px in both orientations — which is how the one real defect turned up: the sensor table came to 796 px against 734 px of card in portrait, putting the connection column and its stability figure behind a sideways scroll on the exact size the brief names. The cell gutters were paying for that width, so they give it back below 900 px through `--aq-table-cell-padding`; all eight columns now fit, and the rows are shorter for it. |
-| **There is a phone layout, though the brief does not ask for one** | Going through the app at 320–430 px found the shell clipping "Sensor List" mid-word and the sensor table hiding PM2.5, PM10, AQI and connection behind a sideways scroll — three columns of eight, and not the three anyone opens the table for. Since the layout had to change rather than merely narrow, it changed properly: the app bar wraps, the KPI row goes to one column below 360 px, the map legend moves under the canvas, the watchlist stops scrolling inside itself, and each table row becomes a card of labelled fields. Sorting moves with it — the column headers are collapsed to a pixel, so the footer carries a sort control that writes to the same event. Covered by its own Playwright project at 390 px, axe included. |
+| **Tablet layout** | No mockup was given. KPIs go 4→2 columns at 900 px; the map/watchlist split stacks at 1100 px, where the watchlist becomes two columns to use the width. Measuring at 768, 820, 1024 and 1180 px in both orientations is how the one real defect turned up: in portrait the sensor table came to 796 px against 734 px of card, putting the connection column behind a sideways scroll at the exact size the brief names. The cell gutters were paying for that width and give it back below 900 px (`--aq-table-cell-padding`); all eight columns now fit. |
+| **There is a phone layout, though the brief does not ask for one** | At 320–430 px the shell clipped "Sensor List" mid-word and the table hid PM2.5, PM10, AQI and connection behind a sideways scroll — and not the three columns anyone opens it for. The layout had to change rather than narrow, so it changed properly: the app bar wraps, the KPI row goes to one column below 360 px, the map legend moves under the canvas, and each row becomes a card ([below](#3--where-i-traded-completeness-for-time)). Covered by its own Playwright project at 390 px, axe included. |
 
 ---
 
@@ -209,53 +231,41 @@ eyeballed.
   series to render 20 rows. The clean fix is a network-wide `/snapshot`
   endpoint; inventing one felt out of scope.
 - **No keyboard access to individual map markers.** 240 tab stops would be worse
-  than none; keyboard and screen-reader users reach every station through the
-  watchlist, the table, and — for any station at all — the header search, which
-  narrows the map to one marker and selects it, chart and URL included. I had
-  written here that a production version would add a "jump to station" combobox
-  over the map; going back to check, that would duplicate the search field a tab
-  stop away. What is genuinely missing is picking a marker *spatially* — "the
-  one in the north-east" — which a combobox would not give either. The keyboard
-  path is pinned in `e2e/shell.spec.ts`.
+  than none; keyboard and screen-reader users reach any station through the
+  watchlist, the table, and the header search, which narrows the map to one
+  marker and selects it — chart and URL included, pinned in `e2e/shell.spec.ts`.
+  I had written here that a production version would add a "jump to station"
+  combobox, then checked: it would duplicate the search field a tab stop away.
+  What is genuinely missing is picking a marker *spatially* — "the one in the
+  north-east" — which a combobox would not give either.
 - **`GET /stations/:id/readings/count` is implemented but unused.** The
   dashboard already holds each full series, so the tally is free from data in
   hand (ADR 0005). It stays in the client as the right tool the moment a caller
   needs stability *without* the series.
 - **The 30-day chart shows daily means, not 720 hourly bars.** Sub-pixel bars
-  imply a precision the eye cannot read. 7D uses 6-hour buckets. Both are
+  imply a precision the eye cannot read; 7D uses 6-hour buckets, and both are
   labelled by range in the card subtitle.
 
-  The **bars** are cut on the Berlin clock. Trailing 24-hour *buckets* were what
-  I built first, and they are wrong in a way that only shows up if you read the
-  axis: a bar labelled "12 Jun" covered 15:00 on the 12th to 14:00 on the 13th,
-  when a daily mean means a calendar day — that is what the EU limit values are
-  defined over. The cost is a partial bar at each end, which the tooltip states
-  outright ("11 Jul 00:00–15:00"), and two days a year that are 23 or 25 hours
-  long, which `bucketBoundaries` handles by stepping through local midnights
-  rather than adding 24 hours. Both DST days are unit-tested.
-
-  The **window**, separately, always trails the snapshot: 24H is the 24 hours
-  ending at the latest reported hour, which is 14:00 Berlin, so the axis runs
-  15:00 → 14:00 rather than 00:00 → 23:00. Those are two different decisions and
-  they do not conflict — the unit on the axis decides the cut. Hour labels need
-  no calendar; date labels do. Snapping the window to midnight instead would
-  make "24H" mean 15 bars in the afternoon and 24 at night, under a label that
-  claims a fixed duration. The consequence is that 24H crosses midnight
-  somewhere in the middle, so the bar that opens the day carries its date
-  instead of its hour. Written up as [ADR 0010](docs/adr/0010-chart-windows-and-buckets.md).
-- **The phone table is a card list, and that is a real design decision rather
-  than a fallback.** Eight columns do not fit a 390 px screen under any amount
-  of squeezing, so below 640 px each row becomes a card of labelled fields. Two
-  details are what make it defensible rather than a CSS trick. The column
-  headers are collapsed with height and clipping, never `display: none` — that
-  keeps them, their `aria-sort` and their sort buttons in the accessibility
-  tree, so a screen-reader user still sorts from the header while the footer
-  control serves everyone looking at the screen; both write to the same event,
-  so there is one ordering model. And the roles are spelled out explicitly,
-  because laying a `tr` out as a block is exactly what makes a browser drop the
-  implicit table semantics. The alternative — dropping columns on a phone —
-  would have hidden the readings, which is what the layout was broken for in
-  the first place.
+  Two separate decisions sit underneath that, and only the axis unit tells them
+  apart. The **bars** are cut on the Berlin clock, because a daily mean means a
+  calendar day — trailing 24-hour buckets, which is what I built first, put "12
+  Jun" over 15:00 on the 12th to 14:00 on the 13th. The **window** trails the
+  snapshot hour instead, so 24H runs 15:00 → 14:00 rather than 00:00 → 23:00;
+  snapping it to midnight would make "24H" mean 15 bars in the afternoon and 24
+  at night. The costs — a partial bucket at each end, and 24H crossing midnight
+  in the middle — are stated in the tooltip and worked through in
+  [ADR 0010](docs/adr/0010-chart-windows-and-buckets.md). The two DST days that
+  are 23 and 25 hours long are unit-tested.
+- **The phone table is a card list rather than a narrower table.** Eight columns
+  do not fit 390 px under any amount of squeezing, and dropping columns would
+  have hidden the readings the table exists for, so below 640 px each row
+  becomes a card of labelled fields. Two details keep that a design decision
+  rather than a CSS trick: the column headers are collapsed with clipping and
+  never `display: none`, so they keep their `aria-sort` and sort buttons in the
+  accessibility tree while the footer control serves everyone looking at the
+  screen — one ordering model, two ways in; and the ARIA roles are spelled out,
+  because laying a `tr` out as a block is what makes a browser drop the implicit
+  table semantics.
 - **The visual baselines are captured once, at desktop width on Chromium.**
   The iPad and phone layouts are asserted by measurement instead — widths, tap
   targets, which fields reach the screen — because repeating the screenshots per
@@ -265,110 +275,97 @@ eyeballed.
   Chromium, since a real iPad is a Safari and `clip-path`, `color-mix` and flex
   rounding are exactly where engines disagree.
 
-### An audit pass, and what it found
+### Four audit passes, and what they found
 
-Late on, I went back through the brief line by line and ran the app rather
-than trusting it. That found eight things worth fixing, and they are the
-changes I would point at first:
+Twenty defects, and the test suite reported green through all of them. Each pass
+looked at something different: the brief line by line, then the shipped screens
+against the mockups, then the running app and its build output, and finally
+someone simply *using* the dashboard. The order matters — the last pass found
+what none of the first three could.
+
+**Reading the brief against the code.**
 
 - **A dead end in the watchlist.** Its empty state told the operator to star a
-  station in the sensor list — and the sensor list had no star. Unstarring all
-  four defaults left no way back. Now `WatchStar` is a shared control used in
-  both places, with the watchlist cap surfaced as a disabled state that says
-  why.
-- **A feature reaching past the wrapper layer** (`SensorTable` importing
-  PrimeVue's `Button` and `DataTable` directly), now `AppButton` / `DataGrid`
-  plus the lint rule described above.
-- **`aria-sort` on the sort button instead of the `<th>`**, where assistive
-  tech actually reads it.
-- **`role="application"` on the map**, which traps a screen reader's virtual
-  cursor; `region` is the correct role for a landmark you can look at.
-- **A blocking spinner over rows that were already readable** — station
-  identity arrives before the readings, so the table now shows the rows and
-  reports "Loading readings…" instead of hiding them.
-- **Two empty states that were lying**: a dashboard search matching nothing
+  station in the sensor list, and the sensor list had no star; unstarring the
+  four defaults left no way back. `WatchStar` is now one shared control used in
+  both places, with the cap surfaced as a disabled state that says why.
+- **A feature reaching past the wrapper layer** — `SensorTable` importing
+  PrimeVue's `Button` and `DataTable` directly. Now `AppButton` / `DataGrid`,
+  with the lint rule that stops it recurring.
+- **`aria-sort` sat on the sort button, not the `<th>`** where assistive tech
+  reads it; **`role="application"` on the map** trapped a screen reader's
+  virtual cursor, where `region` is the role for a landmark you look at.
+- **A blocking spinner over rows that were already readable.** Station identity
+  arrives before the readings, so the table now shows the rows and reports
+  "Loading readings…" rather than hiding them.
+- **Two empty states that were lying** — a dashboard search matching nothing
   rendered a blank map with no explanation, and the watchlist blamed "nothing
-  tracked" when a search had simply hidden the rows.
-- Numeric column headers misaligned with their cells, and the twelve contrast
-  failures above.
+  tracked" when a search had merely hidden the rows — plus numeric headers
+  misaligned with their cells and the twelve contrast failures above.
 
-A second pass, done by reading the shipped screens against the brief again
-rather than the code, found four more:
+**Reading the shipped screens against the mockups.**
 
-- **A badge that contradicted itself.** One station in the dataset (BLN-0011)
-  reports 0.8556 stability: below the brief's 86 % threshold, so a *poor* link —
-  but rounded to nearest it printed "Poor link 86%", a figure the same brief
-  calls healthy. Stability now rounds **down**, so the number clears 86 exactly
-  when the state does (`formatStability`).
-- **A sort that lied about its scope**, and **a search that fetched far more
-  than it needed** — both described under "the table" above.
-- **A count reported before it was known.** Entering a search rendered "0
-  matching stations" for as long as the index took to arrive. It now says it is
-  still searching, because zero is an answer and the table did not have one yet.
+- **A badge that contradicted itself.** BLN-0011 reports 0.8556 stability:
+  below the brief's 86 % threshold, so a *poor* link — but rounded to nearest it
+  printed "Poor link 86%", a figure the same brief calls healthy. Stability now
+  rounds **down**, so the number clears 86 exactly when the state does.
+- **A count reported before it was known.** A search rendered "0 matching
+  stations" while the index was still arriving; zero is an answer, and the table
+  did not have one yet. It now says it is still searching.
+- **A sort that lied about its scope, and a search that fetched far more than it
+  needed** — both described under [the table](#the-table-cursor-pagination-versus-search-and-sort).
 
-A third pass, this one auditing the running app and the build output rather
-than the screens, found five more:
+**Auditing the running app and the build output.**
 
 - **Every tap on the map rebuilt all 240 markers.** The redraw watcher covered
-  the selection and the pollutant alongside the station set, so selecting a
-  station tore down 240 `circleMarker`s and their tooltips to change two of
-  them. Now the layer is rebuilt only when the set of stations changes; a
-  selection repaints exactly the marker leaving it and the one taking it, and a
-  pollutant switch repaints in place. This is the interaction an operator
-  repeats all day, and it was the most expensive thing on the page.
+  the selection alongside the station set, so selecting one station tore down
+  240 `circleMarker`s and their tooltips to change two of them. The layer is now
+  rebuilt only when the set of stations changes; a selection repaints the marker
+  leaving it and the one taking it. This is the interaction an operator repeats
+  all day, and it was the most expensive thing on the page.
 - **The axis labelling lived in the component**, where it could not be tested
-  without mounting ECharts — and it was the one derived value not in
-  `src/domain/`, against this repo's own rule. It is now `domain/chart-axis.ts`
-  with its own spec, which is also what surfaced the missing day boundary on the
-  24H axis (above).
-- **`prefers-reduced-motion` was only half honoured.** `tokens.css` zeroes the
-  CSS transitions, but ECharts animates on a canvas and Leaflet animates its own
-  panes — neither reads the stylesheet. Both now ask (`theme/motion.ts`), and
-  reactively, so changing the OS setting reaches an open page.
+  without mounting ECharts — the one derived value outside `src/domain/`,
+  against this repo's own rule. Moving it to `domain/chart-axis.ts` with a spec
+  is what surfaced the missing day boundary on the 24H axis.
+- **`prefers-reduced-motion` was only half honoured.** The stylesheet zeroes CSS
+  transitions, but ECharts animates on a canvas and Leaflet animates its own
+  panes; neither reads a stylesheet. Both now ask, reactively, so changing the
+  OS setting reaches an open page.
 - **The icon font shipped in five formats.** PrimeIcons declares `eot`, `woff2`,
-  `woff`, `ttf` and an SVG font that is 342 kB on its own; Vite copied all five
-  into `dist/` although every target browser takes the woff2 and ignores the
-  rest. A six-line build plugin rewrites the `src` descriptor: **597 kB** of
-  assets nothing would ever request, gone.
-- **`npm test` printed two unhandled rejections** while reporting all green —
-  jsdom has no `scrollIntoView`, and the watchlist's scroll-into-view watcher
-  rejected on it. Cosmetic behaviour should not fail loudly in a test log, so
-  the call is optional. Worth saying plainly: the suite was green and the output
-  was not, and only one of those is what a reviewer sees first.
+  `woff`, `ttf` and a 342 kB SVG font, and Vite copied all five although every
+  target browser takes the woff2. A six-line build plugin rewrites the `src`
+  descriptor: **597 kB** of assets nothing would request, gone.
+- **`npm test` printed two unhandled rejections while reporting all green** —
+  jsdom has no `scrollIntoView`. The suite was green and the output was not, and
+  only one of those is what a reviewer sees first.
 
-A fourth pass came from someone simply *using* the dashboard, which found what
-none of the previous ones did:
+**Using the dashboard.**
 
 - **Touching any control threw the page back to the top.** Putting the selection
   in the URL turned picking a marker into a `router.replace`, and the router's
-  blanket `scrollBehavior: { top: 0 }` treated every one of them as arriving
-  somewhere new. On the sensor list that is right; on a page whose whole point
-  is that the map, the watchlist and the chart are visible together, it made the
-  dashboard unusable. Scrolling now happens only when the path actually changes.
+  blanket `scrollBehavior: { top: 0 }` treated each one as arriving somewhere
+  new. On a page whose whole point is that the map, the watchlist and the chart
+  are visible together, that made the dashboard unusable. Scrolling now happens
+  only when the path actually changes.
 - **The watchlist was scrolling the document.** `scrollIntoView({ block:
   'nearest' })` moves *every* scrollable ancestor, so keeping the selected row
-  visible slid the whole page by a hundred pixels. The same behaviour is now
-  computed against the panel and touches nothing else. Both are pinned by a test
-  that reports which of the two moved the page, because they looked identical
-  from the outside.
+  visible slid the whole page a hundred pixels. Both defects are pinned by a
+  test that reports which of the two moved the page, because from the outside
+  they looked identical.
 - **The suite was outrunning its own fixture.** Six Playwright projects at seven
   workers against a single-threaded mock server failed about one run in four,
-  always somewhere different. Capping the workers costs ten seconds and turned
-  eight-runs-with-two-failures into ten clean ones. Worth saying plainly: for a
-  while I was fixing the tests that complained rather than the reason they
-  complained.
-- **And then CI found the one place that judgement was still wrong.** Pushing to
-  GitHub, the WebKit iPad project failed on the walk to the last cursor page: 11
-  sequential round-trips, each with the pager disabled while its page is in
-  flight, cost ~3 s a step on a shared runner against ~0.5 s locally, so the
-  default 30 s test budget expired mid-walk with every assertion still passing.
-  The honest fix was the clock (90 s a test on CI, 20 s an assertion, both 30 s
-  and 5 s locally), because the alternatives — walking fewer pages, or leaving
-  the pager live during a fetch so a second tap could skip a page — would each
-  have deleted something the test is there to prove. The local bounds stay tight
-  on purpose: five seconds there is a claim about the app, and the same five on
-  a two-core runner is a claim about the runner. Green on one machine is not the
-  same claim as green.
+  always somewhere different. Capping the workers costs ten seconds and bought
+  ten clean runs. Plainly: for a while I was fixing the tests that complained
+  rather than the reason they complained.
+- **And CI found the last place that judgement was wrong.** On GitHub's runner
+  the walk to the final cursor page — 11 sequential round-trips, each with the
+  pager deliberately disabled while its page is in flight — cost ~3 s a step
+  against ~0.5 s locally, so the 30 s test budget expired mid-walk with every
+  assertion still passing. The fix was the clock (90 s a test and 20 s an
+  assertion on CI, 30 s and 5 s locally): walking fewer pages, or leaving the
+  pager live during a fetch, would each have deleted something the test exists
+  to prove. Five seconds locally is a claim about the app; five seconds on a
+  two-core runner is a claim about the runner.
 
 ## 4 · What I'd do next, with more time
 
