@@ -359,10 +359,13 @@ none of the previous ones did:
   sequential round-trips, each with the pager disabled while its page is in
   flight, cost ~3 s a step on a shared runner against ~0.5 s locally, so the
   default 30 s test budget expired mid-walk with every assertion still passing.
-  The honest fix was the clock (`timeout` is 90 s on CI), because the
-  alternatives — walking fewer pages, or leaving the pager live during a fetch
-  so a second tap could skip a page — would each have deleted something the test
-  is there to prove. Green on one machine is not the same claim as green.
+  The honest fix was the clock (90 s a test on CI, 20 s an assertion, both 30 s
+  and 5 s locally), because the alternatives — walking fewer pages, or leaving
+  the pager live during a fetch so a second tap could skip a page — would each
+  have deleted something the test is there to prove. The local bounds stay tight
+  on purpose: five seconds there is a claim about the app, and the same five on
+  a two-core runner is a claim about the runner. Green on one machine is not the
+  same claim as green.
 
 ## 4 · What I'd do next, with more time
 

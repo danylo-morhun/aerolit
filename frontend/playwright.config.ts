@@ -42,6 +42,18 @@ export default defineConfig({
    * page really omits its forward cursor.
    */
   timeout: process.env['CI'] ? 90_000 : 30_000,
+
+  /**
+   * The same allowance for a single assertion.
+   *
+   * Locally five seconds is a real bound: nothing the dashboard does should
+   * take longer, and a test that needs more is describing a defect. On a
+   * two-core runner sharing itself with a second worker, the 240-series roll-up
+   * and the 240 marker repaints behind it genuinely take several seconds, so
+   * five is a measure of the machine rather than of the app. Raising it there
+   * keeps the local bound honest instead of loosening it everywhere.
+   */
+  expect: { timeout: process.env['CI'] ? 20_000 : 5_000 },
   forbidOnly: !!process.env['CI'],
   retries: process.env['CI'] ? 1 : 0,
   reporter: process.env['CI'] ? [['github'], ['html', { open: 'never' }]] : [['list']],
