@@ -14,6 +14,20 @@ import { defineConfig, devices } from '@playwright/test';
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
+
+  /**
+   * Fewer workers than the default `cores / 2`.
+   *
+   * Six projects share one fixture: a single-threaded Node mock server. Several
+   * tests open the dashboard, which pulls 240 series apiece, and one of them
+   * rolls those up in a 595 ms synchronous pass. At the default width the suite
+   * failed roughly one run in four, always somewhere different — a tap not
+   * delivered, an overlay that never opened, an assertion that ran out of
+   * patience. None of that is the app; it is the harness outrunning its own
+   * server. Capping the workers costs a few seconds and buys a suite whose red
+   * means something.
+   */
+  workers: process.env['CI'] ? 2 : 4,
   forbidOnly: !!process.env['CI'],
   retries: process.env['CI'] ? 1 : 0,
   reporter: process.env['CI'] ? [['github'], ['html', { open: 'never' }]] : [['list']],
