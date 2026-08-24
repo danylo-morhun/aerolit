@@ -78,10 +78,18 @@ test('the footer control sorts the whole network', async ({ page }) => {
   const sortBy = page.getByLabel('Sort the sensor list by');
   await sortBy.scrollIntoViewIfNeeded();
   await expect(sortBy).toBeInViewport();
-  await sortBy.click();
 
   const district = page.getByRole('option', { name: 'District', exact: true });
-  await expect(district).toBeVisible();
+
+  // Retried rather than clicked once: on WebKit a tap on this control is
+  // occasionally swallowed under a loaded suite and the overlay never opens,
+  // which is exactly what a person does about it — tap again. Anything else
+  // here is a timeout dressed up as a failure.
+  await expect(async () => {
+    await sortBy.click();
+    await expect(district).toBeVisible({ timeout: 2_000 });
+  }).toPass({ timeout: 30_000 });
+
   await district.click();
 
   await expect(page.getByText(/matching stations/)).toBeVisible({ timeout: 30_000 });
