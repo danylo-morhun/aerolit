@@ -253,11 +253,14 @@ eyeballed.
   implicit table semantics. The alternative — dropping columns on a phone —
   would have hidden the readings, which is what the layout was broken for in
   the first place.
-- **The tablet e2e project runs Chromium, not WebKit.** What it verifies —
-  responsive layout, no hover-only interaction, tap targets — is
-  engine-independent, and requiring a second browser engine would mean anyone
-  running the suite downloads WebKit too. A real iPad-targeted product would
-  add the WebKit project.
+- **The visual baselines are captured once, at desktop width on Chromium.**
+  The iPad and phone layouts are asserted by measurement instead — widths, tap
+  targets, which fields reach the screen — because repeating the screenshots per
+  project would triple the images for the same information, and a baseline is
+  only as useful as the diff someone actually reads. The engines themselves are
+  covered: both the 768 px and the 390 px projects run on WebKit as well as
+  Chromium, since a real iPad is a Safari and `clip-path`, `color-mix` and flex
+  rounding are exactly where engines disagree.
 
 ### An audit pass, and what it found
 
