@@ -73,8 +73,8 @@ The point of the layering is that this is a short list.
 | `src/queries/useSensorTable.ts` | Loses the `search` mode; every question is a cursor query |
 | `src/features/dashboard/SensorMap.vue` | Markers follow the viewport; clusters above a zoom |
 
-**Does not change** — the 13 modules and 1 004 lines of `src/domain/` (plus the
-841 lines of tests that come with them), every shared component in
+**Does not change** — the 13 modules and 1 132 lines of `src/domain/` (plus the
+1 004 lines of tests that come with them), every shared component in
 `src/components/ui/`, the stores, the theme, the router, and the pages, which
 read the same `NetworkView` shape whoever computed it.
 
