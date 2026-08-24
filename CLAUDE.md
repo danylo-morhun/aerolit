@@ -38,6 +38,7 @@ npm run lint && npm run typecheck    # ESLint 9 flat config · vue-tsc
 
 ## Assignment source
 
-The brief is `README.md` (root) + `frontend/README.md`; mockups are the four
-PNGs in `frontend/`. `frontend/mock-data/` is given by the assignment — do
-not modify it.
+The brief is `docs/assignment-brief.md` (preserved verbatim) +
+`frontend/README.md`; mockups are the four PNGs in `frontend/`. The root
+`README.md` is this submission's own README, not the brief.
+`frontend/mock-data/` is given by the assignment — do not modify it.
