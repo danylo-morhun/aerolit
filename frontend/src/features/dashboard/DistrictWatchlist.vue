@@ -65,11 +65,24 @@ watch(
   async (id) => {
     if (id === null) return;
     await nextTick();
-    const row = list.value?.querySelector(`[data-station="${CSS.escape(id)}"]`);
-    // Optional call, not just optional chaining: jsdom has no `scrollIntoView`,
-    // and a rejected watcher there is a failure in the test output for
-    // behaviour that is purely cosmetic.
-    row?.scrollIntoView?.({ block: 'nearest' });
+
+    const box = list.value;
+    const row = box?.querySelector(`[data-station="${CSS.escape(id)}"]`);
+    if (!box || !row) return;
+
+    /**
+     * Scrolls the panel, and only the panel.
+     *
+     * `scrollIntoView({ block: 'nearest' })` was the obvious call and it moves
+     * *every* scrollable ancestor, the document included — so selecting a
+     * marker slid the whole dashboard by a hundred pixels under the operator's
+     * cursor. Same "nearest" behaviour, computed against this container.
+     */
+    const rowBox = row.getBoundingClientRect();
+    const panelBox = box.getBoundingClientRect();
+
+    if (rowBox.top < panelBox.top) box.scrollTop -= panelBox.top - rowBox.top;
+    else if (rowBox.bottom > panelBox.bottom) box.scrollTop += rowBox.bottom - panelBox.bottom;
   },
 );
 </script>
