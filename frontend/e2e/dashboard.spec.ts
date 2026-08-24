@@ -210,3 +210,66 @@ test('returning to the dashboard puts the range back in the url', async ({ page 
   await expect(page.getByText(/· 7D · µg\/m³/)).toBeVisible({ timeout: 30_000 });
   await expect(page).toHaveURL(/range=7d/);
 });
+
+/**
+ * Using a control is not arriving somewhere new.
+ *
+ * The selection lives in the query, so picking a marker or switching the range
+ * is a `router.replace` — and the router's blanket `scrollBehavior: { top: 0 }`
+ * treated each one as a navigation, throwing the operator back to the KPI row
+ * every time they touched the map. On a page whose whole point is that the map,
+ * the watchlist and the chart are visible together, that is the difference
+ * between a dashboard and a slot machine. Reported from using the app.
+ */
+test('choosing a station or a range does not scroll the page', async ({ page }, testInfo) => {
+  // Desktop only. Scroll position is router and document behaviour — it does
+  // not vary by engine or viewport, while opening the dashboard costs 240
+  // series every time. Running this in three projects bought no coverage and
+  // saturated the machine, which showed up as failures elsewhere in the suite.
+  test.skip(testInfo.project.name !== 'desktop', 'scroll behaviour is engine-independent');
+
+  await page.goto('/dashboard');
+  await expect.poll(() => page.locator('path.marker').count(), { timeout: 30_000 }).toBe(240);
+  // The chart is a lazily-imported chunk carrying ECharts; five seconds is not
+  // enough for it under a full suite, and the page has to be its full height
+  // before there is anything to scroll.
+  await expect(page.locator('canvas').first()).toBeVisible({ timeout: 30_000 });
+
+  await page.evaluate(() => window.scrollTo(0, 700));
+  await expect.poll(() => page.evaluate(() => Math.round(window.scrollY))).toBeGreaterThan(0);
+  const parked = await page.evaluate(() => Math.round(window.scrollY));
+
+  // A few pixels of tolerance, not exact equality: redrawing the chart can
+  // reflow the page by a hair, and that is not what anyone complained about.
+  // What must not happen is the view jumping back to the top.
+  const stillParked = async (what: string) => {
+    const now = await page.evaluate(() => Math.round(window.scrollY));
+    expect(Math.abs(now - parked), `${what} moved the page from ${parked} to ${now}`).toBeLessThan(
+      24,
+    );
+  };
+
+  await page.locator('path.marker:not(.marker--selected)').nth(80).click({ force: true });
+  await expect.poll(() => new URL(page.url()).searchParams.get('station')).not.toBeNull();
+  await stillParked('picking a station');
+
+  await page.getByRole('button', { name: '7D', exact: true }).click();
+  await expect(page).toHaveURL(/range=7d/);
+  await stillParked('switching the range');
+});
+
+/** The other half of the rule: a real page change still starts at the top. */
+test('moving between pages still lands at the top', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'scroll behaviour is engine-independent');
+
+  await page.goto('/dashboard');
+  await expect.poll(() => page.locator('path.marker').count(), { timeout: 30_000 }).toBe(240);
+
+  await page.evaluate(() => window.scrollTo(0, 700));
+  await expect.poll(() => page.evaluate(() => Math.round(window.scrollY))).toBeGreaterThan(0);
+
+  await page.getByRole('link', { name: 'Sensor List' }).click();
+  await expect(page).toHaveURL(/\/sensors/);
+
+  expect(await page.evaluate(() => Math.round(window.scrollY))).toBe(0);
+});
