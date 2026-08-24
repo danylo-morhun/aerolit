@@ -330,6 +330,28 @@ than the screens, found five more:
   the call is optional. Worth saying plainly: the suite was green and the output
   was not, and only one of those is what a reviewer sees first.
 
+A fourth pass came from someone simply *using* the dashboard, which found what
+none of the previous ones did:
+
+- **Touching any control threw the page back to the top.** Putting the selection
+  in the URL turned picking a marker into a `router.replace`, and the router's
+  blanket `scrollBehavior: { top: 0 }` treated every one of them as arriving
+  somewhere new. On the sensor list that is right; on a page whose whole point
+  is that the map, the watchlist and the chart are visible together, it made the
+  dashboard unusable. Scrolling now happens only when the path actually changes.
+- **The watchlist was scrolling the document.** `scrollIntoView({ block:
+  'nearest' })` moves *every* scrollable ancestor, so keeping the selected row
+  visible slid the whole page by a hundred pixels. The same behaviour is now
+  computed against the panel and touches nothing else. Both are pinned by a test
+  that reports which of the two moved the page, because they looked identical
+  from the outside.
+- **The suite was outrunning its own fixture.** Six Playwright projects at seven
+  workers against a single-threaded mock server failed about one run in four,
+  always somewhere different. Capping the workers costs ten seconds and turned
+  eight-runs-with-two-failures into ten clean ones. Worth saying plainly: for a
+  while I was fixing the tests that complained rather than the reason they
+  complained.
+
 ## 4 · What I'd do next, with more time
 
 1. **Server-side aggregation**, written up with numbers in
