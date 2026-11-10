@@ -1,4 +1,4 @@
-# aerolit-air-quality-dashboard
+# aerolit
 
 operator dashboard for a network of 240 air quality sensors in Berlin.
 it was built as a frontend home assignment for Wised.
